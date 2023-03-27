@@ -69,8 +69,9 @@ function secure_login_customizer_admin_page() {
             submit_button();
             ?>
         </form>
-    </div>
+	  </div>
     <?php
+	
 }
 
 function secure_login_customizer_tab_2fa() {
@@ -118,7 +119,9 @@ function secure_login_customizer_tab_2fa() {
             </tr>
         </table>
     </div>
-    <?php
+    </form>
+	<?php
+	
 }
 
 
@@ -182,6 +185,7 @@ function secure_login_customizer_tab_security() {
         </table>
     </div>
     <?php
+	
 }
 
 
@@ -248,6 +252,8 @@ function secure_login_customizer_tab_login_screen() {
         </table>
     </div>
     <?php
+	
+
 }
 
 function secure_login_customizer_tab_messages() {
@@ -309,6 +315,7 @@ function secure_login_customizer_tab_documentation() {
         </table>
     </div>
     <?php
+	
 }
 
 function secure_login_customizer_settings() {
