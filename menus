@@ -364,7 +364,41 @@ function secure_login_customizer_settings() {
 }
 
 function secure_login_customizer_sanitize_options($input) {
+    //$new_options = array();
     $new_options = array();
+
+    foreach ($input as $key => $value) {
+        if (isset($input[$key])) {
+            $new_options[$key] = sanitize_text_field($input[$key]);
+        }
+    }
+    
+	$new_options = wp_parse_args($new_options, array(
+        '2fa_enable' => '',
+        '2fa_backup_codes' => '',
+        '2fa_disable_for_users' => '',
+        'security_headers' => '',
+        'anonymize_messages' => '',
+        'deny_proxy_connections' => '',
+        'weak_passwords' => '',
+        'blacklist' => '',
+        'whitelist' => '',
+        'login_attempts' => '',
+        'lockout_time' => '',
+        'desktop_logo_url' => '',
+        'mobile_logo_url' => '',
+        'button_color' => '',
+        'background_color' => '',
+        'text_color' => '',
+        'border_color' => '',
+        'transparency' => '',
+        'qr_code_info_url' => '',
+        'secret_codes_info_url' => '',
+        'account_deactivation_info_url' => '',
+    ));
+
+    return $output;
+
 
     // Onglet 1 - 2FA
     $new_options['enable_2fa'] = isset($input['enable_2fa']) ? (bool)$input['enable_2fa'] : false;
@@ -462,4 +496,4 @@ function secure_login_customizer_sanitize_options($input) {
     // Pas besoin d'ajouter de champs pour la section Documentation
 }
 
-
+ 
