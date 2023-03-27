@@ -3,7 +3,7 @@
 Plugin Name: SecureLoginCustomizer
 Description: Customizes the login screen and adds 2FA authentication for WordPress.
 Version: 1.0
-Author: Your Name
+Author: YM
 */
 
 // Exit if accessed directly.
@@ -11,37 +11,88 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-/**
- * SecureLoginCustomizer main class.
- */
-class SecureLoginCustomizer {
-
-    /**
-     * Constructor.
-     */
-    public function __construct() {
+function __construct() {
         add_action('admin_menu', array($this, 'register_admin_menu'));
+        add_action('admin_init', array($this, 'secure_login_customizer_register_settings'));
+        add_action('admin_enqueue_scripts', array($this, 'secure_login_customizer_enqueue_scripts'));
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_plugin_action_links'));
+        add_filter('the_content', array($this, 'secure_login_customizer_add_shortcode_support'));
     }
 
-    /**
-     * Register the admin menu.
-     */
-    public function register_admin_menu() {
-        add_menu_page(
-            __('SecureLoginCustomizer', 'secure-login-customizer'),
-            __('SecureLoginCustomizer', 'secure-login-customizer'),
+function register_admin_menu() {
+        add_submenu_page(
+            'options-general.php',
+            'Secure Login Customizer',
+            'Secure Login Customizer',
             'manage_options',
-            'secure-login-customizer',
-            array($this, 'display_options_page'),
-            'dashicons-shield',
-            85
+            'secure_login_customizer',
+            array($this, 'display_options_page')
         );
     }
+
+function secure_login_customizer_add_admin_menu() {
+        add_submenu_page(
+            'options-general.php',
+            'Secure Login Customizer',
+            'Secure Login Customizer',
+            'manage_options',
+            'secure_login_customizer',
+            array($this, 'display_options_page')
+        );
+    }
+
+
+function secure_login_customizer_register_settings() {
+        register_setting('secure_login_customizer_options', 'secure_login_customizer_options', array($this, 'secure_login_customizer_sanitize_options'));
+    }
+
+
+function add_plugin_action_links($links) {
+        $settings_link = '<a href="options-general.php?page=secure_login_customizer">' . __('Settings') . '</a>';
+        array_unshift($links, $settings_link);
+        return $links;
+    }
+
+ function secure_login_customizer_add_shortcode_support($content) {
+        $content = do_shortcode($content);
+        return $content;
+    }
+
+ function secure_login_customizer_sanitize_options($options) {
+        if (!is_array($options)) {
+            $options = array();
+        }
+
+        foreach ($options as $name => &$value) {
+            if ($name == 'lost_password_message') {
+                $value = wp_kses_post($value);
+            }
+            elseif ($name == 'custom_css') {
+                $value = wp_kses_post($value);
+            }
+            elseif ($name == 'blacklist') {
+                $value = sanitize_text_field($value);
+            }
+            elseif ($name == 'whitelist') {
+                $value = sanitize_text_field($value);
+            }
+        }
+
+        return $options;
+    }
+
+function secure_login_customizer_init() {
+  $customizer = new Secure_Login_Customizer();
+  add_action('admin_menu', array('Secure_Login_Customizer', 'secure_login_customizer_add_admin_menu'));
+}
+
+add_action('init', 'secure_login_customizer_init');
+add_action('admin_menu', array('Secure_Login_Customizer', 'secure_login_customizer_add_admin_menu'));
 
     /**
      * Display the options page.
      */
-    public function display_options_page() {
+function display_options_page() {
         ?>
         <div class="wrap">
             <h1><?php esc_html_e('SecureLoginCustomizer', 'secure-login-customizer'); ?></h1>
@@ -58,23 +109,14 @@ class SecureLoginCustomizer {
         <?php
     }
 
-		public function display_settings_link( $links ) {
+function display_settings_link( $links ) {
 			$settings_link = '<a href="options-general.php?page=secure_login_customizer">' . __( 'Settings', 'secure_login_customizer' ) . '</a>';
 			array_unshift( $links, $settings_link );
 			return $links;
 		}
 
-		public function add_dashboard_page() {
-			add_dashboard_page(
-				__( 'Secure Login Customizer', 'secure_login_customizer' ),
-				__( 'Secure Login Customizer', 'secure_login_customizer' ),
-				'manage_options',
-				'secure_login_customizer_dashboard',
-				array( $this, 'display_dashboard_page' )
-			);
-		}
-
-		public function display_dashboard_page() {
+ 
+function display_dashboard_page() {
 			$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'general';
 			?>
 			<div class="wrap">
@@ -109,7 +151,7 @@ class SecureLoginCustomizer {
 			<?php
 		}
 
-public function tab_general() {
+function tab_general() {
     $options = get_option('secure_login_customizer_options', secure_login_customizer_get_default_options());
 
     // Enable 2FA
@@ -163,7 +205,7 @@ public function tab_general() {
     <?php
 }
 
-public function tab_security() {
+function tab_security() {
     $options = get_option('secure_login_customizer_options', secure_login_customizer_get_default_options());
     ?>
     <div class="tab_content" id="tab_security">
@@ -224,7 +266,7 @@ public function tab_security() {
 /**
  * Callback for "Custom Login Screen" tab.
  */
-public function tab_custom_login_screen()
+function tab_custom_login_screen()
 {
     $options = get_option('secure_login_customizer_options', secure_login_customizer_get_default_options());
 
@@ -284,7 +326,7 @@ public function tab_custom_login_screen()
     <?php
 }
 
-public function tab_custom_message() {
+function tab_custom_message() {
     $options = get_option('secure_login_customizer_options', secure_login_customizer_get_default_options());
     ?>
     <div class="tab_content" id="tab_custom_message">
@@ -312,41 +354,40 @@ public function tab_custom_message() {
     <?php
 }
 
-public function tab_shortcodes() {
+function tab_shortcodes() {
     ?>
     <div class="tab_content" id="tab_shortcodes">
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis neque et diam bibendum vestibulum. Fusce rhoncus tincidunt aliquet. Sed elementum lorem ut massa consectetur, vel lobortis massa tincidunt. In ullamcorper iaculis lacinia. Duis in massa ultricies, sodales lectus non, fringilla nibh. Fusce posuere tortor a eros consectetur, at varius urna placerat. Nulla posuere consequat mi, sed posuere velit varius sit amet. Ut facilisis ipsum sed lectus ornare posuere. Nam sit amet lectus justo. Sed rhoncus urna vel diam vulputate, ut tempor justo bibendum. Duis ullamcorper magna vel elementum faucibus.</p>
-
         <p>In hac habitasse platea dictumst. Sed id commodo justo. Sed at placerat orci. Morbi lobortis vestibulum sagittis. Ut efficitur lacus nec elit consectetur cursus. Vestibulum at leo ut felis tristique gravida. Nulla eget lorem ut magna efficitur dapibus. Nullam vehicula quam ac urna blandit ultrices. Sed ac tristique eros. Ut euismod mi ac augue pulvinar, ut commodo eros consectetur. Donec dignissim felis ac sapien bibendum, id eleifend enim faucibus. Ut non leo ornare, rutrum felis eget, efficitur diam. Proin tincidunt lobortis ipsum, vel viverra nibh. Integer tincidunt pharetra libero, vel suscipit magna aliquam id. Aliquam erat volutpat.</p>
-
         <p>Nullam euismod sapien vel purus tristique, sed ultricies nisi efficitur. Nulla facilisi. Nam commodo euismod turpis id maximus. Sed venenatis tellus euismod eros finibus, quis rhoncus augue pellentesque. Vivamus commodo imperdiet nulla vel sagittis. Fusce fringilla suscipit mauris, eget interdum risus consectetur ac. Duis consequat mi sit amet elit rhoncus, at tincidunt mi fringilla. Donec ornare nulla vitae ipsum posuere varius. Integer eu congue lorem, id efficitur enim. Etiam euismod semper sapien a rhoncus. Nam volutpat quam non porttitor malesuada. Morbi semper orci vitae velit vulputate, sit amet blandit metus tempor.</p>
     </div>
     <?php
-}
+}  
 
 /**
  * Enqueue scripts and styles.
  */
-public function secure_login_customizer_enqueue_scripts() {
+function secure_login_customizer_enqueue_scripts() {
     wp_enqueue_style( 'secure-login-customizer-style', plugin_dir_url( __FILE__ ) . 'css/style.css' );
     wp_enqueue_script( 'secure-login-customizer-script', plugin_dir_url( __FILE__ ) . 'js/script.js', array( 'jquery' ), '', true );
 }
 
 
-public function secure_login_customizer_register_settings() {
+function secure_login_customizer_register_settings() {
     register_setting('secure_login_customizer_options', 'secure_login_customizer_options', array($this, 'secure_login_customizer_sanitize_options'));
     add_action( 'admin_enqueue_scripts', array( $this, 'secure_login_customizer_enqueue_scripts' ) );
 }
 
-public function secure_login_customizer_sanitize_options($options) {
+function secure_login_customizer_sanitize_options($options) {
     // Sanitize and validate options here
     return $options;
 }
 
-public function secure_login_customizer_add_settings_link($links) {
+function secure_login_customizer_add_settings_link($links) {
     $settings_link = '<a href="options-general.php?page=secure-login-customizer">' . __('Settings') . '</a>';
     array_push($links, $settings_link);
     return $links;
 }
-add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'secure_login_customizer_add_settings_link'));
+
+ 
 
