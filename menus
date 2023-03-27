@@ -30,6 +30,21 @@ function secure_login_customizer_add_admin_menu() {
 }
 add_action('admin_menu', 'secure_login_customizer_add_admin_menu');
 
+function secure_login_customizer_init_settings() {
+    // Enregistrement des groupes d'options
+    register_setting('secure_login_customizer_2fa_options_group', 'secure_login_customizer_2fa_options');
+    register_setting('secure_login_customizer_security_options_group', 'secure_login_customizer_security_options');
+    register_setting('secure_login_customizer_login_screen_options_group', 'secure_login_customizer_login_screen_options');
+    register_setting('secure_login_customizer_messages_options_group', 'secure_login_customizer_messages_options');
+
+    // Ajout des sections et des champs de paramètres ici
+    // Par exemple, ajoutez des sections pour chaque onglet en utilisant add_settings_section()
+    // et ajoutez des champs à ces sections en utilisant add_settings_field()
+}
+
+add_action('admin_init', 'secure_login_customizer_init_settings');
+
+
 // Génération de la page d'administration du plugin
 
 function secure_login_customizer_admin_page() {
@@ -53,20 +68,20 @@ $active_tab = isset($_GET['tab']) ? $_GET['tab'] : '2fa';
     <form action="options.php" method="post">
     <?php
         if ($active_tab == '2fa') {
-            settings_fields('secure_login_customizer_2fa_options_group');
-            do_settings_sections('secure_login_customizer_2fa_options_group');
+            settings_fields('secure_login_customizer_options_group');
+			do_settings_sections('secure_login_customizer');
             secure_login_customizer_tab_2fa();
         } elseif ($active_tab == 'security') {
-            settings_fields('secure_login_customizer_security_options_group');
-            do_settings_sections('secure_login_customizer_security');
+            settings_fields('secure_login_customizer_options_group');
+			do_settings_sections('secure_login_customizer');
             secure_login_customizer_tab_security();
         } elseif ($active_tab == 'login_screen') {
-            settings_fields('secure_login_customizer_login_screen_options_group');
-            do_settings_sections('secure_login_customizer_login_screen');
+            settings_fields('secure_login_customizer_options_group');
+			do_settings_sections('secure_login_customizer');
             secure_login_customizer_tab_login_screen();
         } elseif ($active_tab == 'messages') {
-            settings_fields('secure_login_customizer_messages_options_group');
-            do_settings_sections('secure_login_customizer_messages');
+			settings_fields('secure_login_customizer_options_group');
+			do_settings_sections('secure_login_customizer');
             secure_login_customizer_tab_messages();
         } elseif ($active_tab == 'documentation') {
             // Remove the settings_fields and do_settings_sections lines here
