@@ -155,25 +155,29 @@ function secure_login_customizer_tab_security() {
                 <th scope="row"><?php _e('Blacklist', 'secure-login-customizer'); ?></th>
                 <td>
                     <textarea name="secure_login_customizer_blacklist" rows="5" cols="50"><?php echo esc_textarea(get_option('secure_login_customizer_blacklist')); ?></textarea>
-                </td>
+					<p class="description"><?php _e("Entrez les IP à ne jamais bloquer séparées par des virgules", 'secure-login-customizer'); ?></p>               
+			   </td>
             </tr>
             <tr valign="top">
                 <th scope="row"><?php _e('Whitelist', 'secure-login-customizer'); ?></th>
                 <td>
                     <textarea name="secure_login_customizer_whitelist" rows="5" cols="50"><?php echo esc_textarea(get_option('secure_login_customizer_whitelist')); ?></textarea>
+					<p class="description"><?php _e("Entrez les IP à ne toujours bloquer séparées par des virgules", 'secure-login-customizer'); ?></p>               
                 </td>
             </tr>
             <tr valign="top">
                 <th scope="row"><?php _e('Nombre de tentatives de connexions avant désactivation', 'secure-login-customizer'); ?></th>
                 <td>
                     <input type="number" name="secure_login_customizer_login_attempts" min="0" max="20" value="<?php echo esc_attr(get_option('secure_login_customizer_login_attempts', '0')); ?>">
-                </td>
+                	<p class="description"><?php _e("Nombre de tentatives de connexion incorrectes avant de bloquer, O = jamais", 'secure-login-customizer'); ?></p>               
+				</td>
             </tr>
             <tr valign="top">
                   <th scope="row"><?php _e('Temps de blocage du compte', 'secure-login-customizer'); ?></th>
                 <td>
                     <input type="number" name="secure_login_customizer_account_lock_time" min="0" max="300" value="<?php echo esc_attr(get_option('secure_login_customizer_account_lock_time', '0')); ?>">
-                </td>
+                	<p class="description"><?php _e("Temps de verrouillage du compte en minutes, maximum 300 soit 5 heures", 'secure-login-customizer'); ?></p>               
+				</td>
             </tr>
         </table>
     </div>
@@ -186,17 +190,29 @@ function secure_login_customizer_tab_login_screen() {
     <div class="wrap">
         <h2><?php _e('Customisation Login Screen', 'secure-login-customizer'); ?></h2>
         <table class="form-table">
-            <tr valign="top">
+            
+			<tr>
+				<th scope="row"><?php _e('Logo URL', 'secure-login-customizer'); ?></th>
+				<td>
+				<input type="text" name="secure_login_customizer_options[logo_url]" value="<?php echo esc_attr($options['logo_url']); ?>" size="75" />
+				<p class="description"><?php _e('Entrez l\'URL du logo à afficher sur la page de connexion.', 'secure-login-customizer'); ?></p>
+			</td>
+			</tr>
+
+			
+			<tr valign="top">
                 <th scope="row"><?php _e('URL pour desktop', 'secure-login-customizer'); ?></th>
                 <td>
                     <input type="text" name="secure_login_customizer_desktop_url" size="75" value="<?php echo esc_attr(get_option('secure_login_customizer_desktop_url', '')); ?>">
-                </td>
+                <p class="description"><?php _e('Entrez l\'URL du papier peint à afficher en fond sur écran autre que mobile.', 'secure-login-customizer'); ?></p>
+				</td>
             </tr>
             <tr valign="top">
                 <th scope="row"><?php _e('URL pour mobile', 'secure-login-customizer'); ?></th>
-                <td>
+             	<td>
                     <input type="text" name="secure_login_customizer_mobile_url" size="75" value="<?php echo esc_attr(get_option('secure_login_customizer_mobile_url', '')); ?>">
-                </td>
+					<p class="description"><?php _e('Entrez l\'URL du papier peint à afficher en fond sur mobiles.', 'secure-login-customizer'); ?></p>             
+			 </td>
             </tr>
             <tr valign="top">
                 <th scope="row"><?php _e('Couleur du bouton', 'secure-login-customizer'); ?></th>
@@ -226,7 +242,8 @@ function secure_login_customizer_tab_login_screen() {
                 <th scope="row"><?php _e('Niveau de transparence', 'secure-login-customizer'); ?></th>
                 <td>
                     <input type="number" name="secure_login_customizer_transparency_level" min="0" max="100" value="<?php echo esc_attr(get_option('secure_login_customizer_transparency_level', '0')); ?>">
-                </td>
+                 <p class="description"><?php _e("Entrez le niveau de transparence de l'écran de connexion", 'secure-login-customizer'); ?></p>
+				</td>
             </tr>
         </table>
     </div>
@@ -312,6 +329,7 @@ function secure_login_customizer_settings() {
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_account_lock_time');
 
     // Onglet 3: Customisation login screen
+	register_setting('secure_login_customizer_options_group', 'secure_login_customizer_options', 'secure_login_customizer_sanitize_options');
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_desktop_url');
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_mobile_url');
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_button_color');
@@ -326,4 +344,40 @@ function secure_login_customizer_settings() {
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_account_disabled_info_url');
 }
 
- 
+function secure_login_customizer_sanitize_options($input) {
+    $new_options = array();
+
+    // Onglet 1 - 2FA
+    $new_options['enable_2fa'] = isset($input['enable_2fa']) ? (bool)$input['enable_2fa'] : false;
+    $new_options['enable_backup_code'] = isset($input['enable_backup_code']) ? (bool)$input['enable_backup_code'] : false;
+    $new_options['prevent_disable_2fa'] = isset($input['prevent_disable_2fa']) ? (bool)$input['prevent_disable_2fa'] : false;
+    $new_options['groups'] = isset($input['groups']) ? array_map('sanitize_text_field', (array)$input['groups']) : array();
+
+    // Onglet 2 - Sécurité
+    $new_options['enable_security_headers'] = isset($input['enable_security_headers']) ? (bool)$input['enable_security_headers'] : false;
+    $new_options['enable_anonymize_messages'] = isset($input['enable_anonymize_messages']) ? (bool)$input['enable_anonymize_messages'] : false;
+    $new_options['deny_proxy_connections'] = isset($input['deny_proxy_connections']) ? (bool)$input['deny_proxy_connections'] : false;
+    $new_options['forbid_weak_passwords'] = isset($input['forbid_weak_passwords']) ? (bool)$input['forbid_weak_passwords'] : false;
+    $new_options['blacklist'] = isset($input['blacklist']) ? sanitize_textarea_field($input['blacklist']) : '';
+    $new_options['whitelist'] = isset($input['whitelist']) ? sanitize_textarea_field($input['whitelist']) : '';
+    $new_options['max_login_attempts'] = isset($input['max_login_attempts']) && is_numeric($input['max_login_attempts']) && $input['max_login_attempts'] >= 0 && $input['max_login_attempts'] <= 20 ? intval($input['max_login_attempts']) : 3;
+    $new_options['account_lock_time'] = isset($input['account_lock_time']) && is_numeric($input['account_lock_time']) && $input['account_lock_time'] >= 0 && $input['account_lock_time'] <= 300 ? intval($input['account_lock_time']) : 0;
+    
+    // Onglet 3 - Customisation Login Screen
+    $new_options['desktop_logo_url'] = isset($input['desktop_logo_url']) ? esc_url_raw($input['desktop_logo_url']) : '';
+    $new_options['mobile_logo_url'] = isset($input['mobile_logo_url']) ? esc_url_raw($input['mobile_logo_url']) : '';
+    $new_options['button_color'] = isset($input['button_color']) ? sanitize_hex_color($input['button_color']) : '';
+    $new_options['background_color'] = isset($input['background_color']) ? sanitize_hex_color($input['background_color']) : '';
+    $new_options['text_color'] = isset($input['text_color']) ? sanitize_hex_color($input['text_color']) : '';
+    $new_options['border_color'] = isset($input['border_color']) ? sanitize_hex_color($input['border_color']) : '';
+    $new_options['transparency_level'] = max(0, min(100, $new_options['transparency_level']));
+
+    // Onglet 4 : Customisation Messages
+    $new_options['qr_code_info_url'] = isset($input['qr_code_info_url']) ? esc_url_raw($input['qr_code_info_url']) : '';
+    $new_options['secret_codes_info_url'] = isset($input['secret_codes_info_url']) ? esc_url_raw($input['secret_codes_info_url']) : '';
+    $new_options['account_deactivation_info_url'] = isset($input['account_deactivation_info_url']) ? esc_url_raw($input['account_deactivation_info_url']) : '';
+
+    return $new_options;
+}
+
+
