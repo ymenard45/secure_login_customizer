@@ -1,41 +1,92 @@
 <?php
 /*
 Plugin Name: SecureLoginCustomizer
-Plugin URI: https://example.com/secure-login-customizer
+Plugin URI: https://example.com/secure_login_customizer
 Description: Un plugin pour sécuriser et personnaliser le processus de connexion à WordPress.
 Version: 1.0
 Author: Votre nom
 Author URI: https://example.com
-Text Domain: secure-login-customizer
+Text Domain: secure_login_customizer
 Domain Path: /languages
 */
 
 // Chargement des fichiers de traduction
 function secure_login_customizer_load_textdomain() {
-    load_plugin_textdomain('secure-login-customizer', false, basename(dirname(__FILE__)) . '/languages');
+    load_plugin_textdomain('secure_login_customizer', false, basename(dirname(__FILE__)) . '/languages');
 }
 add_action('plugins_loaded', 'secure_login_customizer_load_textdomain');
 
 // Ajout du menu d'administration
 function secure_login_customizer_add_admin_menu() {
     add_menu_page(
-        __('SecureLoginCustomizer', 'secure-login-customizer'),
-        __('SecureLoginCustomizer', 'secure-login-customizer'),
+        __('SecureLoginCustomizer', 'secure_login_customizer'),
+        __('SecureLoginCustomizer', 'secure_login_customizer'),
         'manage_options',
-        'secure-login-customizer',
+        'secure_login_customizer',
         'secure_login_customizer_admin_page',
-        'dashicons-shield',
+        'dashicons_shield',
         80
     );
 }
 add_action('admin_menu', 'secure_login_customizer_add_admin_menu');
 
 // Génération de la page d'administration du plugin
+
 function secure_login_customizer_admin_page() {
+?>
+<style>
+    .wrap .notice_warning {
+        display: none;
+    }
+</style>
+<?php
+
+$active_tab = isset($_GET['tab']) ? $_GET['tab'] : '2fa';
+?>
+<div class="wrap">
+    <h1><?php _e('SecureLoginCustomizer', 'secure_login_customizer'); ?></h1>
+    <h2 class="nav_tab_wrapper">
+        ...
+        ...
+    </h2>
+
+    <form action="options.php" method="post">
+    <?php
+        if ($active_tab == '2fa') {
+            settings_fields('secure_login_customizer_2fa_options_group');
+            do_settings_sections('secure_login_customizer_2fa_options_group');
+            secure_login_customizer_tab_2fa();
+        } elseif ($active_tab == 'security') {
+            settings_fields('secure_login_customizer_security_options_group');
+            do_settings_sections('secure_login_customizer_security');
+            secure_login_customizer_tab_security();
+        } elseif ($active_tab == 'login_screen') {
+            settings_fields('secure_login_customizer_login_screen_options_group');
+            do_settings_sections('secure_login_customizer_login_screen');
+            secure_login_customizer_tab_login_screen();
+        } elseif ($active_tab == 'messages') {
+            settings_fields('secure_login_customizer_messages_options_group');
+            do_settings_sections('secure_login_customizer_messages');
+            secure_login_customizer_tab_messages();
+        } elseif ($active_tab == 'documentation') {
+            // Remove the settings_fields and do_settings_sections lines here
+            secure_login_customizer_tab_documentation();
+        }
+    submit_button();
+    ?>
+    </form>
+</div>
+<?php
+
+}
+
+
+
+/* function secure_login_customizer_admin_page() {
     
      ?>
     <style>
-        .wrap .notice-warning {
+        .wrap .notice_warning {
             display: none;
         }
     </style>
@@ -44,38 +95,34 @@ function secure_login_customizer_admin_page() {
     $active_tab = isset($_GET['tab']) ? $_GET['tab'] : '2fa';
     ?>
     <div class="wrap">
-        <h1><?php _e('SecureLoginCustomizer', 'secure-login-customizer'); ?></h1>
-        <h2 class="nav-tab-wrapper">
-            <a href="?page=secure-login-customizer&tab=2fa" class="nav-tab <?php echo $active_tab == '2fa' ? 'nav-tab-active' : ''; ?>"><?php _e('2FA', 'secure-login-customizer'); ?></a>
-            <a href="?page=secure-login-customizer&tab=security" class="nav-tab <?php echo $active_tab == 'security' ? 'nav-tab-active' : ''; ?>"><?php _e('Sécurité', 'secure-login-customizer'); ?></a>
-            <a href="?page=secure-login-customizer&tab=login_screen" class="nav-tab <?php echo $active_tab == 'login_screen' ? 'nav-tab-active' : ''; ?>"><?php _e('Customisation Login Screen', 'secure-login-customizer'); ?></a>
-            <a href="?page=secure-login-customizer&tab=messages" class="nav-tab <?php echo $active_tab == 'messages' ? 'nav-tab-active' : ''; ?>"><?php _e('Customisation Messages', 'secure-login-customizer'); ?></a>
-            <a href="?page=secure-login-customizer&tab=documentation" class="nav-tab <?php echo $active_tab == 'documentation' ? 'nav-tab-active' : ''; ?>"><?php _e('Documentation', 'secure-login-customizer'); ?></a>
+        <h1><?php _e('SecureLoginCustomizer', 'secure_login_customizer'); ?></h1>
+        <h2 class="nav_tab_wrapper">
+            <a href="?page=secure_login_customizer&tab=2fa" class="nav_tab <?php echo $active_tab == '2fa' ? 'nav_tab_active' : ''; ?>"><?php _e('2FA', 'secure_login_customizer'); ?></a>
+            <a href="?page=secure_login_customizer&tab=security" class="nav_tab <?php echo $active_tab == 'security' ? 'nav_tab_active' : ''; ?>"><?php _e('Sécurité', 'secure_login_customizer'); ?></a>
+            <a href="?page=secure_login_customizer&tab=login_screen" class="nav_tab <?php echo $active_tab == 'login_screen' ? 'nav_tab_active' : ''; ?>"><?php _e('Customisation Login Screen', 'secure_login_customizer'); ?></a>
+            <a href="?page=secure_login_customizer&tab=messages" class="nav_tab <?php echo $active_tab == 'messages' ? 'nav_tab_active' : ''; ?>"><?php _e('Customisation Messages', 'secure_login_customizer'); ?></a>
+            <a href="?page=secure_login_customizer&tab=documentation" class="nav_tab <?php echo $active_tab == 'documentation' ? 'nav_tab_active' : ''; ?>"><?php _e('Documentation', 'secure_login_customizer'); ?></a>
         </h2>
 
 			<form action="options.php" method="post">
 			<?php
 				if ($active_tab == '2fa') {
 					settings_fields('secure_login_customizer_2fa_options_group');
-					do_settings_sections('secure-login-customizer-2fa');
+					do_settings_sections('secure_login_customizer_2fa_options_group');
 					secure_login_customizer_tab_2fa();
 				} elseif ($active_tab == 'security') {
 					settings_fields('secure_login_customizer_security_options_group');
-					do_settings_sections('secure-login-customizer-security');
+					do_settings_sections('secure_login_customizer_security');
 					secure_login_customizer_tab_security();
 				} elseif ($active_tab == 'login_screen') {
 					settings_fields('secure_login_customizer_login_screen_options_group');
-					do_settings_sections('secure-login-customizer-login_screen');
+					do_settings_sections('secure_login_customizer_login_screen');
 					secure_login_customizer_tab_login_screen();
 				} elseif ($active_tab == 'messages') {
 					settings_fields('secure_login_customizer_messages_options_group');
-					do_settings_sections('secure-login-customizer-messages');
+					do_settings_sections('secure_login_customizer_messages');
 					secure_login_customizer_tab_messages();
-				} elseif ($active_tab == 'documentation') {
-					settings_fields('secure_login_customizer_documentation_options_group');
-					do_settings_sections('secure-login-customizer-documentation');
-					secure_login_customizer_tab_documentation();
-				}
+				} 
 			submit_button();
 			?>
 		</form>
@@ -83,45 +130,45 @@ function secure_login_customizer_admin_page() {
     <?php
 	
 }
-
+ */
 function secure_login_customizer_tab_2fa() {
    
     ?>
-    <div class="tab-content" id="tab-1">
-        <table class="form-table">
+    <div class="tab_content" id="tab_1">
+        <table class="form_table">
             <tr valign="top">
-                <th scope="row"><?php _e('Activer 2FA Authentification', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Activer 2FA Authentification', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="checkbox" name="secure_login_customizer_enable_2fa" value="1" <?php checked(1, get_option('secure_login_customizer_enable_2fa'), true); ?>>
+                    <input type="checkbox" name="secure_login_customizer_enable_2fa" value="1" <?php checked(1, get_options('secure_login_customizer_enable_2fa'), true); ?>>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Activer Code de secours', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Activer Code de secours', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="checkbox" name="secure_login_customizer_enable_backup_code" value="1" <?php checked(1, get_option('secure_login_customizer_enable_backup_code'), true); ?>>
+                    <input type="checkbox" name="secure_login_customizer_enable_backup_code" value="1" <?php checked(1, get_options('secure_login_customizer_enable_backup_code'), true); ?>>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Interdire la désactivation de 2FA Authentification', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Interdire la désactivation de 2FA Authentification', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="checkbox" name="secure_login_customizer_forbid_2fa_deactivation" value="1" <?php checked(1, get_option('secure_login_customizer_forbid_2fa_deactivation'), true); ?>>
+                    <input type="checkbox" name="secure_login_customizer_forbid_2fa_deactivation" value="1" <?php checked(1, get_options('secure_login_customizer_forbid_2fa_deactivation'), true); ?>>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Sélection des groupes de sécurité où 2FA sera activé', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Sélection des groupes de sécurité où 2FA sera activé', 'secure_login_customizer'); ?></th>
                 <td>
                     <select name="secure_login_customizer_2fa_groups[]" multiple>
                         <?php
-                        $selected_groups = get_option('secure_login_customizer_2fa_groups', array());
+                        $selected_groups = get_options('secure_login_customizer_2fa_groups', array());
                         $groups = array(
-                            'administrator' => __('Administrateur', 'secure-login-customizer'),
-                            'editor' => __('Éditeur', 'secure-login-customizer'),
-                            'author' => __('Auteur', 'secure-login-customizer'),
-                            'contributor' => __('Contributeur', 'secure-login-customizer'),
-                            'subscriber' => __('Abonné', 'secure-login-customizer')
+                            'administrator' => __('Administrateur', 'secure_login_customizer'),
+                            'editor' => __('Éditeur', 'secure_login_customizer'),
+                            'author' => __('Auteur', 'secure_login_customizer'),
+                            'contributor' => __('Contributeur', 'secure_login_customizer'),
+                            'subscriber' => __('Abonné', 'secure_login_customizer')
                         );
                         foreach ($groups as $value => $label) {
-                            printf('<option value="%s"%s>%s</option>', $value, in_array($value, $selected_groups) ? ' selected' : '', $label);
+                            printf('<options value="%s"%s>%s</options>', $value, in_array($value, $selected_groups) ? ' selected' : '', $label);
                         }
                         ?>
                     </select>
@@ -138,58 +185,58 @@ function secure_login_customizer_tab_2fa() {
 function secure_login_customizer_tab_security() {
     
      ?>
-    <div class="tab-content" id="tab-2">
-        <table class="form-table">
+    <div class="tab_content" id="tab_2">
+        <table class="form_table">
             <tr valign="top">
-                <th scope="row"><?php _e('Activer Security headers', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Activer Security headers', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="checkbox" name="secure_login_customizer_enable_security_headers" value="1" <?php checked(1, get_option('secure_login_customizer_enable_security_headers'), true); ?>>
+                    <input type="checkbox" name="secure_login_customizer_enable_security_headers" value="1" <?php checked(1, get_options('secure_login_customizer_enable_security_headers'), true); ?>>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Activer l\'anonymisation des messages', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Activer l\'anonymisation des messages', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="checkbox" name="secure_login_customizer_enable_anonymize_messages" value="1" <?php checked(1, get_option('secure_login_customizer_enable_anonymize_messages'), true); ?>>
+                    <input type="checkbox" name="secure_login_customizer_enable_anonymize_messages" value="1" <?php checked(1, get_options('secure_login_customizer_enable_anonymize_messages'), true); ?>>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Refuser les connexions depuis un proxy', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Refuser les connexions depuis un proxy', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="checkbox" name="secure_login_customizer_deny_proxy_connections" value="1" <?php checked(1, get_option('secure_login_customizer_deny_proxy_connections'), true); ?>>
+                    <input type="checkbox" name="secure_login_customizer_deny_proxy_connections" value="1" <?php checked(1, get_options('secure_login_customizer_deny_proxy_connections'), true); ?>>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Interdire les mots de passe à faible sécurité', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Interdire les mots de passe à faible sécurité', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="checkbox" name="secure_login_customizer_disallow_weak_passwords" value="1" <?php checked(1, get_option('secure_login_customizer_disallow_weak_passwords'), true); ?>>
+                    <input type="checkbox" name="secure_login_customizer_disallow_weak_passwords" value="1" <?php checked(1, get_options('secure_login_customizer_disallow_weak_passwords'), true); ?>>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Blacklist', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Blacklist', 'secure_login_customizer'); ?></th>
                 <td>
-                    <textarea name="secure_login_customizer_blacklist" rows="5" cols="50"><?php echo esc_textarea(get_option('secure_login_customizer_blacklist')); ?></textarea>
-					<p class="description"><?php _e("Entrez les IP à ne jamais bloquer séparées par des virgules", 'secure-login-customizer'); ?></p>               
+                    <textarea name="secure_login_customizer_blacklist" rows="5" cols="50"><?php echo esc_textarea(get_options('secure_login_customizer_blacklist')); ?></textarea>
+					<p class="description"><?php _e("Entrez les IP à ne jamais bloquer séparées par des virgules", 'secure_login_customizer'); ?></p>               
 			   </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Whitelist', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Whitelist', 'secure_login_customizer'); ?></th>
                 <td>
-                    <textarea name="secure_login_customizer_whitelist" rows="5" cols="50"><?php echo esc_textarea(get_option('secure_login_customizer_whitelist')); ?></textarea>
-					<p class="description"><?php _e("Entrez les IP à ne toujours bloquer séparées par des virgules", 'secure-login-customizer'); ?></p>               
+                    <textarea name="secure_login_customizer_whitelist" rows="5" cols="50"><?php echo esc_textarea(get_options('secure_login_customizer_whitelist')); ?></textarea>
+					<p class="description"><?php _e("Entrez les IP à ne toujours bloquer séparées par des virgules", 'secure_login_customizer'); ?></p>               
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Nombre de tentatives de connexions avant désactivation', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Nombre de tentatives de connexions avant désactivation', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="number" name="secure_login_customizer_login_attempts" min="0" max="20" value="<?php echo esc_attr(get_option('secure_login_customizer_login_attempts', '0')); ?>">
-                	<p class="description"><?php _e("Nombre de tentatives de connexion incorrectes avant de bloquer, O = jamais", 'secure-login-customizer'); ?></p>               
+                    <input type="number" name="secure_login_customizer_login_attempts" min="0" max="20" value="<?php echo esc_attr(get_options('secure_login_customizer_login_attempts', '0')); ?>">
+                	<p class="description"><?php _e("Nombre de tentatives de connexion incorrectes avant de bloquer, O = jamais", 'secure_login_customizer'); ?></p>               
 				</td>
             </tr>
             <tr valign="top">
-                  <th scope="row"><?php _e('Temps de blocage du compte', 'secure-login-customizer'); ?></th>
+                  <th scope="row"><?php _e('Temps de blocage du compte', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="number" name="secure_login_customizer_account_lock_time" min="0" max="300" value="<?php echo esc_attr(get_option('secure_login_customizer_account_lock_time', '0')); ?>">
-                	<p class="description"><?php _e("Temps de verrouillage du compte en minutes, maximum 300 soit 5 heures", 'secure-login-customizer'); ?></p>               
+                    <input type="number" name="secure_login_customizer_account_lock_time" min="0" max="300" value="<?php echo esc_attr(get_options('secure_login_customizer_account_lock_time', '0')); ?>">
+                	<p class="description"><?php _e("Temps de verrouillage du compte en minutes, maximum 300 soit 5 heures", 'secure_login_customizer'); ?></p>               
 				</td>
             </tr>
         </table>
@@ -202,61 +249,61 @@ function secure_login_customizer_tab_security() {
 function secure_login_customizer_tab_login_screen() {
     ?>
     <div class="wrap">
-        <h2><?php _e('Customisation Login Screen', 'secure-login-customizer'); ?></h2>
-        <table class="form-table">
+        <h2><?php _e('Customisation Login Screen', 'secure_login_customizer'); ?></h2>
+        <table class="form_table">
             
 			<tr>
-				<th scope="row"><?php _e('Logo URL', 'secure-login-customizer'); ?></th>
+				<th scope="row"><?php _e('Logo URL', 'secure_login_customizer'); ?></th>
 				<td>
 				<input type="text" name="secure_login_customizer_options[logo_url]" value="<?php echo esc_attr($options['logo_url']); ?>" size="75" />
-				<p class="description"><?php _e('Entrez l\'URL du logo à afficher sur la page de connexion.', 'secure-login-customizer'); ?></p>
+				<p class="description"><?php _e('Entrez l\'URL du logo à afficher sur la page de connexion.', 'secure_login_customizer'); ?></p>
 			</td>
 			</tr>
 
 			
 			<tr valign="top">
-                <th scope="row"><?php _e('URL pour desktop', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('URL pour desktop', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="text" name="secure_login_customizer_desktop_url" size="75" value="<?php echo esc_attr(get_option('secure_login_customizer_desktop_url', '')); ?>">
-                <p class="description"><?php _e('Entrez l\'URL du papier peint à afficher en fond sur écran autre que mobile.', 'secure-login-customizer'); ?></p>
+                    <input type="text" name="secure_login_customizer_desktop_url" size="75" value="<?php echo esc_attr(get_options('secure_login_customizer_desktop_url', '')); ?>">
+                <p class="description"><?php _e('Entrez l\'URL du papier peint à afficher en fond sur écran autre que mobile.', 'secure_login_customizer'); ?></p>
 				</td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('URL pour mobile', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('URL pour mobile', 'secure_login_customizer'); ?></th>
              	<td>
-                    <input type="text" name="secure_login_customizer_mobile_url" size="75" value="<?php echo esc_attr(get_option('secure_login_customizer_mobile_url', '')); ?>">
-					<p class="description"><?php _e('Entrez l\'URL du papier peint à afficher en fond sur mobiles.', 'secure-login-customizer'); ?></p>             
+                    <input type="text" name="secure_login_customizer_mobile_url" size="75" value="<?php echo esc_attr(get_options('secure_login_customizer_mobile_url', '')); ?>">
+					<p class="description"><?php _e('Entrez l\'URL du papier peint à afficher en fond sur mobiles.', 'secure_login_customizer'); ?></p>             
 			 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Couleur du bouton', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Couleur du bouton', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="color" name="secure_login_customizer_button_color" value="<?php echo esc_attr(get_option('secure_login_customizer_button_color', '#000000')); ?>">
+                    <input type="color" name="secure_login_customizer_button_color" value="<?php echo esc_attr(get_options('secure_login_customizer_button_color', '#000000')); ?>">
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Couleur du fond', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Couleur du fond', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="color" name="secure_login_customizer_background_color" value="<?php echo esc_attr(get_option('secure_login_customizer_background_color', '#000000')); ?>">
+                    <input type="color" name="secure_login_customizer_background_color" value="<?php echo esc_attr(get_options('secure_login_customizer_background_color', '#000000')); ?>">
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Couleur du texte', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Couleur du texte', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="color" name="secure_login_customizer_text_color" value="<?php echo esc_attr(get_option('secure_login_customizer_text_color', '#000000')); ?>">
+                    <input type="color" name="secure_login_customizer_text_color" value="<?php echo esc_attr(get_options('secure_login_customizer_text_color', '#000000')); ?>">
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Couleur des bords', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Couleur des bords', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="color" name="secure_login_customizer_border_color" value="<?php echo esc_attr(get_option('secure_login_customizer_border_color', '#000000')); ?>">
+                    <input type="color" name="secure_login_customizer_border_color" value="<?php echo esc_attr(get_options('secure_login_customizer_border_color', '#000000')); ?>">
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Niveau de transparence', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Niveau de transparence', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="number" name="secure_login_customizer_transparency_level" min="0" max="100" value="<?php echo esc_attr(get_option('secure_login_customizer_transparency_level', '0')); ?>">
-                 <p class="description"><?php _e("Entrez le niveau de transparence de l'écran de connexion", 'secure-login-customizer'); ?></p>
+                    <input type="number" name="secure_login_customizer_transparency_level" min="0" max="100" value="<?php echo esc_attr(get_options('secure_login_customizer_transparency_level', '0')); ?>">
+                 <p class="description"><?php _e("Entrez le niveau de transparence de l'écran de connexion", 'secure_login_customizer'); ?></p>
 				</td>
             </tr>
         </table>
@@ -269,24 +316,24 @@ function secure_login_customizer_tab_login_screen() {
 function secure_login_customizer_tab_messages() {
     ?>
     <div class="wrap">
-        <h2><?php _e('Customisation Messages', 'secure-login-customizer'); ?></h2>
-        <table class="form-table">
+        <h2><?php _e('Customisation Messages', 'secure_login_customizer'); ?></h2>
+        <table class="form_table">
             <tr valign="top">
-                <th scope="row"><?php _e('URL de la page pour information QR-CODE', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('URL de la page pour information QR_CODE', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="text" name="secure_login_customizer_qrcode_info_url" size="75" value="<?php echo esc_attr(get_option('secure_login_customizer_qrcode_info_url', '')); ?>">
+                    <input type="text" name="secure_login_customizer_qrcode_info_url" size="75" value="<?php echo esc_attr(get_options('secure_login_customizer_qrcode_info_url', '')); ?>">
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('URL de la page pour information Codes secret', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('URL de la page pour information Codes secret', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="text" name="secure_login_customizer_secret_codes_info_url" size="75" value="<?php echo esc_attr(get_option('secure_login_customizer_secret_codes_info_url', '')); ?>">
+                    <input type="text" name="secure_login_customizer_secret_codes_info_url" size="75" value="<?php echo esc_attr(get_options('secure_login_customizer_secret_codes_info_url', '')); ?>">
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('URL de la page pour information Désactivation compte', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('URL de la page pour information Désactivation compte', 'secure_login_customizer'); ?></th>
                 <td>
-                    <input type="text" name="secure_login_customizer_account_deactivation_info_url" size="75" value="<?php echo esc_attr(get_option('secure_login_customizer_account_deactivation_info_url', '')); ?>">
+                    <input type="text" name="secure_login_customizer_account_deactivation_info_url" size="75" value="<?php echo esc_attr(get_options('secure_login_customizer_account_deactivation_info_url', '')); ?>">
                 </td>
             </tr>
         </table>
@@ -297,27 +344,27 @@ function secure_login_customizer_tab_messages() {
 function secure_login_customizer_tab_documentation() {
     ?>
     <div class="wrap">
-        <h2><?php _e('Documentation', 'secure-login-customizer'); ?></h2>
-        <p><?php _e('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero.', 'secure-login-customizer'); ?></p>
-        <p><?php _e('Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet.', 'secure-login-customizer'); ?></p>
-        <p><?php _e('Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta.', 'secure-login-customizer'); ?></p>
+        <h2><?php _e('Documentation', 'secure_login_customizer'); ?></h2>
+        <p><?php _e('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero.', 'secure_login_customizer'); ?></p>
+        <p><?php _e('Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet.', 'secure_login_customizer'); ?></p>
+        <p><?php _e('Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta.', 'secure_login_customizer'); ?></p>
         
-        <h3><?php _e('Shortcodes', 'secure-login-customizer'); ?></h3>
-        <table class="form-table">
+        <h3><?php _e('Shortcodes', 'secure_login_customizer'); ?></h3>
+        <table class="form_table">
             <tr valign="top">
-                <th scope="row"><?php _e('Faux shortcode 1', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Faux shortcode 1', 'secure_login_customizer'); ?></th>
                 <td>
                     <code>[faux_shortcode_1]</code>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Faux shortcode 2', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Faux shortcode 2', 'secure_login_customizer'); ?></th>
                 <td>
                     <code>[faux_shortcode_2]</code>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Faux shortcode 3', 'secure-login-customizer'); ?></th>
+                <th scope="row"><?php _e('Faux shortcode 3', 'secure_login_customizer'); ?></th>
                 <td>
                     <code>[faux_shortcode_3]</code>
                 </td>
@@ -346,7 +393,7 @@ function secure_login_customizer_settings() {
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_account_lock_time');
 
     // Onglet 3: Customisation login screen
-	register_setting('secure_login_customizer_options_group', 'secure_login_customizer_options', 'secure_login_customizer_sanitize_options');
+	//register_setting('secure_login_customizer_options_group', 'secure_login_customizer_options', 'secure_login_customizer_sanitize_options');
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_desktop_url');
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_mobile_url');
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_button_color');
@@ -360,6 +407,23 @@ function secure_login_customizer_settings() {
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_secret_code_info_url');
     register_setting('secure_login_customizer_settings', 'secure_login_customizer_account_disabled_info_url');
 }
+
+function secure_login_customizer_sanitize_messages_options($input) {
+    $new_options = array();
+
+    $new_options['error_wrong_username_or_password'] = isset($input['error_wrong_username_or_password']) ? wp_kses_post($input['error_wrong_username_or_password']) : '';
+    $new_options['error_empty_username'] = isset($input['error_empty_username']) ? wp_kses_post($input['error_empty_username']) : '';
+    $new_options['error_empty_password'] = isset($input['error_empty_password']) ? wp_kses_post($input['error_empty_password']) : '';
+    $new_options['error_username_exists'] = isset($input['error_username_exists']) ? wp_kses_post($input['error_username_exists']) : '';
+    $new_options['error_email_exists'] = isset($input['error_email_exists']) ? wp_kses_post($input['error_email_exists']) : '';
+    $new_options['error_invalid_email'] = isset($input['error_invalid_email']) ? wp_kses_post($input['error_invalid_email']) : '';
+    $new_options['error_password_mismatch'] = isset($input['error_password_mismatch']) ? wp_kses_post($input['error_password_mismatch']) : '';
+    $new_options['error_weak_password'] = isset($input['error_weak_password']) ? wp_kses_post($input['error_weak_password']) : '';
+    $new_options['error_password_reset_disabled'] = isset($input['error_password_reset_disabled']) ? wp_kses_post($input['error_password_reset_disabled']) : '';
+
+    return $new_options;
+}
+
 
 function secure_login_customizer_sanitize_options($input) {
     //$new_options = array();
@@ -398,13 +462,13 @@ function secure_login_customizer_sanitize_options($input) {
     return $output;
 
 
-    // Onglet 1 - 2FA
+    // Onglet 1 _ 2FA
     $new_options['enable_2fa'] = isset($input['enable_2fa']) ? (bool)$input['enable_2fa'] : false;
     $new_options['enable_backup_code'] = isset($input['enable_backup_code']) ? (bool)$input['enable_backup_code'] : false;
     $new_options['prevent_disable_2fa'] = isset($input['prevent_disable_2fa']) ? (bool)$input['prevent_disable_2fa'] : false;
     $new_options['groups'] = isset($input['groups']) ? array_map('sanitize_text_field', (array)$input['groups']) : array();
 
-    // Onglet 2 - Sécurité
+    // Onglet 2 _ Sécurité
     $new_options['enable_security_headers'] = isset($input['enable_security_headers']) ? (bool)$input['enable_security_headers'] : false;
     $new_options['enable_anonymize_messages'] = isset($input['enable_anonymize_messages']) ? (bool)$input['enable_anonymize_messages'] : false;
     $new_options['deny_proxy_connections'] = isset($input['deny_proxy_connections']) ? (bool)$input['deny_proxy_connections'] : false;
@@ -414,7 +478,7 @@ function secure_login_customizer_sanitize_options($input) {
     $new_options['max_login_attempts'] = isset($input['max_login_attempts']) && is_numeric($input['max_login_attempts']) && $input['max_login_attempts'] >= 0 && $input['max_login_attempts'] <= 20 ? intval($input['max_login_attempts']) : 3;
     $new_options['account_lock_time'] = isset($input['account_lock_time']) && is_numeric($input['account_lock_time']) && $input['account_lock_time'] >= 0 && $input['account_lock_time'] <= 300 ? intval($input['account_lock_time']) : 0;
     
-    // Onglet 3 - Customisation Login Screen
+    // Onglet 3 _ Customisation Login Screen
     $new_options['desktop_logo_url'] = isset($input['desktop_logo_url']) ? esc_url_raw($input['desktop_logo_url']) : '';
     $new_options['mobile_logo_url'] = isset($input['mobile_logo_url']) ? esc_url_raw($input['mobile_logo_url']) : '';
     $new_options['button_color'] = isset($input['button_color']) ? sanitize_hex_color($input['button_color']) : '';
@@ -432,129 +496,32 @@ function secure_login_customizer_sanitize_options($input) {
 }
 
  function secure_login_customizer_settings_init() {
-    // Onglet 2FA
-    add_settings_section(
-        'secure_login_customizer_2fa_section',
-        __('Paramètres 2FA', 'secure-login-customizer'),
-        'secure_login_customizer_section_2fa_cb',
-        'secure-login-customizer-2fa'
-    );
+    // 2FA Settings
+    register_setting('secure_login_customizer_2fa_options_group', 'secure_login_customizer_2fa_options', 'secure_login_customizer_sanitize_options');
+    add_settings_section('secure_login_customizer_2fa_section', __('Two-Factor Authentication', 'secure-login-customizer'), 'secure_login_customizer_2fa_section_callback', 'secure-login-customizer-2fa');
+    add_settings_field('enable_2fa', __('Enable 2FA', 'secure-login-customizer'), 'secure_login_customizer_enable_2fa_callback', 'secure-login-customizer-2fa', 'secure_login_customizer_2fa_section');
 
-    // Onglet Sécurité
-    add_settings_section(
-        'secure_login_customizer_security_section',
-        __('Paramètres de sécurité', 'secure-login-customizer'),
-        'secure_login_customizer_section_security_cb',
-        'secure-login-customizer-security'
-    );
+    // Security Settings
+    register_setting('secure_login_customizer_security_options_group', 'secure_login_customizer_security_options', 'secure_login_customizer_sanitize_options');
+    add_settings_section('secure_login_customizer_security_section', __('Security', 'secure-login-customizer'), 'secure_login_customizer_security_section_callback', 'secure-login-customizer-security');
+    add_settings_field('enable_security', __('Enable Security', 'secure-login-customizer'), 'secure_login_customizer_enable_security_callback', 'secure-login-customizer-security', 'secure_login_customizer_security_section');
 
-    // Onglet Customisation Login Screen
-    add_settings_section(
-        'secure_login_customizer_login_screen_section',
-        __('Paramètres de la page de connexion', 'secure-login-customizer'),
-        'secure_login_customizer_section_login_screen_cb',
-        'secure-login-customizer-login-screen'
-    );
+    // Login Screen Settings
+    register_setting('secure_login_customizer_login_screen_options_group', 'secure_login_customizer_login_screen_options', 'secure_login_customizer_sanitize_options');
+    add_settings_section('secure_login_customizer_login_screen_section', __('Customization Login Screen', 'secure-login-customizer'), 'secure_login_customizer_login_screen_section_callback', 'secure-login-customizer-login-screen');
+    add_settings_field('enable_login_screen', __('Enable Login Screen Customization', 'secure-login-customizer'), 'secure_login_customizer_enable_login_screen_callback', 'secure-login-customizer-login-screen', 'secure_login_customizer_login_screen_section');
 
-    // Onglet Customisation Messages
-    add_settings_section(
-        'secure_login_customizer_messages_section',
-        __('Paramètres des messages', 'secure-login-customizer'),
-        'secure_login_customizer_section_messages_cb',
-        'secure-login-customizer-messages'
-    );
-
-    // Onglet Documentation
-    add_settings_section(
-        'secure_login_customizer_documentation_section',
-        __('Documentation', 'secure-login-customizer'),
-        'secure_login_customizer_section_documentation_cb',
-        'secure-login-customizer-documentation'
-    );
-
- 
-	 register_setting(
-		'secure_login_customizer_options_group', // Option group
-		'secure_login_customizer_options',
-		'secure_login_customizer_sanitize_options'
-	);
-
-	// onglet 2FA
-	 register_setting(
-		'secure_login_customizer_2fa_options_group',
-		'secure_login_customizer_2fa_options',
-		'secure_login_customizer_sanitize_options'
-	);
-
-	add_settings_section(
-		'secure_login_customizer_2fa_section',
-		__('2FA Options', 'secure-login-customizer'),
-		'secure_login_customizer_2fa_section_callback',
-		'secure-login-customizer-2fa-options-group'
-	);
-
-	// onglet securite
-	 register_setting(
-		'secure_login_customizer_security_options_group',
-		'secure_login_customizer_security_options',
-		'secure_login_customizer_sanitize_options'
-	);
-
-	add_settings_section(
-		'secure_login_customizer_security_section',
-		__('Security Options', 'secure-login-customizer'),
-		'secure_login_customizer_security_section_callback',
-		'secure-login-customizer-security-options-group'
-	);
-
-	// onglet login custom 
-	 register_setting(
-		'secure_login_customizer_login_screen_options_group',
-		'secure_login_customizer_login_screen_options',
-		'secure_login_customizer_sanitize_options'
-	);
-
-	add_settings_section(
-		'secure_login_customizer_login_screen_section',
-		__('Login Screen Options', 'secure-login-customizer'),
-		'secure_login_customizer_login_screen_section_callback',
-		'secure-login-customizer-login-screen-options-group'
-	);
-
-	// onglet message
-	 register_setting(
-		'secure_login_customizer_messages_options_group',
-		'secure_login_customizer_messages_options',
-		'secure_login_customizer_sanitize_options'
-	);
-
-	add_settings_section(
-		'secure_login_customizer_messages_section',
-		__('Messages Options', 'secure-login-customizer'),
-		'secure_login_customizer_messages_section_callback',
-		'secure-login-customizer-messages-options-group'
-	);
-
- 
-/*     // Enregistrer les paramètres pour chaque onglet
-    register_setting('secure_login_customizer_2fa_options_group', 'secure_login_customizer_2fa_options', 'secure_login_customizer_sanitize_2fa_options');
-    register_setting('secure_login_customizer_security_options_group', 'secure_login_customizer_security_options', 'secure_login_customizer_sanitize_security_options');
-    register_setting('secure_login_customizer_login_screen_options_group', 'secure_login_customizer_login_screen_options', 'secure_login_customizer_sanitize_login_screen_options');
+    // Messages Settings
     register_setting('secure_login_customizer_messages_options_group', 'secure_login_customizer_messages_options', 'secure_login_customizer_sanitize_messages_options');
-    register_setting('secure_login_customizer_documentation_options_group', 'secure_login_customizer_documentation_options', 'secure_login_customizer_sanitize_documentation_options');
-
-    // Ajouter les sections pour chaque onglet
-    add_settings_section('secure_login_customizer_2fa_section', __('2FA', 'secure-login-customizer'), null, 'secure-login-customizer-2fa');
-    add_settings_section('secure_login_customizer_security_section', __('Sécurité', 'secure-login-customizer'), null, 'secure-login-customizer-security');
-    add_settings_section('secure_login_customizer_login_screen_section', __('Customisation Login Screen', 'secure-login-customizer'), null, 'secure-login-customizer-login_screen');
-    add_settings_section('secure_login_customizer_messages_section', __('Customisation Messages', 'secure-login-customizer'), null, 'secure-login-customizer-messages');
-
-    // Ajouter les champs pour chaque section
-    secure_login_customizer_2fa_fields();
-    secure_login_customizer_security_fields();
-    secure_login_customizer_login_screen_fields();
-    secure_login_customizer_messages_fields();
-    // Pas besoin d'ajouter de champs pour la section Documentation */
+    add_settings_section('secure_login_customizer_messages_section', __('Customization Messages', 'secure-login-customizer'), 'secure_login_customizer_messages_section_callback', 'secure-login-customizer-messages');
+    add_settings_field('enable_messages', __('Enable Messages Customization', 'secure-login-customizer'), 'secure_login_customizer_enable_messages_callback', 'secure-login-customizer-messages', 'secure_login_customizer_messages_section');
 }
 
- 
+ function secure_login_customizer_error_password_reset_disabled_callback() {
+    $options = get_option('secure_login_customizer_messages_options');
+    ?>
+    <textarea id="error_password_reset_disabled" name="secure_login_customizer_messages_options[error_password_reset_disabled]" rows="5" cols="50" type="textarea"><?php echo isset($options['error_password_reset_disabled']) ? esc_attr($options['error_password_reset_disabled']) : ''; ?></textarea>
+    <p class="description"><?php _e('Ce message s\'affiche lorsque la réinitialisation du mot de passe est désactivée.', 'secure-login-customizer'); ?></p>
+    <?php
+}
+
