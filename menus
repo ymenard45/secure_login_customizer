@@ -380,4 +380,60 @@ function secure_login_customizer_sanitize_options($input) {
     return $new_options;
 }
 
+ function secure_login_customizer_settings_init() {
+    // Onglet 2FA
+    add_settings_section(
+        'secure_login_customizer_2fa_section',
+        __('Paramètres 2FA', 'secure-login-customizer'),
+        'secure_login_customizer_section_2fa_cb',
+        'secure-login-customizer-2fa'
+    );
+
+    // Onglet Sécurité
+    add_settings_section(
+        'secure_login_customizer_security_section',
+        __('Paramètres de sécurité', 'secure-login-customizer'),
+        'secure_login_customizer_section_security_cb',
+        'secure-login-customizer-security'
+    );
+
+    // Onglet Customisation Login Screen
+    add_settings_section(
+        'secure_login_customizer_login_screen_section',
+        __('Paramètres de la page de connexion', 'secure-login-customizer'),
+        'secure_login_customizer_section_login_screen_cb',
+        'secure-login-customizer-login-screen'
+    );
+
+    // Onglet Customisation Messages
+    add_settings_section(
+        'secure_login_customizer_messages_section',
+        __('Paramètres des messages', 'secure-login-customizer'),
+        'secure_login_customizer_section_messages_cb',
+        'secure-login-customizer-messages'
+    );
+
+    // Onglet Documentation
+    add_settings_section(
+        'secure_login_customizer_documentation_section',
+        __('Documentation', 'secure-login-customizer'),
+        'secure_login_customizer_section_documentation_cb',
+        'secure-login-customizer-documentation'
+    );
+
+    // Enregistrer les paramètres pour chaque onglet
+    register_setting('secure_login_customizer_options_group', 'secure_login_customizer_2fa_options', 'secure_login_customizer_sanitize_2fa_options');
+    register_setting('secure_login_customizer_options_group', 'secure_login_customizer_security_options', 'secure_login_customizer_sanitize_security_options');
+    register_setting('secure_login_customizer_options_group', 'secure_login_customizer_login_screen_options', 'secure_login_customizer_sanitize_login_screen_options');
+    register_setting('secure_login_customizer_options_group', 'secure_login_customizer_messages_options', 'secure_login_customizer_sanitize_messages_options');
+    register_setting('secure_login_customizer_options_group', 'secure_login_customizer_documentation_options', 'secure_login_customizer_sanitize_documentation_options');
+
+    // Ajouter les champs pour chaque section
+    secure_login_customizer_2fa_fields();
+    secure_login_customizer_security_fields();
+    secure_login_customizer_login_screen_fields();
+    secure_login_customizer_messages_fields();
+    // Pas besoin d'ajouter de champs pour la section Documentation
+}
+
 
