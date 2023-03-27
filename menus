@@ -331,11 +331,11 @@ public function secure_login_customizer_enqueue_scripts() {
     wp_enqueue_style( 'secure-login-customizer-style', plugin_dir_url( __FILE__ ) . 'css/style.css' );
     wp_enqueue_script( 'secure-login-customizer-script', plugin_dir_url( __FILE__ ) . 'js/script.js', array( 'jquery' ), '', true );
 }
-add_action( 'admin_enqueue_scripts', array( $this, 'secure_login_customizer_enqueue_scripts' ) );
 
 
 public function secure_login_customizer_register_settings() {
     register_setting('secure_login_customizer_options', 'secure_login_customizer_options', array($this, 'secure_login_customizer_sanitize_options'));
+    add_action( 'admin_enqueue_scripts', array( $this, 'secure_login_customizer_enqueue_scripts' ) );
 }
 
 public function secure_login_customizer_sanitize_options($options) {
