@@ -55,10 +55,11 @@ function slc_render_plugin_settings_page() {
 						.tab-content {
 							margin-left: 15px;
 						}	
-						    h2.slc-plugin-title,
-							tab-content h2 {
+						    h1.slc-plugin-title,
+							.tab-content h2,
+							.form-table th {
 							display: none;
-						}
+							}
 						 
 					</style>
 				 
@@ -244,30 +245,19 @@ add_action('admin_init', 'slc_add_2fa_fields');
     $options = get_option('slc_2fa_settings');
     $user_roles = array_merge(wp_roles()->roles, ['customer' => ['name' => 'Customer']]); // Fusionner les rôles WordPress et WooCommerce
 
-    foreach ($user_roles as $role_slug => $role_info) {
-        $role_name = translate_user_role($role_info['name']);
-        $checked = isset($options['2fa_user_roles'][$role_slug]) ? 'checked' : '';
-        ?>
-        <label>
-            <input type="checkbox" name="slc_2fa_settings[2fa_user_roles][<?php echo esc_attr($role_slug); ?>]" value="1" <?php echo $checked; ?>>
-            <?php echo esc_html($role_name); ?>
-        </label><br>
-        <?php
-    }
+	function slc_enable_2fa_for_groups_callback() {
+		$options = get_option('slc_options');
+		$wp_roles = new WP_Roles();
+		$all_roles = $wp_roles->roles;
+
+		foreach ($all_roles as $role_key => $role) {
+			$checked = isset($options['enable_2fa_for_groups'][$role_key]) ? 'checked' : '';
+			echo '<input type="checkbox" name="slc_options[enable_2fa_for_groups][' . $role_key . ']" value="1" ' . $checked . '> ' . $role['name'] . '<br>';
+		}
 	}
 
-/* 	function slc_enable_2fa_callback() {
-		$options = get_option('slc_2fa_settings');
-		$checked = isset($options['enable_2fa']) ? 'checked' : '';
-		echo '<input type="checkbox" name="slc_2fa_settings[enable_2fa]" value="1" ' . $checked . '>';
-	} */
 
-/* 	function slc_enable_backup_codes_callback() {
-		$options = get_option('slc_2fa_settings');
-		$checked = isset($options['enable_backup_codes']) ? 'checked' : '';
-		echo '<input type="checkbox" name="slc_2fa_settings[enable_backup_codes]" value="1" ' . $checked . '>';
-	}
- */
+ 
 /* Fonctions pour gérer l'onglet 2 */
 
 // fonction pour enregistrer les paramètres de onglet 2
