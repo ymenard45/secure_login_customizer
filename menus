@@ -44,26 +44,67 @@ add_action('admin_menu', 'slc_add_plugin_menu');
 // strcuture html pour les onglets
 function slc_render_plugin_settings_page() {
     ?>
-    <div class="wrap">
-					 
-					<style>
-						.wrap > h1 {
-							margin-bottom: 50px;
-							color: blue;
-						}
+		<div class="wrap">
+		<div class="slc-title-container">
+        <span class="dashicons dashicons-shield"></span>
+        <h1><?php _e('Secure Login Customizer', 'secure-login-customizer'); ?></h1>
+		<span class="dashicons dashicons-shield"></span>
+		</div>
+				<style>
+					.tab-content p:first-child  {
+					margin-top: 15px; /* Ajustez cette valeur en fonction de l'espace souhaité */
+					}
+					.dashicons-shield {
+					font-size: 36px; /* Ajustez la taille de l'icône */
+					margin-right: 10px; /* Ajoutez une marge à droite pour l'espacement entre l'icône et le texte */
+					vertical-align: middle; /* Alignement vertical avec le texte */
+					}
+					
+					.form{
+					margin-top:15 px;	
+					}
+					.wrap > h1 {
+					color:blue;	
+					margin-bottom: 30px;
+				    }
 
-						.tab-content {
-							margin-left: 15px;
-						}	
-						    h1.slc-plugin-title,
-							.tab-content h2,
-							.form-table th {
-							display: none;
-							}
-						 
-					</style>
-				 
-        <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+					.tab-content {
+					margin-left: 25px;
+					}
+				
+					h1.slc-plugin-title,
+					.tab-content h2 {
+					display: none;
+					}
+					
+					.slc-title-container {
+						text-align: center;
+					}
+
+					.slc-title-container h1 {
+						display: inline-block;
+						vertical-align: middle;
+						margin-left: 15px;
+						margin-right: 10px;
+						font-size:36px;
+						color:blue;
+					}
+					
+					.nav-tab {padding-top:10px;
+							   padding-bottom:10px;
+							   margin-top:20px;
+							   margin-bottom:20px}
+
+					.dashicons-shield {
+						font-size: 36px;
+						margin-right: 5px;
+						vertical-align: middle;
+					}
+										
+										
+			 </style>
+
+        
         <h2 class="nav-tab-wrapper">
             <a href="#tab-1" class="nav-tab"><?php _e('2FA', 'secure-login-customizer'); ?></a>
             <a href="#tab-2" class="nav-tab"><?php _e('Sécurité', 'secure-login-customizer'); ?></a>
@@ -205,59 +246,53 @@ function slc_add_2fa_fields() {
     add_settings_field('enable_2fa', __('Activer 2FA authentification', 'secure-login-customizer'), 'slc_enable_2fa_callback', 'slc_2fa_settings', 'slc_2fa_section');
     add_settings_field('enable_backup_codes', __('Activer code de secours', 'secure-login-customizer'), 'slc_enable_backup_codes_callback', 'slc_2fa_settings', 'slc_2fa_section');
     add_settings_field('disable_2fa_disabling', __('Interdire la désactivation de 2FA authentification', 'secure-login-customizer'), 'slc_disable_2fa_disabling_callback', 'slc_2fa_settings', 'slc_2fa_section');
-//   	add_settings_field('slc_security_group', __('Groupes de sécurité', 'secure-login-customizer'),'slc_enable_2fa_for_groups_callback','secure-login-customizer', 'slc_2fa_section');
 add_settings_field(
     'slc_security_group', // ID du champ
     __('Groupes de sécurité', 'secure-login-customizer'), // Titre du champ
     'slc_enable_2fa_for_groups_callback', // Nom de la fonction de rappel
     'secure-login-customizer',
     'slc_2fa_section'
-);
-
-
+);    
+	
 }
 // Ligne 5
 add_action('admin_init', 'slc_add_2fa_fields');
 
 // focntion pour gerer activer option activer 2FA de l'onglet 1
-	function slc_enable_2fa_callback() {
+function slc_enable_2fa_callback() {
     $options = get_option('slc_2fa_settings');
     ?>
     <input type="checkbox" name="slc_2fa_settings[enable_2fa]" value="1" <?php checked(1, $options['enable_2fa'], true); ?>>
     <?php
 }
 // focntion pour gerer l'option 'code de securité'
-	function slc_enable_backup_codes_callback() {
+function slc_enable_backup_codes_callback() {
     $options = get_option('slc_2fa_settings');
     ?>
     <input type="checkbox" name="slc_2fa_settings[enable_backup_codes]" value="1" <?php checked(1, $options['enable_backup_codes'], true); ?>>
     <?php
 }
 // focntion pour gerer desactiver option activer 2FA de l'onglet 1
-	function slc_disable_2fa_disabling_callback() {
+function slc_disable_2fa_disabling_callback() {
     $options = get_option('slc_2fa_settings');
     ?>
     <input type="checkbox" name="slc_2fa_settings[disable_2fa_disabling]" value="1" <?php checked(1, $options['disable_2fa_disabling'], true); ?>>
     <?php
 }
 
-	function slc_enable_2fa_for_groups_callback() {
-    $options = get_option('slc_2fa_settings');
-    $user_roles = array_merge(wp_roles()->roles, ['customer' => ['name' => 'Customer']]); // Fusionner les rôles WordPress et WooCommerce
+// fonction 
+function slc_enable_2fa_for_groups_callback() {
+    $options = get_option('slc_options');
+    $wp_roles = new WP_Roles();
+    $all_roles = $wp_roles->roles;
 
-	function slc_enable_2fa_for_groups_callback() {
-		$options = get_option('slc_options');
-		$wp_roles = new WP_Roles();
-		$all_roles = $wp_roles->roles;
-
-		foreach ($all_roles as $role_key => $role) {
-			$checked = isset($options['enable_2fa_for_groups'][$role_key]) ? 'checked' : '';
-			echo '<input type="checkbox" name="slc_options[enable_2fa_for_groups][' . $role_key . ']" value="1" ' . $checked . '> ' . $role['name'] . '<br>';
-		}
-	}
+    foreach ($all_roles as $role_key => $role) {
+        $checked = isset($options['enable_2fa_for_groups'][$role_key]) ? 'checked' : '';
+        echo '<input type="checkbox" name="slc_options[enable_2fa_for_groups][' . $role_key . ']" value="1" ' . $checked . '> ' . $role['name'] . '<br>';
+    }
+}
 
 
- 
 /* Fonctions pour gérer l'onglet 2 */
 
 // fonction pour enregistrer les paramètres de onglet 2
