@@ -234,6 +234,13 @@ function slc_register_2fa_settings() {
 
     // Ajoutez les champs de l'onglet 1 ici (nous le ferons dans les prochaines étapes).
 }
+
+// Enregistre les groupes de sécurité sélectionnés
+register_setting('slc_2fa', 'slc_security_group', array(
+    'type' => 'array',
+    'sanitize_callback' => 'slc_sanitize_security_group',
+));
+
 add_action('admin_init', 'slc_register_2fa_settings');
 
 // focntion pour les champs de l'onglet 1
@@ -247,31 +254,36 @@ function slc_add_2fa_fields() {
     add_settings_field('enable_backup_codes', __('Activer code de secours', 'secure-login-customizer'), 'slc_enable_backup_codes_callback', 'slc_2fa_settings', 'slc_2fa_section');
     add_settings_field('disable_2fa_disabling', __('Interdire la désactivation de 2FA authentification', 'secure-login-customizer'), 'slc_disable_2fa_disabling_callback', 'slc_2fa_settings', 'slc_2fa_section');
 add_settings_field(
-    'slc_security_group', // ID du champ
+    'slc_security_group', // Identifiant du champ
     __('Groupes de sécurité', 'secure-login-customizer'), // Titre du champ
-    'slc_enable_2fa_for_groups_callback', // Nom de la fonction de rappel
-    'secure-login-customizer',
-    'slc_2fa_section'
-);    
+    'slc_security_group_callback', // Fonction de rappel pour afficher le contenu du champ
+    'slc_2fa', // Page sur laquelle le champ doit être affiché
+    'slc_2fa_section' // Section dans laquelle le champ doit être ajouté
+);  
 	
 }
 // Ligne 5
 add_action('admin_init', 'slc_add_2fa_fields');
 
 // focntion pour gerer activer option activer 2FA de l'onglet 1
+// focntion pour gerer activer option activer 2FA de l'onglet 1
 function slc_enable_2fa_callback() {
     $options = get_option('slc_2fa_settings');
+    $checked = isset($options['enable_2fa']) ? $options['enable_2fa'] : false;
     ?>
-    <input type="checkbox" name="slc_2fa_settings[enable_2fa]" value="1" <?php checked(1, $options['enable_2fa'], true); ?>>
+    <input type="checkbox" name="slc_2fa_settings[enable_2fa]" value="1" <?php checked(1, $checked, true); ?>>
     <?php
 }
+
 // focntion pour gerer l'option 'code de securité'
 function slc_enable_backup_codes_callback() {
     $options = get_option('slc_2fa_settings');
+    $checked = isset($options['enable_backup_codes']) ? $options['enable_backup_codes'] : false;
     ?>
-    <input type="checkbox" name="slc_2fa_settings[enable_backup_codes]" value="1" <?php checked(1, $options['enable_backup_codes'], true); ?>>
+    <input type="checkbox" name="slc_2fa_settings[enable_backup_codes]" value="1" <?php checked(1, $checked, true); ?>>
     <?php
 }
+
 // focntion pour gerer desactiver option activer 2FA de l'onglet 1
 function slc_disable_2fa_disabling_callback() {
     $options = get_option('slc_2fa_settings');
@@ -283,7 +295,7 @@ function slc_disable_2fa_disabling_callback() {
 // fonction activation 2FA pour les roles 
 function slc_enable_2fa_for_groups_callback() {
     $options = get_option('slc_options');
-    $wp_roles = new WP_Roles();
+    $user_roles = slc_list_user_roles(); 
     $all_roles = $wp_roles->roles;
 
     foreach ($all_roles as $role_key => $role) {
@@ -293,22 +305,55 @@ function slc_enable_2fa_for_groups_callback() {
 }
 
 // selection des roles
-function slc_security_group_callback() {
-    $roles = slc_list_user_roles();
-    $selected_roles = get_option('slc_security_group_roles', array());
+function slc_list_user_roles() {
+    global $wp_roles;
+    if (!isset($wp_roles)) {
+        $wp_roles = new WP_Roles();
+    }
+    return $wp_roles->get_names();
+}
 
-    foreach ($roles as $role_value => $role_name) {
-        $checked = in_array($role_value, $selected_roles) ? 'checked' : '';
-        ?>
-        <p>
-            <input type="checkbox" name="slc_security_group_roles[]" value="<?php echo esc_attr($role_value); ?>" <?php echo $checked; ?>>
-            <label for="slc_security_group_roles[]"><?php echo esc_html($role_name); ?></label>
-        </p>
-        <?php
+
+function slc_sanitize_security_group($input) {
+    $valid_roles = array_keys(get_editable_roles());
+
+    if (is_array($input)) {
+        foreach ($input as $role) {
+            if (!in_array($role, $valid_roles)) {
+                return array();
+            }
+        }
+    } else {
+        return array();
+    }
+
+    return $input;
+}
+
+
+function slc_security_group_callback() {
+    $slc_options = get_option('slc_options');
+    
+    if (!is_array($slc_options)) {
+        $slc_options = array();
+    }
+
+    $roles = array(
+        'administrator' => __('Administrateur', 'secure-login-customizer'),
+        'editor' => __('Éditeur', 'secure-login-customizer'),
+        'author' => __('Auteur', 'secure-login-customizer'),
+        'contributor' => __('Contributeur', 'secure-login-customizer'),
+        'subscriber' => __('Abonné', 'secure-login-customizer'),
+    );
+
+    // Ajoutez les groupes de sécurité supplémentaires pour WooCommerce ici, si nécessaire
+    // $roles['woocommerce_role'] = __('WooCommerce Role', 'secure-login-customizer');
+
+    foreach ($roles as $role => $role_name) {
+        $checked = isset($slc_options['slc_security_group'][$role]) ? 'checked' : '';
+        echo "<input type='checkbox' name='slc_2fa_settings[slc_security_group][{$role}]' {$checked}>{$role_name}<br>";
     }
 }
- 
-
 
 /* Fonctions pour gérer l'onglet 2 */
 
@@ -403,14 +448,7 @@ function slc_qr_code_info_url_callback() {
     <?php
 }
 
-// selection des roles onglet 1
-function slc_list_user_roles() {
-    global $wp_roles;
-    if (!isset($wp_roles)) {
-        $wp_roles = new WP_Roles();
-    }
-    return $wp_roles->get_names();
-}
+ 
 
 
 /* Fonctions pour gérer l'onglet 5 non necessaires */
