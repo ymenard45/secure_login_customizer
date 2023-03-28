@@ -280,7 +280,7 @@ function slc_disable_2fa_disabling_callback() {
     <?php
 }
 
-// fonction 
+// fonction activation 2FA pour les roles 
 function slc_enable_2fa_for_groups_callback() {
     $options = get_option('slc_options');
     $wp_roles = new WP_Roles();
@@ -291,6 +291,23 @@ function slc_enable_2fa_for_groups_callback() {
         echo '<input type="checkbox" name="slc_options[enable_2fa_for_groups][' . $role_key . ']" value="1" ' . $checked . '> ' . $role['name'] . '<br>';
     }
 }
+
+// selection des roles
+function slc_security_group_callback() {
+    $roles = slc_list_user_roles();
+    $selected_roles = get_option('slc_security_group_roles', array());
+
+    foreach ($roles as $role_value => $role_name) {
+        $checked = in_array($role_value, $selected_roles) ? 'checked' : '';
+        ?>
+        <p>
+            <input type="checkbox" name="slc_security_group_roles[]" value="<?php echo esc_attr($role_value); ?>" <?php echo $checked; ?>>
+            <label for="slc_security_group_roles[]"><?php echo esc_html($role_name); ?></label>
+        </p>
+        <?php
+    }
+}
+ 
 
 
 /* Fonctions pour gérer l'onglet 2 */
@@ -386,9 +403,21 @@ function slc_qr_code_info_url_callback() {
     <?php
 }
 
+// selection des roles onglet 1
+function slc_list_user_roles() {
+    global $wp_roles;
+    if (!isset($wp_roles)) {
+        $wp_roles = new WP_Roles();
+    }
+    return $wp_roles->get_names();
+}
+
+
 /* Fonctions pour gérer l'onglet 5 non necessaires */
 
 /* Fonctions pour créer le menu */
+
+
 
 // Créer le menu de l'extension
 function slc_add_plugin_page() {
