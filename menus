@@ -368,15 +368,197 @@ echo '</form>';
  add_action( 'admin_init', 'secure_login_customizer_register_settings' ); 
 
 function secure_login_customizer_register_settings() {
-	register_setting(
-		'secure_login_customizer_options',
-		'secure_login_customizer_options',
-		'secure_login_customizer_validate_options'
+	register_setting('secure_login_customizer_options', 'secure_login_customizer_options');
+}
+add_action('admin_init', 'secure_login_customizer_register_settings');
+
+
+// customiser settings
+
+// BLOCK 4: Define settings sections and fields
+function secure_login_customizer_settings() {
+	// SECTION 1: 2FA settings
+	add_settings_section(
+		'secure_login_customizer_section_1',
+		__('Two-Factor Authentication', 'secure_login_customizer'),
+		'secure_login_customizer_section_1_content',
+		'secure_login_customizer'
 	);
+
+	add_settings_field(
+		'secure_login_customizer_field_1',
+		__('Enable 2FA', 'secure_login_customizer'),
+		'secure_login_customizer_field_1_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_1'
+	);
+
+	add_settings_field(
+		'secure_login_customizer_field_2',
+		__('Method', 'secure_login_customizer'),
+		'secure_login_customizer_field_2_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_1'
+	);
+
+	add_settings_field(
+		'secure_login_customizer_field_3',
+		__('Backup Codes', 'secure_login_customizer'),
+		'secure_login_customizer_field_3_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_1'
+	);
+
+	// SECTION 2: Security headers and settings
+	add_settings_section(
+		'secure_login_customizer_section_2',
+		__('Security Headers and Settings', 'secure_login_customizer'),
+		'secure_login_customizer_section_2_content',
+		'secure_login_customizer'
+	);
+
+	add_settings_field(
+		'secure_login_customizer_field_4',
+		__('Enable Security Headers', 'secure_login_customizer'),
+		'secure_login_customizer_field_4_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_2'
+	);
+
+	add_settings_field(
+		'secure_login_customizer_field_5',
+		__('Anonymize Login Error Messages', 'secure_login_customizer'),
+		'secure_login_customizer_field_5_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_2'
+	);
+
+	add_settings_field(
+		'secure_login_customizer_field_6',
+		__('Proxy Server Detection', 'secure_login_customizer'),
+		'secure_login_customizer_field_6_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_2'
+	);
+
+
+	add_settings_field(
+		'secure_login_customizer_field_8',
+		__('Disable Weak Passwords', 'secure_login_customizer'),
+		'secure_login_customizer_field_8_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_2'
+	);
+
+	add_settings_section(
+		'secure_login_customizer_section_3',
+		__('Customize Login Form', 'secure_login_customizer'),
+		'secure_login_customizer_section_3_content',
+		'secure_login_customizer'
+	);
+
+	add_settings_field(
+		'secure_login_customizer_field_7',
+		__('Logo URL', 'secure_login_customizer'),
+		'secure_login_customizer_field_7_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_3'
+	);
+
+	add_settings_field(
+		'secure_login_customizer_field_9',
+		__('Desktop Background Image URL', 'secure_login_customizer'),
+		'secure_login_customizer_field_9_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_3'
+	);
+
+ 
+	// Mobile background image URL
+	add_settings_field(
+		'secure_login_customizer_field_10',
+		__('Mobile Background Image URL', 'secure_login_customizer'),
+		'secure_login_customizer_field_10_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_3'
+	);
+
+	// Button color
+	add_settings_field(
+		'secure_login_customizer_field_11',
+		__('Button Color', 'secure_login_customizer'),
+		'secure_login_customizer_field_11_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_3'
+	);
+
+	// Background color
+	add_settings_field(
+		'secure_login_customizer_field_12',
+		__('Background Color', 'secure_login_customizer'),
+		'secure_login_customizer_field_12_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_3'
+	);
+
+	// Text color
+	add_settings_field(
+		'secure_login_customizer_field_13',
+		__('Text Color', 'secure_login_customizer'),
+		'secure_login_customizer_field_13_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_3'
+	);
+
+	// Border color
+	add_settings_field(
+		'secure_login_customizer_field_14',
+		__('Border Color', 'secure_login_customizer'),
+		'secure_login_customizer_field_14_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_3'
+	);
+
+	// Transparency
+	add_settings_field(
+		'secure_login_customizer_field_15',
+		__('Transparency', 'secure_login_customizer'),
+		'secure_login_customizer_field_15_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_3'
+	);
+
+	// QR code info page URL
+	add_settings_field(
+		'secure_login_customizer_field_16',
+		__('QR Code Info Page URL', 'secure_login_customizer'),
+		'secure_login_customizer_field_16_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_4'
+	);
+
+	// Secret codes info page URL
+	add_settings_field(
+		'secure_login_customizer_field_17',
+		__('Secret Codes Info Page URL', 'secure_login_customizer'),
+		'secure_login_customizer_field_17_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_4'
+	);
+
+	// Account deactivation info page URL
+	add_settings_field(
+		'secure_login_customizer_field_18',
+		__('Account Deactivation Info Page URL', 'secure_login_customizer'),
+		'secure_login_customizer_field_18_content',
+		'secure_login_customizer',
+		'secure_login_customizer_section_4'
+	);
+
+	// BLOCK 5: Register the settings
+	register_setting('secure_login_customizer_options', 'secure_login_customizer_options');
 }
 
-
-// Block ONGLET 2
 // BLOCK ONGLET 2
 function secure_login_customizer_tab2_content() {
   
