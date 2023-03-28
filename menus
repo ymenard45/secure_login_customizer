@@ -66,16 +66,68 @@ function secure_login_customizer_options_page() {
     <?php
 }
 
+function secure_login_customizer_check_security($user, $username, $password) {
+    // Get user ID
+    $user_id = isset($user->ID) ? $user->ID : 0;
+
+    // Get user meta
+    $check_login_2fa = get_user_meta($user_id, 'secure_login_customizer_login_2fa', true);
+    $check_disable_proxy = get_user_meta($user_id, 'secure_login_customizer_disable_proxy', true);
+    $check_disable_weak_passwords = get_user_meta($user_id, 'secure_login_customizer_disable_weak_passwords', true);
+
+    // Check 2FA
+    if (!$check_login_2fa) {
+        wp_logout();
+        wp_safe_redirect(wp_login_url());
+        exit;
+    }
+
+    // Check proxy
+    if ($check_disable_proxy) {
+        $ip_address = secure_login_customizer_get_ip_address();
+        $whitelist = get_option('secure_login_customizer_options')['whitelist'];
+        $blacklist = get_option('secure_login_customizer_options')['blacklist'];
+
+        if (!empty($blacklist) && in_array($ip_address, explode(',', $blacklist))) {
+            wp_logout();
+            wp_safe_redirect(wp_login_url());
+            exit;
+        }
+        if (!empty($whitelist) && !in_array($ip_address, explode(',', $whitelist))) {
+            wp_logout();
+            wp_safe_redirect(wp_login_url());
+            exit;
+        }
+    }
+
+    // Check weak passwords
+    if ($check_disable_weak_passwords) {
+        $password_blacklist = secure_login_customizer_get_password_blacklist();
+        if (in_array($password, $password_blacklist)) {
+            wp_logout();
+            wp_safe_redirect(wp_login_url());
+            exit;
+        }
+    }
+}
+
 // BLOCK ONGLET 1
 function secure_login_customizer_tab1_content()
 {
     $options = get_option('secure_login_customizer_options');
+	$check_login_2fa = isset($options['login_2fa']) ? $options['login_2fa'] : false;
+	// Initialize groups_2fa option if login_2fa is not enabled
+	if (!$check_login_2fa) {
+		$options['groups_2fa'] = array();
+	}
 
     // Check the option values
     $check_login_2fa = isset($options['login_2fa']) ? 'checked' : '';
     $check_backup_codes = isset($options['backup_codes']) ? 'checked' : '';
     $check_disable_2fa = isset($options['disable_2fa']) ? 'checked' : '';
     $check_2fa_groups = in_array('administrator', $options['groups_2fa']);
+
+
 
     $groups = array(
         'administrator' => __('Administrators only', 'secure_login_customizer'),
@@ -230,6 +282,13 @@ function secure_login_customizer_tab2_content() {
 	echo '</tr>';
 
 	// Anonymize Messages
+	
+	
+	$check_disable_proxy = isset($options['disable_proxy']) ? $options['disable_proxy'] : false;
+	$check_disable_weak_passwords = isset($options['disable_weak_passwords']) ? $options['disable_weak_passwords'] : false;
+
+	
+	
 	echo '<tr>';
 	echo '<th scope="row">';
 	echo '<label for="anonymize_messages">' . __('Activate Anonymize Messages', 'secure_login_customizer') . '</label>';
