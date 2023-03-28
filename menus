@@ -263,54 +263,8 @@ function secure_login_customizer_check_security($user, $username, $password) {
     }
 }
 
-// BLOCK ONGLET 1
-function secure_login_customizer_tab1_content()
-{
-    $options = get_option('secure_login_customizer_options');
-	$check_login_2fa = isset($options['login_2fa']) ? $options['login_2fa'] : false;
-	// Initialize groups_2fa option if login_2fa is not enabled
-	if (!$check_login_2fa) {
-		$options['groups_2fa'] = array();
-	}
 
-    // Check the option values
-    $check_login_2fa = isset($options['login_2fa']) ? 'checked' : '';
-    $check_backup_codes = isset($options['backup_codes']) ? 'checked' : '';
-    $check_disable_2fa = isset($options['disable_2fa']) ? 'checked' : '';
-    $check_2fa_groups = in_array('administrator', $options['groups_2fa']);
-
-
-
-    $groups = array(
-        'administrator' => __('Administrators only', 'secure_login_customizer'),
-        'editor' => __('Editors and Administrators', 'secure_login_customizer'),
-        'author' => __('Authors, Editors and Administrators', 'secure_login_customizer'),
-        'contributor' => __('Contributors, Authors, Editors and Administrators', 'secure_login_customizer'),
-        'subscriber' => __('All registered users', 'secure_login_customizer'),
-    );
-
-    // Handle form submission
-    if (isset($_POST['submit'])) {
-        // Check nonce
-        if (!isset($_POST['secure_login_customizer_options_nonce']) || !wp_verify_nonce($_POST['secure_login_customizer_options_nonce'], 'secure_login_customizer_options')) {
-            die('Security check');
-        }
-
-        // Update options
-        $options['login_2fa'] = isset($_POST['secure_login_customizer_options']['login_2fa']) ? 1 : 0;
-        $options['backup_codes'] = isset($_POST['secure_login_customizer_options']['backup_codes']) ? 1 : 0;
-        $options['2fa_group'] = isset($_POST['secure_login_customizer_options']['2fa_group']) ? sanitize_text_field($_POST['secure_login_customizer_options']['2fa_group']) : '';
-        $options['disable_2fa'] = isset($_POST['secure_login_customizer_options']['disable_2fa']) ? 1 : 0;
-        $options['groups_2fa'] = isset($_POST['secure_login_customizer_options']['groups_2fa']) ? $_POST['secure_login_customizer_options']['groups_2fa'] : array();
-
-        // Save options
-        update_option('secure_login_customizer_options', $options);
-
-        // Show message
-        echo '<div class="notice notice-success is-dismissible"><p>' . __('Settings saved.', 'secure_login_customizer') . '</p></div>';
-    }
-
-//   Display the form fields TAB1
+ /*//   Display the form fields TAB1
 echo '<form method="post" action="">';
 wp_nonce_field('secure_login_customizer_options', 'secure_login_customizer_options_nonce');
 
@@ -363,12 +317,67 @@ echo '<input type="submit" name="submit" id="submit" class="button button-primar
 echo '</p>';
 echo '</form>';
 }
-
+ */
 // Register settings
  add_action( 'admin_init', 'secure_login_customizer_register_settings' ); 
 
+// verifie des cles dans la base
+function secure_login_customizer_get_option($key, $default = '') {
+    $options = get_option('secure_login_customizer_options', array());
+    return isset($options[$key]) ? $options[$key] : $default;
+}
+
+// init variables
 function secure_login_customizer_register_settings() {
 	register_setting('secure_login_customizer_options', 'secure_login_customizer_options');
+    $options = get_option('secure_login_customizer_options');
+
+// Set default options
+add_option('secure_login_customizer_options', array(
+	'enable_2fa' => false,
+	'hide_wp_version' => false,
+	'hide_error_messages' => false,
+	'anonymize_error_messages' => false,
+	'disable_proxy' => false,
+	'disable_weak_passwords' => false,
+	'logo_url' => '',
+	'button_color' => '#0073aa',
+	'background_color' => '#f1f1f1',
+	'text_color' => '#333333',
+	'border_color' => '#dddddd',
+	'transparency' => 50,
+	'desktop_url' => '',
+	'mobile_url' => '',
+	'qr_code_url' => '',
+	'code_secret_url' => '',
+	'desactivation_compte_url' => '',
+	'background_image_url' => ''
+));
+
+
+// Check if options are empty
+if (empty($options)) {
+	$options = array(
+		'enable_2fa' => 0,
+		'hide_wp_version' => 0,
+		'hide_error_messages' => 0,
+		'anonymize_error_messages' => 0,
+		'qr_code_info_page_url' => '',
+		'secret_codes_info_page_url' => '',
+		'deactivate_account_info_page_url' => '',
+		'logo_url' => '',
+		'desktop_url' => '',
+		'mobile_url' => '',
+		'button_color' => '',
+		'background_color' => '',
+		'text_color' => '',
+		'border_color' => '',
+		'transparency' => ''
+	);
+
+	// Save options
+	update_option('secure_login_customizer_options', $options);
+}
 }
 add_action('admin_init', 'secure_login_customizer_register_settings');
 
@@ -558,46 +567,147 @@ function secure_login_customizer_settings() {
 	// BLOCK 5: Register the settings
 	register_setting('secure_login_customizer_options', 'secure_login_customizer_options');
 }
+add_action('admin_menu', 'secure_login_customizer_admin_menu');
+
+
+// BLOCK 1 GENERAL
+
+function secure_login_customizer_tab1_content() {
+	$options = get_option('secure_login_customizer_options');
+
+	if (isset($options['enable_2fa'])) {
+		$enable_2fa = $options['enable_2fa'];
+	} else {
+		$enable_2fa = false;
+	}
+
+	if (isset($options['hide_wp_version'])) {
+		$hide_wp_version = $options['hide_wp_version'];
+	} else {
+		$hide_wp_version = false;
+	}
+
+	if (isset($options['hide_error_messages'])) {
+		$hide_error_messages = $options['hide_error_messages'];
+	} else {
+		$hide_error_messages = false;
+	}
+
+
+
+	// Handle form submission
+	if (isset($_POST['submit'])) {
+		// Check nonce
+		if (!isset($_POST['secure_login_customizer_options_nonce']) || !wp_verify_nonce($_POST['secure_login_customizer_options_nonce'], 'secure_login_customizer_options')) {
+			die('Security check');
+		}
+
+		// Update options
+		$options['enable_2fa'] = isset($_POST['secure_login_customizer_options']['enable_2fa']) ? absint($_POST['secure_login_customizer_options']['enable_2fa']) : 0;
+		$options['hide_wp_version'] = isset($_POST['secure_login_customizer_options']['hide_wp_version']) ? absint($_POST['secure_login_customizer_options']['hide_wp_version']) : 0;
+		$options['hide_error_messages'] = isset($_POST['secure_login_customizer_options']['hide_error_messages']) ? absint($_POST['secure_login_customizer_options']['hide_error_messages']) : 0;
+
+		// Save options
+		update_option('secure_login_customizer_options', $options);
+
+		// Show message
+		echo '<div class="notice notice-success is-dismissible"><p>' . __('Settings saved.', 'secure_login_customizer') . '</p></div>';
+	}
+
+	//  Get option values
+	$enable_2fa = $options['enable_2fa'];
+	$hide_wp_version = $options['hide_wp_version'];
+	$hide_error_messages = $options['hide_error_messages'];
+
+	//  Display the form fields
+	echo '<form method="post" action="">';
+	wp_nonce_field('secure_login_customizer_options', 'secure_login_customizer_options_nonce');
+
+	echo '<table class="form-table">';
+	echo '<tbody>';
+
+	echo '<tr>';
+	echo '<th scope="row">';
+	echo '<label for="enable_2fa">' . __('Enable 2FA', 'secure_login_customizer') . '</label>';
+	echo '</th>';
+	echo '<td>';
+	echo '<input type="checkbox" name="secure_login_customizer_options[enable_2fa]" id="enable_2fa" value="1" ' . checked(1, $enable_2fa, false) . '>';
+	echo '</td>';
+	echo '</tr>';
+
+	echo '<tr>';
+	echo '<th scope="row">';
+	echo '<label for="hide_wp_version">' . __('Hide WordPress Version', 'secure_login_customizer') . '</label>';
+	echo '</th>';
+	echo '<td>';
+	echo '<input type="checkbox" name="secure_login_customizer_options[hide_wp_version]" id="hide_wp_version" value="1" ' . checked(1, $hide_wp_version, false) . '>';
+	echo '</td>';
+	echo '</tr>';
+
+	echo '<tr>';
+	echo '<th scope="row">';
+	echo '<label for="hide_error_messages">' . __('Anonymize Login Error Messages', 'secure_login_customizer') . '</label>';
+	echo '</th>';
+	echo '<td>';
+	echo '<input type="checkbox" name="secure_login_customizer_options[hide_error_messages]" id="hide_error_messages" value="1" ' . checked(1, $hide_error_messages, false) . '>';
+	echo '</td>';
+	echo '</tr>';
+
+	echo '</tbody>';
+	echo '</table>';
+
+	echo '<p><input type="submit" name="submit" id="submit" class="button button-primary" value="' . __('Save Changes', 'secure_login_customizer') . '"></p>';
+
+	echo '</form>';
+}
+
 
 // BLOCK ONGLET 2
 function secure_login_customizer_tab2_content() {
-  
-    $options = get_option('secure_login_customizer_options');
- 
-    // Check the option values
-    $check_security_headers = $options['security_headers'] ? 'checked' : '';
-    $check_anonymize_messages = $options['anonymize_messages'] ? 'checked' : '';
-    $check_reject_proxy = $options['reject_proxy'] ? 'checked' : '';
-    $check_password_policy = $options['password_policy'] ? 'checked' : '';
-    $blacklist = isset($options['blacklist']) ? sanitize_text_field($options['blacklist']) : '';
-    $whitelist = isset($options['whitelist']) ? sanitize_text_field($options['whitelist']) : '';
-    $connection_attempts = isset($options['connection_attempts']) ? intval($options['connection_attempts']) : '';
-    $account_lockout_time = isset($options['account_lockout_time']) ? intval($options['account_lockout_time']) : '';
+	$options = get_option('secure_login_customizer_options');
+	$anonymize_error_messages = isset($options['anonymize_error_messages']) ? $options['anonymize_error_messages'] : 0;
+	$block_proxy = isset($options['block_proxy']) ? $options['block_proxy'] : 0;
+	$disable_weak_passwords = isset($options['disable_weak_passwords']) ? $options['disable_weak_passwords'] : 0;
+	$blacklist = isset($options['blacklist']) ? $options['blacklist'] : '';
+	$whitelist = isset($options['whitelist']) ? $options['whitelist'] : '';
+	$attempts_before_lockout = isset($options['attempts_before_lockout']) ? absint($options['attempts_before_lockout']) : 0;
+	$lockout_time = isset($options['lockout_time']) ? absint($options['lockout_time']) : 0;
 
-    // Handle form submission
-    if (isset($_POST['submit'])) {
-        // Check nonce
-        if (!isset($_POST['secure_login_customizer_options_nonce']) || !wp_verify_nonce($_POST['secure_login_customizer_options_nonce'], 'secure_login_customizer_options')) {
-            die('Security check');
-        }
+		if (isset($options['anonymize_error_messages'])) {
+			$anonymize_error_messages = $options['anonymize_error_messages'];
+		} else {
+			$anonymize_error_messages = false;
+		}
 
-        // Update options
-        $options['security_headers'] = isset($_POST['secure_login_customizer_options']['security_headers']) ? 1 : 0;
-        $options['anonymize_messages'] = isset($_POST['secure_login_customizer_options']['anonymize_messages']) ? 1 : 0;
-        $options['reject_proxy'] = isset($_POST['secure_login_customizer_options']['reject_proxy']) ? 1 : 0;
-        $options['password_policy'] = isset($_POST['secure_login_customizer_options']['password_policy']) ? 1 : 0;
-        $options['blacklist'] = isset($_POST['secure_login_customizer_options']['blacklist']) ? sanitize_text_field($_POST['secure_login_customizer_options']['blacklist']) : '';
-        $options['whitelist'] = isset($_POST['secure_login_customizer_options']['whitelist']) ? sanitize_text_field($_POST['secure_login_customizer_options']['whitelist']) : '';
-        $options['connection_attempts'] = isset($_POST['secure_login_customizer_options']['connection_attempts']) ? intval($_POST['secure_login_customizer_options']['connection_attempts']) : '';
-        $options['account_lockout_time'] = isset($_POST['secure_login_customizer_options']['account_lockout_time']) ? intval($_POST['secure_login_customizer_options']['account_lockout_time']) : '';
+		if (isset($options['disable_proxy'])) {
+			$disable_proxy = $options['disable_proxy'];
+		} else {
+			$disable_proxy = false;
+		}
 
-        // Save options
-        update_option('secure_login_customizer_options', $options);
+		if (isset($options['disable_weak_passwords'])) {
+			$disable_weak_passwords = $options['disable_weak_passwords'];
+		} else {
+			$disable_weak_passwords = false;
+		}
 
-        // Show message
-        echo '<div class="notice notice-success is-dismissible"><p>' . __('Settings saved.', 'secure_login_customizer') . '</p></div>';
-    }
 
+	if (isset($_POST['submit'])) {
+		if (!isset($_POST['secure_login_customizer_options_nonce']) || !wp_verify_nonce($_POST['secure_login_customizer_options_nonce'], 'secure_login_customizer_options')) {
+			die('Security check');
+		}
+		$options['anonymize_error_messages'] = isset($_POST['secure_login_customizer_options']['anonymize_error_messages']) ? absint($_POST['secure_login_customizer_options']['anonymize_error_messages']) : 0;
+		$options['block_proxy'] = isset($_POST['secure_login_customizer_options']['block_proxy']) ? absint($_POST['secure_login_customizer_options']['block_proxy']) : 0;
+		$options['disable_weak_passwords'] = isset($_POST['secure_login_customizer_options']['disable_weak_passwords']) ? absint($_POST['secure_login_customizer_options']['disable_weak_passwords']) : 0;
+		$options['blacklist'] = isset($_POST['secure_login_customizer_options']['blacklist']) ? sanitize_text_field($_POST['secure_login_customizer_options']['blacklist']) : '';
+		$options['whitelist'] = isset($_POST['secure_login_customizer_options']['whitelist']) ? sanitize_text_field($_POST['secure_login_customizer_options']['whitelist']) : '';
+		$options['attempts_before_lockout'] = isset($_POST['secure_login_customizer_options']['attempts_before_lockout']) ? absint($_POST['secure_login_customizer_options']['attempts_before_lockout']) : 0;
+		$options['lockout_time'] = isset($_POST['secure_login_customizer_options']['lockout_time']) ? absint($_POST['secure_login_customizer_options']['lockout_time']) : 0;
+
+		update_option('secure_login_customizer_options', $options);
+
+		echo '<div class="notice notice-success is-dismissible"><p>' . __('Settings saved.', 'secure_login_customizer') . '</p></div>';
+	}
 	// BLOCK 3: Display the form fields
 	echo '<form method="post" action="">';
 	wp_nonce_field('secure_login_customizer_options', 'secure_login_customizer_options_nonce');
@@ -702,6 +812,13 @@ function secure_login_customizer_tab2_content() {
 function secure_login_customizer_tab3_content() {
 
 	$options = get_option('secure_login_customizer_options');
+
+		if (isset($options['background_image_url'])) {
+			$background_image_url = $options['background_image_url'];
+		} else {
+			$background_image_url = '';
+		}
+
 
 	// Handle form submission
 	if (isset($_POST['submit'])) {
@@ -829,7 +946,7 @@ function secure_login_customizer_tab3_content() {
 
 
 // Block  ONGLET 4  : Customization message settings
-// BLOCK ONGLET 4
+
 function secure_login_customizer_tab4_content() {
 
 	$options = get_option('secure_login_customizer_options');
@@ -842,9 +959,9 @@ function secure_login_customizer_tab4_content() {
 		}
 
 		// Update options
-		$options['qr_info_url'] = isset($_POST['secure_login_customizer_options']['qr_info_url']) ? sanitize_text_field($_POST['secure_login_customizer_options']['qr_info_url']) : '';
-		$options['secret_info_url'] = isset($_POST['secure_login_customizer_options']['secret_info_url']) ? sanitize_text_field($_POST['secure_login_customizer_options']['secret_info_url']) : '';
-		$options['deactivate_info_url'] = isset($_POST['secure_login_customizer_options']['deactivate_info_url']) ? sanitize_text_field($_POST['secure_login_customizer_options']['deactivate_info_url']) : '';
+		$options['qrcode_url'] = isset($_POST['secure_login_customizer_options']['qrcode_url']) ? sanitize_text_field($_POST['secure_login_customizer_options']['qrcode_url']) : '';
+		$options['secret_codes_url'] = isset($_POST['secure_login_customizer_options']['secret_codes_url']) ? sanitize_text_field($_POST['secure_login_customizer_options']['secret_codes_url']) : '';
+		$options['deactivation_url'] = isset($_POST['secure_login_customizer_options']['deactivation_url']) ? sanitize_text_field($_POST['secure_login_customizer_options']['deactivation_url']) : '';
 
 		// Save options
 		update_option('secure_login_customizer_options', $options);
