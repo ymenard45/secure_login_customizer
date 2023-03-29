@@ -285,13 +285,13 @@ function slc_enable_backup_codes_callback() {
 }
 
 // focntion pour gerer desactiver option activer 2FA de l'onglet 1
-/* function slc_disable_2fa_disabling_callback() {
+function slc_disable_2fa_disabling_callback() {
     $options = get_option('slc_2fa_settings');
     ?>
-    <input type="checkbox" name="slc_2fa_settings[disable_2fa_disabling]" value="1" <?php if (array_key_exists('disable_2fa_disabling', $options)) checked(1, $options['disable_2fa_disabling'], true); ?>>
+    <input type="checkbox" name="slc_2fa_settings[disable_2fa_disabling]" value="1" <?php checked(1, $options['disable_2fa_disabling'], true); ?>>
     <?php
 }
- */
+
 // fonction activation 2FA pour les roles 
 function slc_enable_2fa_for_groups_callback() {
     $options = get_option('slc_options');
@@ -353,154 +353,41 @@ function slc_security_group_callback() {
         $checked = isset($slc_options['slc_security_group'][$role]) ? 'checked' : '';
         echo "<input type='checkbox' name='slc_2fa_settings[slc_security_group][{$role}]' {$checked}>{$role_name}<br>";
     }
-	
-	function slc_disable_2fa_disabling_callback() {
-    $options = get_option('slc_2fa_settings');
-    ?>
-    <input type="checkbox" name="slc_2fa_settings[disable_2fa_disabling]" value="1" <?php checked(1, isset($options['disable_2fa_disabling']) ? $options['disable_2fa_disabling'] : '', true); ?>>
-    <?php
-	}
-
-
-
-
-	
-} // onglet 1
+}
 
 /* Fonctions pour gérer l'onglet 2 */
 
 // fonction pour enregistrer les paramètres de onglet 2
  
+	function slc_register_security_settings() {
+		register_setting('slc_security_settings', 'slc_security_settings', 'slc_sanitize_security_settings');
+
+		add_settings_section('slc_security_section', __('Paramètres de sécurité', 'secure-login-customizer'), 'slc_security_section_callback', 'slc_security_settings');
+
+		// Ajoutez les champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
+	}
  
+	add_action('admin_init', 'slc_register_security_settings');
+
 	function slc_security_section_callback() {
 		_e('Paramètres de sécurité pour le site.', 'secure-login-customizer');
 	}
- 
+
 	// Ligne 1
 	function slc_add_security_fields() {
-		
-		//add_settings_field('enable_security_headers', __('Activer Security headers', 'secure-login-customizer'), 'slc_enable_security_headers_callback', 'slc_security_settings', 'slc_security_section');
+		add_settings_field('enable_security_headers', __('Activer Security headers', 'secure-login-customizer'), 'slc_enable_security_headers_callback', 'slc_security_settings', 'slc_security_section');
 		// Ajoutez les autres champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
-			add_settings_section('slc_security_section', 'Sécurité', '', 'slc_settings');
-			add_settings_field('enable_security_headers', 'Activer Security headers', 'slc_enable_security_headers_callback', 'slc_settings', 'slc_security_section');
-			add_settings_field('anonymize_login_messages', 'Activer l’anonymisation des messages', 'slc_anonymize_login_messages_callback', 'slc_settings', 'slc_security_section');
-			add_settings_field('refuse_proxy_connection', 'Refuser les connexions depuis un proxy', 'slc_refuse_proxy_connection_callback', 'slc_settings', 'slc_security_section');
-			add_settings_field('forbid_weak_passwords', 'Interdire les mots de passe à faible sécurité', 'slc_forbid_weak_passwords_callback', 'slc_settings', 'slc_security_section');
-			add_settings_field('blacklist', 'Blacklist', 'slc_blacklist_callback', 'slc_settings', 'slc_security_section');
-			add_settings_field('whitelist', 'Whitelist', 'slc_whitelist_callback', 'slc_settings', 'slc_security_section');
-			add_settings_field('login_attempts', 'Nombre de tentatives de connexions avant désactivation (de 0 à 20, 0 =jamais)', 'slc_login_attempts_callback', 'slc_settings', 'slc_security_section');
-			add_settings_field('account_lock_time', 'Temps de blocage du compte (de 0 à 300, 0=aucun)', 'slc_account_lock_time_callback', 'slc_settings', 'slc_security_section');
 	}
 	 
 	add_action('admin_init', 'slc_add_security_fields');
 
-	/* Fonctions pour l'onglet 2 */
-	
-	function slc_security_settings_init() {
-    register_setting('slc_security_settings', 'slc_security_settings');
-
-    add_settings_section(
-        'slc_security_section',
-        __('Security Headers Settings', 'slc'),
-        'slc_security_settings_section_callback',
-        'slc_security'
-    );
-
-    add_settings_field(
-        'enable_security_headers',
-        __('Enable Security Headers', 'slc'),
-        'slc_enable_security_headers_callback',
-        'slc_security',
-        'slc_security_section'
-    );
-	
-	add_settings_field(
-		'slc_enable_message_anonymization', // ID du champ
-		__('Activer l’anonymisation des messages', 'slc'), // Libellé du champ
-		'slc_enable_message_anonymization_callback', // Fonction de rappel pour afficher le champ
-		'slc_security_settings', // Page d'administration sur laquelle afficher le champ
-		'slc_security_settings_section' // Section sur laquelle afficher le champ
-	);
-	
-	add_settings_field(
-		'slc_reject_proxy_connections', // ID du champ
-		__('Refuser les connexions depuis un proxy', 'slc'), // Libellé du champ
-		'slc_reject_proxy_connections_callback', // Fonction de rappel pour afficher le champ
-		'slc_security_settings', // Page d'administration sur laquelle afficher le champ
-		'slc_security_settings_section' // Section sur laquelle afficher le champ
-	);
-	
-	add_settings_field(
-		'slc_disable_weak_passwords', // ID du champ
-		__('Interdire les Mots de passe à faible sécurité', 'slc'), // Libellé du champ
-		'slc_disable_weak_passwords_callback', // Fonction de rappel pour afficher le champ
-		'slc_security_settings', // Page d'administration sur laquelle afficher le champ
-		'slc_security_settings_section' // Section sur laquelle afficher le champ
-	);
-    // Ajouter d'autres champs ici pour l'onglet de sécurité
-
-	} // slc_security_settings_init
-	add_action('admin_init', 'slc_security_settings_init');
-	
 	// champ security headers
-	
 	function slc_enable_security_headers_callback() {
 		$options = get_option('slc_security_settings');
 		?>
-		<input type="checkbox" name="slc_security_settings[enable_security_headers]" value="1" <?php checked(1, isset($options['enable_security_headers']) ? $options['enable_security_headers'] : '', true); ?>>
+		<input type="checkbox" name="slc_security_settings[enable_security_headers]" value="1" <?php checked(1, $options['enable_security_headers'], true); ?>>
 		<?php
 	}
-
-	function slc_enable_anonymize_messages_callback() {
-    $options = get_option('slc_security_settings');
-    ?>
-    <input type="checkbox" name="slc_security_settings[enable_anonymize_messages]" value="1" <?php checked(1, $options['enable_anonymize_messages'], true); ?>>
-    <?php
-	}
-	function slc_deny_proxy_connections_callback() {
-		$options = get_option('slc_security_settings');
-		?>
-		<input type="checkbox" name="slc_security_settings[deny_proxy_connections]" value="1" <?php checked(1, $options['deny_proxy_connections'], true); ?>>
-		<?php
-	}
-	function slc_disallow_weak_passwords_callback() {
-		$options = get_option('slc_security_settings');
-		?>
-		<input type="checkbox" name="slc_security_settings[disallow_weak_passwords]" value="1" <?php checked(1, $options['disallow_weak_passwords'], true); ?>>
-		<?php
-	}
-	function slc_blacklist_callback() {
-		$options = get_option('slc_security_settings');
-		?>
-		<textarea name="slc_security_settings[blacklist]" rows="4" cols="50"><?php echo esc_textarea($options['blacklist']); ?></textarea>
-		<?php
-	}
-	function slc_whitelist_callback() {
-		$options = get_option('slc_security_settings');
-		?>
-		<textarea name="slc_security_settings[whitelist]" rows="4" cols="50"><?php echo esc_textarea($options['whitelist']); ?></textarea>
-		<?php
-	}
-	function slc_login_attempts_limit_callback() {
-		$options = get_option('slc_security_settings');
-		?>
-		<input type="number" name="slc_security_settings[login_attempts_limit]" value="<?php echo intval($options['login_attempts_limit']); ?>" min="0" max="20">
-		<?php
-	}
-	function slc_account_lockout_duration_callback() {
-		$options = get_option('slc_security_settings');
-		?>
-		<input type="number" name="slc_security_settings[account_lockout_duration]" value="<?php echo intval($options['account_lockout_duration']); ?>" min="0" max="300">
-		<?php
-	}
-
-		
-	
-	
-	// Actions et filtres
-add_action('admin_init', 'slc_add_security_fields');
-//add_action('admin_menu', 'slc_register_options_page');
-	
 /* Fonctions pour gérer l'onglet 3 */
  
  // Ligne 1
@@ -583,7 +470,4 @@ function slc_add_plugin_page() {
     );
 }
 add_action('admin_menu', 'slc_add_plugin_page');
-
-
-
 
