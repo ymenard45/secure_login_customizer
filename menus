@@ -355,11 +355,33 @@ function slc_security_group_callback() {
     }
 }
 
+
+// fonction pour enregistrer les paramètres de onglet 2
+ 
+function slc_register_security_settings() {
+	register_setting('slc_security_settings', 'slc_security_settings', 'slc_sanitize_security_settings');
+	add_settings_section('slc_security_section', __('Paramètres de sécurité', 'secure-login-customizer'), 'slc_security_section_callback', 'slc_security_settings');
+
+ 
+		 
 /* Fonctions pour gérer l'onglet 2 */
+function slc_add_security_fields() {
+	add_settings_field('enable_security_headers', __('Activer Security headers', 'secure-login-customizer'), 'slc_enable_security_headers_callback', 'slc_security_settings', 'slc_security_section');
+	// Ajoutez les autres champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
+}
+		 
 
 function slc_security_settings_section_callback() {
     echo '<p>' . __('Configurer les paramètres de sécurité pour le plugin.', 'secure-login-customizer') . '</p>';
 }
+
+// champ security headers
+function slc_enable_security_headers_callback() {
+ 	$options = get_option('slc_security_settings');
+		?>
+		<input type="checkbox" name="slc_security_settings[enable_security_headers]" value="1" <?php checked(1, $options['enable_security_headers'], true); ?>>
+		<?php
+		}
 
 function slc_enable_anonymize_messages_callback() {
     $options = get_option('slc_security_settings');
@@ -402,105 +424,91 @@ function slc_account_lockout_duration_callback() {
     <input type="number" name="slc_security_settings[account_lockout_duration]" value="<?php echo intval($options['account_lockout_duration']); ?>" min="0" max="300">
     <?php
 }
-
-
-
-
-
-// fonction pour enregistrer les paramètres de onglet 2
+}
+// Actions et filtres
+add_action('admin_init', 'slc_add_security_fields');
+add_action('admin_menu', 'slc_register_options_page');
+/**/
  
-	function slc_register_security_settings() {
-		register_setting('slc_security_settings', 'slc_security_settings', 'slc_sanitize_security_settings');
+ 
 
-		add_settings_section('slc_security_section', __('Paramètres de sécurité', 'secure-login-customizer'), 'slc_security_section_callback', 'slc_security_settings');
-		//
-		// Ajoutez les champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
-	}
+		// champs onglet 2
+
+			// Activer l'anonymisation des messages
+		add_settings_field(
+			'enable_anonymize_messages',
+			__('Activer l\'anonymisation des messages', 'secure-login-customizer'),
+			'slc_enable_anonymize_messages_callback',
+			'slc_security_settings',
+			'slc_security_settings_section'
+		);
+
+		// Refuser les connexions depuis un proxy
+		add_settings_field(
+			'refuse_proxy_connections',
+			__('Refuser les connexions depuis un proxy', 'secure-login-customizer'),
+			'slc_refuse_proxy_connections_callback',
+			'slc_security_settings',
+			'slc_security_settings_section'
+		);
+
+		// Interdire les mots de passe à faible sécurité
+		add_settings_field(
+			'disallow_weak_passwords',
+			__('Interdire les mots de passe à faible sécurité', 'secure-login-customizer'),
+			'slc_disallow_weak_passwords_callback',
+			'slc_security_settings',
+			'slc_security_settings_section'
+		);
+
+		// Blacklist
+		add_settings_field(
+			'blacklist',
+			__('Blacklist', 'secure-login-customizer'),
+			'slc_blacklist_callback',
+			'slc_security_settings',
+			'slc_security_settings_section'
+		);
+
+		// Whitelist
+		add_settings_field(
+			'whitelist',
+			__('Whitelist', 'secure-login-customizer'),
+			'slc_whitelist_callback',
+			'slc_security_settings',
+			'slc_security_settings_section'
+		);
+
+		// Nombre de tentatives de connexion avant désactivation
+		add_settings_field(
+			'login_attempts',
+			__('Nombre de tentatives de connexion avant désactivation', 'secure-login-customizer'),
+			'slc_login_attempts_callback',
+			'slc_security_settings',
+			'slc_security_settings_section'
+		);
+
+		// Temps de blocage du compte
+		add_settings_field(
+			'account_lock_time',
+			__('Temps de blocage du compte', 'secure-login-customizer'),
+			'slc_account_lock_time_callback',
+			'slc_security_settings',
+			'slc_security_settings_section'
+		);
+
+			// Ajoutez les champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
+		}
+ 
+ /**/
  
 	add_action('admin_init', 'slc_register_security_settings');
+	add_action('admin_init', 'slc_add_security_fields');
 
 	function slc_security_section_callback() {
 		_e('Paramètres de sécurité pour le site.', 'secure-login-customizer');
 	}
 
-	// Ligne 1
-	function slc_add_security_fields() {
-		add_settings_field('enable_security_headers', __('Activer Security headers', 'secure-login-customizer'), 'slc_enable_security_headers_callback', 'slc_security_settings', 'slc_security_section');
-		// Ajoutez les autres champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
-	}
-	 
-	add_action('admin_init', 'slc_add_security_fields');
-
-	// champs onglet 2
-	// champ security headers
-	function slc_enable_security_headers_callback() {
-		$options = get_option('slc_security_settings');
-		?>
-		<input type="checkbox" name="slc_security_settings[enable_security_headers]" value="1" <?php checked(1, $options['enable_security_headers'], true); ?>>
-		<?php
-	}
-		// Activer l'anonymisation des messages
-	add_settings_field(
-		'enable_anonymize_messages',
-		__('Activer l\'anonymisation des messages', 'secure-login-customizer'),
-		'slc_enable_anonymize_messages_callback',
-		'slc_security_settings',
-		'slc_security_settings_section'
-	);
-
-	// Refuser les connexions depuis un proxy
-	add_settings_field(
-		'refuse_proxy_connections',
-		__('Refuser les connexions depuis un proxy', 'secure-login-customizer'),
-		'slc_refuse_proxy_connections_callback',
-		'slc_security_settings',
-		'slc_security_settings_section'
-	);
-
-	// Interdire les mots de passe à faible sécurité
-	add_settings_field(
-		'disallow_weak_passwords',
-		__('Interdire les mots de passe à faible sécurité', 'secure-login-customizer'),
-		'slc_disallow_weak_passwords_callback',
-		'slc_security_settings',
-		'slc_security_settings_section'
-	);
-
-	// Blacklist
-	add_settings_field(
-		'blacklist',
-		__('Blacklist', 'secure-login-customizer'),
-		'slc_blacklist_callback',
-		'slc_security_settings',
-		'slc_security_settings_section'
-	);
-
-	// Whitelist
-	add_settings_field(
-		'whitelist',
-		__('Whitelist', 'secure-login-customizer'),
-		'slc_whitelist_callback',
-		'slc_security_settings',
-		'slc_security_settings_section'
-	);
-
-	// Nombre de tentatives de connexion avant désactivation
-	add_settings_field(
-		'login_attempts',
-		__('Nombre de tentatives de connexion avant désactivation', 'secure-login-customizer'),
-		'slc_login_attempts_callback',
-		'slc_security_settings',
-		'slc_security_settings_section'
-	);
-
-	// Temps de blocage du compte
-	add_settings_field(
-		'account_lock_time',
-		__('Temps de blocage du compte', 'secure-login-customizer'),
-		'slc_account_lock_time_callback',
-		'slc_security_settings',
-		'slc_security_settings_section'
-	);
 
 	
 /* Fonctions pour gérer l'onglet 3 */
