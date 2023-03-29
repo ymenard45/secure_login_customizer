@@ -1,343 +1,397 @@
 <?php
-/*
-Plugin Name: SecureLoginCustomizer
-Description: Plugin de personnalisation du processus de connexion et d'amélioration de la sécurité
-Version: 1.0
-Author: Your Name
-Author URI: https://example.com
-*/
+/**
+ * Plugin Name: Secure Login Customizer
+ * Plugin URI: https://example.com/secure-login-customizer
+ * Description: Un plugin pour customiser l'écran de connexion et ajouter des options de sécurité.
+ * Version: 1.0
+ * Author: Your Name
+ * Author URI: https://example.com
+ * Text Domain: secure-login-customizer
+ * Domain Path: /languages
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
-// Ajout d'un menu pour le plugin
-add_action('admin_menu', 'slc_plugin_setup_menu');
-
-function slc_plugin_setup_menu() {
-  add_menu_page('SecureLoginCustomizer', 'SecureLoginCustomizer', 'manage_options', 'secure_login_customizer', 'slc_plugin_homepage', '', 90);
+// Ligne 1
+function slc_plugin_action_links($links) {
+    $settings_link = '<a href="options-general.php?page=secure-login-customizer">' . __('Settings', 'secure-login-customizer') . '</a>';
+    array_unshift($links, $settings_link);
+    return $links;
 }
+// Ligne 5
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'slc_plugin_action_links');
 
-// Page d'accueil du plugin
-function slc_plugin_homepage() {
-  ?>
-  <div class="wrap">
-    <h1>SecureLoginCustomizer</h1>
-    <p>Bienvenue sur la page d'accueil du plugin SecureLoginCustomizer.</p>
-    <p>Ce plugin permet de personnaliser le processus de connexion et d'améliorer la sécurité.</p>
-  </div>
-  <?php
+// Charge le fichier de traduction du plugin.
+function slc_load_plugin_textdomain() {
+    load_plugin_textdomain('secure-login-customizer', false, basename(dirname(__FILE__)) . '/languages');
 }
+// Ligne 10
+add_action('plugins_loaded', 'slc_load_plugin_textdomain');
 
-// Ajout des onglets
-add_action('admin_init', 'slc_initialize_plugin_options');
-
-function slc_initialize_plugin_options() {
-  // Onglet 1 - Sécurité 2FA
-  add_settings_section('slc_2fa_section', '2FA Authentification', 'slc_2fa_section_callback', 'slc_2fa_settings_page');
-  add_settings_field('enable_2fa', 'Activer 2FA Authentification', 'slc_enable_2fa_callback', 'slc_2fa_settings_page', 'slc_2fa_section');
-  add_settings_field('enable_backup_codes', 'Activer Code de Secours', 'slc_enable_backup_codes_callback', 'slc_2fa_settings_page', 'slc_2fa_section');
-  add_settings_field('disable_2fa_disabling', 'Interdire la Désactivation de 2FA Authentification', 'slc_disable_2fa_disabling_callback', 'slc_2fa_settings_page', 'slc_2fa_section');
-  add_settings_field('security_groups', 'Groupes de Sécurité où 2FA sera Activé', 'slc_security_groups_callback', 'slc_2fa_settings_page', 'slc_2fa_section');
-  register_setting('slc_2fa_settings', 'slc_2fa_settings');
-
-// Onglet 2 - Sécurité
-add_settings_section('slc_security_section', 'Sécurité', 'slc_security_section_callback', 'slc_security_settings_page');
-
-add_settings_field('x-xss-protection', 'X-XSS-Protection', 'slc_security_headers_callback', 'slc_security_settings_page', 'slc_security_section', array('x-xss-protection', 'slc_security_settings', true));
-add_settings_field('x-frame-options', 'X-Frame-Options', 'slc_security_headers_callback', 'slc_security_settings_page', 'slc_security_section', array('x-frame-options', 'slc_security_settings', true));
-add_settings_field('x-content-type-options', 'X-Content-Type-Options', 'slc_security_headers_callback', 'slc_security_settings_page', 'slc_security_section', array('x-content-type-options', 'slc_security_settings', true));
-add_settings_field('content-security-policy', 'Content-Security-Policy', 'slc_security_headers_callback', 'slc_security_settings_page', 'slc_security_section', array('content-security-policy', 'slc_security_settings', false));
-add_settings_field('strict-transport-security', 'Strict-Transport-Security', 'slc_security_headers_callback', 'slc_security_settings_page', 'slc_security_section', array('strict-transport-security', 'slc_security_settings', true));
-
-add_settings_field('anonymize-messages', 'Anonymiser les messages', 'slc_anonymize_messages_callback', 'slc_security_settings_page', 'slc_security_section', array('anonymize-messages', 'slc_security_settings', false));
-add_settings_field('proxy-block', 'Refuser les connexions depuis un proxy', 'slc_proxy_block_callback', 'slc_security_settings_page', 'slc_security_section', array('proxy-block', 'slc_security_settings', false));
-add_settings_field('weak-passwords', 'Interdire les mots de passe à faible sécurité', 'slc_weak_passwords_callback', 'slc_security_settings_page', 'slc_security_section', array('weak-passwords', 'slc_security_settings', false));
-
-add_settings_field('blacklist', 'Liste noire des IP', 'slc_blacklist_callback', 'slc_security_settings_page', 'slc_security_section', array('blacklist', 'slc_security_settings', ''));
-add_settings_field('whitelist', 'Liste blanche des IP', 'slc_whitelist_callback', 'slc_security_settings_page', 'slc_security_section', array('whitelist', 'slc_security_settings', ''));
-
-add_settings_field('login-attempts', 'Nombre de tentatives de connexion avant désactivation', 'slc_login_attempts_callback', 'slc_security_settings_page', 'slc_security_section', array('login-attempts', 'slc_security_settings', 0));
-add_settings_field('account-lock-time', 'Temps de blocage du compte', 'slc_account_lock_time_callback', 'slc_security_settings_page', 'slc_security_section', array('account-lock-time', 'slc_security_settings', 0));
-
-// Onglet 3 - Customisation de l'écran de connexion
-add_settings_section('slc_customization_section', 'Customisation de l\'écran de connexion', 'slc_customization_section_callback', 'slc_security_settings_page');
-
-// Champ 1 - URL du logo
-add_settings_field('slc_login_logo', 'URL du logo', 'slc_login_logo_callback', 'slc_security_settings_page', 'slc_customization_section');
-register_setting('slc_security_settings', 'slc_login_logo');
-
-// Champ 2 - URL pour desktop
-add_settings_field('slc_desktop_image', 'URL pour desktop', 'slc_desktop_image_callback', 'slc_security_settings_page', 'slc_customization_section');
-register_setting('slc_security_settings', 'slc_desktop_image');
-
-// Champ 3 - URL pour mobile
-add_settings_field('slc_mobile_image', 'URL pour mobile', 'slc_mobile_image_callback', 'slc_security_settings_page', 'slc_customization_section');
-register_setting('slc_security_settings', 'slc_mobile_image');
-
-// Champ 4 - Couleur du bouton
-add_settings_field('slc_button_color', 'Couleur du bouton', 'slc_button_color_callback', 'slc_security_settings_page', 'slc_customization_section');
-register_setting('slc_security_settings', 'slc_button_color');
-
-// Champ 5 - Couleur de fond
-add_settings_field('slc_background_color', 'Couleur de fond', 'slc_background_color_callback', 'slc_security_settings_page', 'slc_customization_section');
-register_setting('slc_security_settings', 'slc_background_color');
-
-// Champ 6 - Couleur du texte
-add_settings_field('slc_text_color', 'Couleur du texte', 'slc_text_color_callback', 'slc_security_settings_page', 'slc_customization_section');
-register_setting('slc_security_settings', 'slc_text_color');
-
-// Champ 7 - Couleur des bordures
-add_settings_field('slc_border_color', 'Couleur des bordures', 'slc_border_color_callback', 'slc_security_settings_page', 'slc_customization_section');
-register_setting('slc_security_settings', 'slc_border_color');
-
-// Champ 8 - Niveau de transparence
-add_settings_field('slc_transparency_level', 'Niveau de transparence (0-100)', 'slc_transparency_level_callback', 'slc_security_settings_page', 'slc_customization_section');
-register_setting('slc_security_settings', 'slc_transparency_level');
-
-// Onglet 4 - Customisation des messages
-add_settings_section('slc_messages_section', 'Customisation des messages', 'slc_messages_section_callback', 'slc_security_settings_page');
-
-// Champ URL QR Code Info
-add_settings_field('slc_qrcode_url_field', 'URL de la page d\'information QR Code', 'slc_qrcode_url_callback', 'slc_security_settings_page', 'slc_messages_section');
-
-// Champ URL Désactivation Compte Info
-add_settings_field('slc_disable_account_url_field', 'URL de la page d\'information Désactivation Compte', 'slc_disable_account_url_callback', 'slc_security_settings_page', 'slc_messages_section');
-
-// Enregistrement des options
-register_setting('slc_security_settings', 'slc_security_settings');
+// Ligne 1
+function slc_add_plugin_menu() {
+    add_options_page(
+        __('Secure Login Customizer', 'secure-login-customizer'),
+        __('Secure Login Customizer', 'secure-login-customizer'),
+        'manage_options',
+        'secure-login-customizer',
+        'slc_render_plugin_settings_page'
+    );
 }
+// Ligne 7
+add_action('admin_menu', 'slc_add_plugin_menu');
 
-// Fonction de callback pour l'affichage de la section Customisation des messages
-function slc_messages_section_callback() {
-    echo 'Personnalisez les messages affichés dans votre zone d\'administration.';
-}
-
-// Fonction de callback pour l'affichage du champ URL QR Code Info
-function slc_qrcode_url_callback() {
-$options = get_option('slc_security_settings');
-?>
-<input type="url" name="slc_security_settings[qrcode_url]" value="<?php echo $options['qrcode_url']; ?>" size="75">
-<?php
-}
-
-// Fonction de callback pour l'affichage du champ URL Secret Code Info
-function slc_secret_code_url_callback() {
-$options = get_option('slc_security_settings');
-?>
-<input type="url" name="slc_security_settings[secret_code_url]" value="<?php echo $options['secret_code_url']; ?>" size="75">
-<?php
-}
-
-// Fonction de callback pour l'affichage du champ URL Désactivation Compte Info
-function slc_disable_account_url_callback() {
-$options = get_option('slc_security_settings');
-?>
-<input type="url" name="slc_security_settings[disable_account_url]" value="<?php echo $options['disable_account_url']; ?>" size="75">
-
-<?php
-}
-
-// Fonction de callback pour l'affichage de la section Customisation de l'écran de connexion
-function slc_customization_section_callback() {
-echo 'Personnalisez l\'écran de connexion de votre site web.';
-}
-
-// Fonction de callback pour l'affichage du champ URL du logo
-function slc_login_logo_callback() {
-$options = get_option('slc_security_settings');
-?>
-<input type="url" name="slc_security_settings[login_logo]" value="<?php echo $options['login_logo']; ?>" size="75">
-<?php
-}
-// Fonction de callback pour l'affichage du champ URL pour desktop
-function slc_desktop_image_callback() {
-$options = get_option('slc_security_settings');
-?>
-<input type="url" name="slc_security_settings[desktop_image]" value="<?php echo $options['desktop_image']; ?>" size="75">
-
-<?php
-}
-
-// Fonction de callback pour l'affichage du champ URL pour mobile
-function slc_mobile_image_callback() {
-$options = get_option('slc_security_settings');
-?>
-<input type="url" name="slc_security_settings[mobile_image]" value="<?php echo $options['mobile_image']; ?>" size="75">
-<?php
-}
-// Fonction de callback pour l'affichage du champ Couleur du bouton
-function slc_button_color_callback() {
-$options = get_option('slc_security_settings');
-?>
-<input type="color" name="slc_security_settings[button_color]" value="<?php echo $options['button_color']; ?>">
-
-<?php
-}
-
-// Fonction de callback pour l'affichage du champ Couleur de fond
-function slc_background_color_callback() {
-$options = get_option('slc_security_settings');
-?>
-<input type="color" name="slc_security_settings[background_color]" value="<?php echo $options['background_color']; ?>">
-<?php
-}
-
-// Fonction de callback pour l'affichage du champ Couleur du texte
-function slc_text_color_callback() {
-    $options = get_option('slc_security_settings');
+// strcuture html pour les onglets
+function slc_render_plugin_settings_page() {
     ?>
-    <input type="color" name="slc_security_settings[text_color]" value="<?php echo $options['text_color']; ?>"></input>
+		<div class="wrap">
+		<div class="slc-title-container">
+        <span class="dashicons dashicons-shield"></span>
+        <h1><?php _e('Secure Login Customizer', 'secure-login-customizer'); ?></h1>
+		<span class="dashicons dashicons-shield"></span>
+		</div>
+				<style>
+					.tab-content p:first-child  {
+					margin-top: 15px; /* Ajustez cette valeur en fonction de l'espace souhaité */
+					}
+					.dashicons-shield {
+					font-size: 36px; /* Ajustez la taille de l'icône */
+					margin-right: 10px; /* Ajoutez une marge à droite pour l'espacement entre l'icône et le texte */
+					vertical-align: middle; /* Alignement vertical avec le texte */
+					}
+					
+					.form{
+					margin-top:15 px;	
+					}
+					.wrap > h1 {
+					color:blue;	
+					margin-bottom: 30px;
+				    }
+
+					.tab-content {
+					margin-left: 25px;
+					}
+				
+					h1.slc-plugin-title,
+					.tab-content h2 {
+					display: none;
+					}
+					
+					.slc-title-container {
+						text-align: center;
+					}
+
+					.slc-title-container h1 {
+						display: inline-block;
+						vertical-align: middle;
+						margin-left: 15px;
+						margin-right: 10px;
+						font-size:36px;
+						color:blue;
+					}
+					
+					.nav-tab {padding-top:10px;
+							   padding-bottom:10px;
+							   margin-top:20px;
+							   margin-bottom:20px}
+
+					.dashicons-shield {
+						font-size: 36px;
+						margin-right: 5px;
+						vertical-align: middle;
+					}
+										
+										
+			 </style>
+
+        
+        <h2 class="nav-tab-wrapper">
+            <a href="#tab-1" class="nav-tab"><?php _e('2FA', 'secure-login-customizer'); ?></a>
+            <a href="#tab-2" class="nav-tab"><?php _e('Sécurité', 'secure-login-customizer'); ?></a>
+            <a href="#tab-3" class="nav-tab"><?php _e('Customisation login screen', 'secure-login-customizer'); ?></a>
+            <a href="#tab-4" class="nav-tab"><?php _e('Customisation message', 'secure-login-customizer'); ?></a>
+            <a href="#tab-5" class="nav-tab"><?php _e('Lorem Ipsum', 'secure-login-customizer'); ?></a>
+        </h2>
+    </div>
     <?php
-}
-
-// Fonction de callback pour l'affichage du champ Couleur des bordures
-function slc_border_color_callback() {
-    $options = get_option('slc_security_settings');
-    ?>
-    <input type="color" name="slc_security_settings[border_color]" value="<?php echo $options['border_color']; ?>">
-    <?php
-}
-
-
-// Fonction de callback pour l'affichage du champ Niveau de transparence
-function slc_transparency_level_callback() {
-$options = get_option('slc_security_settings');
-?>
-<input type="range" name="slc_security_settings[transparency_level]" min="0" max="100" value="<?php echo $options['transparency_level']; ?>">
-
-<?php
-}
-
-// Fonction de callback pour l'affichage de la section Sécurité
-function slc_security_section_callback() {
-echo 'Personnalisez les options de sécurité pour votre site web.';
-}
-
-// Fonction de callback pour l'affichage du champ X-XSS-Protection, X-Frame-Options et Strict-Transport-Security
-function slc_security_headers_callback($args) {
-$header = $args[0];
-$options_name = $args[1];
-$default_enabled = $args[2];
-$options = get_option($options_name);
-?>
-<input type="checkbox" name="<?php echo $options_name.'['.$header.'_enabled]'; ?>" value="1" <?php checked($options[$header.'_enabled'], 1, true); ?>>
-<label for="<?php echo $options_name.'['.$header.'_enabled]'; ?>"><?php echo $header; ?></label>
-
-  <?php if ($default_enabled) { ?>
-  <br>
-  <input type="text" name="<?php echo $options_name.'['.$header.']'; ?>" value="<?php echo $options[$header]; ?>" size="75">
-  <?php } ?>
-  <?php
-}
-// Fonction de callback pour l'affichage du champ Anonymize Messages
-function slc_anonymize_messages_callback($args) {
-$option_name = $args[0];
-$options = get_option($option_name);
-?>
-<input type="checkbox" name="<?php echo $option_name.'[anonymize-messages]'; ?>" value="1" <?php checked($options['anonymize-messages'], 1, true); ?>>
-
-  <?php
-}
-
-// Fonction de callback pour l'affichage du champ Proxy Block
-function slc_proxy_block_callback($args) {
-  $option_name = $args[0];
-  $options = get_option($option_name);
-  ?>
-<input type="checkbox" name="<?php echo $option_name.'[proxy-block]'; ?>" value="1" <?php checked($options['proxy-block'], 1, true); ?>>
-
-  <?php
-}
-
-// Fonction de callback pour l'affichage du champ Weak Passwords
-function slc_weak_passwords_callback($args) {
-  $option_name = $args[0];
-  $options = get_option($option_name);
-  ?>
-<input type="checkbox" name="<?php echo $option_name.'[weak-passwords]'; ?>" value="1" <?php checked($options['weak-passwords'], 1, true); ?>>
-
-  <?php
-}
-
-// Fonction de callback pour l'affichage du champ Blacklist
-function slc_blacklist_callback($args) {
-  $option_name = $args[0];
-  $options = get_option($option_name);
-  ?>
-  <input type="text" name="<?php echo $option_name.'[blacklist]'; ?>" value="<?php echo $options['blacklist']; ?>" size="75">
-  <?php
-}
-// Fonction de callback pour l'affichage du champ Whitelist
-function slc_whitelist_callback($args) {
-$option_name = $args[0];
-$options = get_option($option_name);
-?>
-<input type="text" name="<?php echo $option_name.'[whitelist]'; ?>" value="<?php echo $options['whitelist']; ?>" size="75">
-
-  <?php
-}
-
+	
+    // gestion de chaque onglets
  
+    // Contenu de l'onglet 1
+    ?>
+    <div id="tab-1" class="tab-content">
+        <h2><?php _e('2FA', 'secure-login-customizer'); ?></h2>
+        <form method="post" action="options.php">
+            <?php
+			
+			settings_fields('slc_2fa_settings');
+			do_settings_sections('slc_2fa_settings');
+			submit_button();
 
-// Fonction de callback pour l'affichage du champ Login Attempts
-function slc_login_attempts_callback($args) {
-  $option_name = $args[0];
-  $options = get_option($option_name);
-  ?>
-  <input type="number" name="<?php echo $option_name.'[login-attempts]'; ?>" value="<?php echo $options['login-attempts']; ?>" min="1" max="10">
-  <?php
+			
+            // Nous ajouterons des champs de formulaire et des sections ici plus tard.
+            ?>
+        </form>
+    </div>
+    <?php
+
+    // Contenu de l'onglet 2
+    ?>
+    <div id="tab-2" class="tab-content">
+        <h2><?php _e('Sécurité', 'secure-login-customizer'); ?></h2>
+        <form method="post" action="options.php">
+              
+			<?php
+			  // champs de formulaire onglet 2
+				settings_fields('slc_security_settings');
+				do_settings_sections('slc_security_settings');
+				submit_button();
+
+			?>
+        </form>
+    </div>
+    <?php
+
+    // Contenu de l'onglet 3
+    ?>
+    <div id="tab-3" class="tab-content">
+        <h2><?php _e('Customisation login screen', 'secure-login-customizer'); ?></h2>
+        <form method="post" action="options.php">
+            <?php
+            //  champs de formulaire onglet 3
+			
+			settings_fields('slc_custom_login_screen_settings');
+			do_settings_sections('slc_custom_login_screen_settings');
+			submit_button();
+
+			
+			
+			
+            ?>
+        </form>
+    </div>
+    <?php
+
+    // Contenu de l'onglet 4
+    ?>
+    <div id="tab-4" class="tab-content">
+        <h2><?php _e('Customisation message', 'secure-login-customizer'); ?></h2>
+        <form method="post" action="options.php">
+            <?php
+            // champs de formulaire onglet 4
+			settings_fields('slc_custom_message_settings');
+			do_settings_sections('slc_custom_message_settings');
+			submit_button();
+
+			
+			
+            ?>
+        </form>
+    </div>
+    <?php
+
+    // Contenu de l'onglet 5
+    ?>
+    <div id="tab-5" class="tab-content">
+        <h2><?php _e('Lorem Ipsum', 'secure-login-customizer'); ?></h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod orci ut ullamcorper tincidunt. Sed auctor sapien ut facilisis fermentum.</p>
+        <p>In hac habitasse platea dictumst. Vestibulum pellentesque elit et erat congue, id ultricies metus vestibulum. Duis commodo augue ac magna laoreet ultrices.</p>
+    </div>
+    <?php
+	
+	
+}   // fin function slc_render_plugin_settings_page
+
+// gestion des onglets avec javascript
+function slc_admin_scripts() {
+    ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const target = event.target.getAttribute('href');
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('nav-tab-active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+                    event.target.classList.add('nav-tab-active');
+                    document.querySelector(target).style.display = 'block';
+                });
+            });
+            tabs[0].click();
+        });
+    </script>
+    <?php
 }
+// activation onglets
+add_action('admin_footer', 'slc_admin_scripts');
 
-// Fonction de callback pour l'affichage du champ Account Lock Time
-function slc_account_lock_time_callback($args) {
-  $option_name = $args[0];
-  $options = get_option($option_name);
-  ?>
-  <input type="number" name="<?php echo $option_name.'[account-lock-time]'; ?>" value="<?php echo $options['account-lock-time']; ?>" min="1" max="60">
-  <?php
+//  fonction pour enregistrer les paramètres de l'onglet 1
+function slc_register_2fa_settings() {
+    register_setting('slc_2fa_settings', 'slc_2fa_settings', 'slc_sanitize_2fa_settings');
+
+    add_settings_section('slc_2fa_section', __('Paramètres 2FA', 'secure-login-customizer'), 'slc_2fa_section_callback', 'slc_2fa_settings');
+
+    // Ajoutez les champs de l'onglet 1 ici (nous le ferons dans les prochaines étapes).
 }
+add_action('admin_init', 'slc_register_2fa_settings');
 
-/***   Fonctions pour afficher les onglets     ***/
-
-// Fonction de callback pour l'affichage du champ Activer 2FA Authentification
-function slc_enable_2fa_callback() {
-  $options = get_option('slc_2fa_settings');
-  ?>
-  <input type="checkbox" name="slc_2fa_settings[enable_2fa]" value="1" <?php checked($options['enable_2fa'], 1, true); ?>>
-
-  <?php
-}
-
-// Fonction de callback pour l'affichage du champ Activer Code de Secours
-function slc_enable_backup_codes_callback() {
-  $options = get_option('slc_2fa_settings');
-  ?>
-  <input type="checkbox" name="slc_2fa_settings[enable_backup_codes]" value="1" <?php checked($options['enable_backup_codes'], 1, true); ?>>
-
-  <?php
-}
-
-// Fonction de callback pour l'affichage du champ Interdire la Désactivation de 2FA Authentification
-function slc_disable_2fa_disabling_callback() {
-  $options = get_option('slc_2fa_settings');
-  ?>
-  <input type="checkbox" name="slc_2fa_settings[disable_2fa_disabling]" value="1" <?php checked($options['disable_2fa_disabling'], 1, true); ?>>
-
-  <?php
-}
-
-// Fonction de callback pour l'affichage du champ Groupes de Sécurité où 2FA sera Activé
-function slc_security_groups_callback() {
-  $options = get_option('slc_2fa_settings');
-  ?>
-  <input type="text" name="slc_2fa_settings[security_groups]" value="<?php echo $options['security_groups']; ?>" size="75">
-  <p class="description">Entrez les noms des groupes de sécurité séparés par des virgules où vous souhaitez activer l'authentification à deux facteurs. Exemple: Administrateurs, Éditeurs</p>
-
-  <?php
-}
-
-// Fonction de callback pour l'affichage de la section 2FA Authentification
+// focntion pour les champs de l'onglet 1
 function slc_2fa_section_callback() {
-  echo 'Personnalisez les options d\'authentification à deux facteurs pour votre site web.';
+    _e('Paramètres de l\'authentification à deux facteurs (2FA).', 'secure-login-customizer');
 }
 
+// Ligne 1
+function slc_add_2fa_fields() {
+    add_settings_field('enable_2fa', __('Activer 2FA authentification', 'secure-login-customizer'), 'slc_enable_2fa_callback', 'slc_2fa_settings', 'slc_2fa_section');
+    add_settings_field('enable_backup_codes', __('Activer code de secours', 'secure-login-customizer'), 'slc_enable_backup_codes_callback', 'slc_2fa_settings', 'slc_2fa_section');
+    add_settings_field('disable_2fa_disabling', __('Interdire la désactivation de 2FA authentification', 'secure-login-customizer'), 'slc_disable_2fa_disabling_callback', 'slc_2fa_settings', 'slc_2fa_section');
+    add_settings_field('security_group', __('Sélection des groupes de sécurité', 'secure-login-customizer'), 'slc_security_group_callback', 'slc_2fa_settings', 'slc_2fa_section');
+}
+// Ligne 5
+add_action('admin_init', 'slc_add_2fa_fields');
+
+// focntion pour gerer activer option activer 2FA de l'onglet 1
+function slc_enable_2fa_callback() {
+    $options = get_option('slc_2fa_settings');
+    ?>
+    <input type="checkbox" name="slc_2fa_settings[enable_2fa]" value="1" <?php checked(1, $options['enable_2fa'], true); ?>>
+    <?php
+}
+// focntion pour gerer l'option 'code de securité'
+function slc_enable_backup_codes_callback() {
+    $options = get_option('slc_2fa_settings');
+    ?>
+    <input type="checkbox" name="slc_2fa_settings[enable_backup_codes]" value="1" <?php checked(1, $options['enable_backup_codes'], true); ?>>
+    <?php
+}
+// focntion pour gerer desactiver option activer 2FA de l'onglet 1
+function slc_disable_2fa_disabling_callback() {
+    $options = get_option('slc_2fa_settings');
+    ?>
+    <input type="checkbox" name="slc_2fa_settings[disable_2fa_disabling]" value="1" <?php checked(1, $options['disable_2fa_disabling'], true); ?>>
+    <?php
+}
+
+// fonction 
+function slc_security_group_callback() {
+    $options = get_option('slc_2fa_settings');
+    ?>
+    <select name="slc_2fa_settings[security_group]">
+        <option value="1" <?php selected($options['security_group'], '1'); ?>><?php _e('Groupe 1', 'secure-login-customizer'); ?></option>
+        <option value="2" <?php selected($options['security_group'], '2'); ?>><?php _e('Groupe 2', 'secure-login-customizer'); ?></option>
+        <!-- Ajoutez d'autres groupes de sécurité ici si nécessaire -->
+    </select>
+    <?php
+}
+
+/* Fonctions pour gérer l'onglet 2 */
+
+// fonction pour enregistrer les paramètres de onglet 2
  
+	function slc_register_security_settings() {
+		register_setting('slc_security_settings', 'slc_security_settings', 'slc_sanitize_security_settings');
+
+		add_settings_section('slc_security_section', __('Paramètres de sécurité', 'secure-login-customizer'), 'slc_security_section_callback', 'slc_security_settings');
+
+		// Ajoutez les champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
+	}
  
-/*** Fin des fonctions d'affichage des onglets ***/
+	add_action('admin_init', 'slc_register_security_settings');
+
+	function slc_security_section_callback() {
+		_e('Paramètres de sécurité pour le site.', 'secure-login-customizer');
+	}
+
+	// Ligne 1
+	function slc_add_security_fields() {
+		add_settings_field('enable_security_headers', __('Activer Security headers', 'secure-login-customizer'), 'slc_enable_security_headers_callback', 'slc_security_settings', 'slc_security_section');
+		// Ajoutez les autres champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
+	}
+	 
+	add_action('admin_init', 'slc_add_security_fields');
+
+	// champ security headers
+	function slc_enable_security_headers_callback() {
+		$options = get_option('slc_security_settings');
+		?>
+		<input type="checkbox" name="slc_security_settings[enable_security_headers]" value="1" <?php checked(1, $options['enable_security_headers'], true); ?>>
+		<?php
+	}
+/* Fonctions pour gérer l'onglet 3 */
+ 
+ // Ligne 1
+ 
+	function slc_register_custom_login_screen_settings() {
+		register_setting('slc_custom_login_screen_settings', 'slc_custom_login_screen_settings', 'slc_sanitize_custom_login_screen_settings');
+
+		add_settings_section('slc_custom_login_screen_section', __('Paramètres de customisation de l’écran de connexion', 'secure-login-customizer'), 'slc_custom_login_screen_section_callback', 'slc_custom_login_screen_settings');
+
+		// Ajoutez les champs de l'onglet 3 ici (nous le ferons dans les prochaines étapes).
+	}    // fin slc_register_custom_login_screen_settings
+		add_action('admin_init', 'slc_register_custom_login_screen_settings');
+
+	function slc_custom_login_screen_section_callback() {
+		_e('Paramètres de customisation de l’écran de connexion.', 'secure-login-customizer');
+	}
+ 
+	function slc_add_custom_login_screen_fields() {
+		add_settings_field('logo_url', __('URL du logo', 'secure-login-customizer'), 'slc_logo_url_callback', 'slc_custom_login_screen_settings', 'slc_custom_login_screen_section');
+		// Ajoutez les autres champs de l'onglet 3 ici (nous le ferons dans les prochaines étapes).
+	}
+	// Ligne 4
+	add_action('admin_init', 'slc_add_custom_login_screen_fields');
+
+// Ligne 1
+	function slc_logo_url_callback() {
+    $options = get_option('slc_custom_login_screen_settings');
+    ?>
+    <input type="text" name="slc_custom_login_screen_settings[logo_url]" value="<?php echo esc_attr($options['logo_url']); ?>" size="75">
+    <?php
+}
+
+/* Fonctions pour gérer l'onglet 4 */
+
+	function slc_register_custom_message_settings() {
+    register_setting('slc_custom_message_settings', 'slc_custom_message_settings', 'slc_sanitize_custom_message_settings');
+
+    add_settings_section('slc_custom_message_section', __('Paramètres de customisation des messages', 'secure-login-customizer'), 'slc_custom_message_section_callback', 'slc_custom_message_settings');
+
+    // Ajoutez les champs de l'onglet 4 ici (nous le ferons dans les prochaines étapes).
+	}
+	add_action('admin_init', 'slc_register_custom_message_settings');
+
+	function slc_custom_message_section_callback() {
+    _e('Paramètres de customisation des messages.', 'secure-login-customizer');
+	}
+
+	function slc_add_custom_message_fields() {
+    add_settings_field('qr_code_info_url', __('URL de la page pour information QR-CODE', 'secure-login-customizer'), 'slc_qr_code_info_url_callback', 'slc_custom_message_settings', 'slc_custom_message_section');
+    // Ajoutez les autres champs de l'onglet 4 ici (nous le ferons dans les prochaines étapes).
+	}
+	add_action('admin_init', 'slc_add_custom_message_fields');
+
+function slc_qr_code_info_url_callback() {
+    $options = get_option('slc_custom_message_settings');
+    ?>
+    <input type="text" name="slc_custom_message_settings[qr_code_info_url]" value="<?php echo esc_attr($options['qr_code_info_url']); ?>" size="75">
+    <?php
+}
+
+/* Fonctions pour gérer l'onglet 5 non necessaires */
+
+/* Fonctions pour créer le menu */
+
+// Créer le menu de l'extension
+function slc_add_plugin_page() {
+    add_menu_page(
+        'Secure Login Customizer',
+        'Secure Login Customizer',
+        'manage_options',
+        'secure-login-customizer',
+        'slc_render_plugin_settings_page',
+        'dashicons-lock',
+        100
+    );
+}
+add_action('admin_menu', 'slc_add_plugin_page');
