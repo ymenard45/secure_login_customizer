@@ -387,6 +387,15 @@ function slc_security_settings_init() {
 		'slc_security_settings',
 		'slc_security_section'
 	);
+		add_settings_field(
+			'enable_security_headers',
+			'Activer Security headers',
+			'slc_enable_security_headers_callback',
+			'slc_security_settings',
+			'slc_security_section'
+		);
+
+
 
 }
 
@@ -398,6 +407,64 @@ function slc_anonymize_messages_callback() {
 }
 // Ajout des champs à l'onglet Sécurité
 add_settings_field('enable_message_anonymization', __('Activer l’anonymisation des messages', 'slc'), 'slc_security_fields_callback', 'slc_security_settings', 'slc_security_section');
+
+function slc_security_fields_callback() {
+	$options = get_option('slc_security_settings');
+	?>
+	<table class="form-table">
+		<tbody>
+			<tr>
+				<th scope="row"><?php esc_html_e('Activate Security Headers', 'secure-login-customizer'); ?></th>
+				<td>
+					<input type="checkbox" name="slc_security_settings[enable_security_headers]" value="1" <?php checked(1, $options['enable_security_headers'], true); ?>>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e('Anonymize messages', 'secure-login-customizer'); ?></th>
+				<td>
+					<input type="checkbox" name="slc_security_settings[anonymize_messages]" value="1" <?php checked(1, $options['anonymize_messages'], true); ?>>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e('Deny Connections from Proxies', 'secure-login-customizer'); ?></th>
+				<td>
+					<input type="checkbox" name="slc_security_settings[deny_connections_from_proxies]" value="1" <?php checked(1, $options['deny_connections_from_proxies'], true); ?>>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e('Disallow weak passwords', 'secure-login-customizer'); ?></th>
+				<td>
+					<input type="checkbox" name="slc_security_settings[disallow_weak_passwords]" value="1" <?php checked(1, $options['disallow_weak_passwords'], true); ?>>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e('Blacklist', 'secure-login-customizer'); ?></th>
+				<td>
+					<textarea name="slc_security_settings[blacklist]" rows="5" cols="50"><?php echo esc_html($options['blacklist']); ?></textarea>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e('Whitelist', 'secure-login-customizer'); ?></th>
+				<td>
+					<textarea name="slc_security_settings[whitelist]" rows="5" cols="50"><?php echo esc_html($options['whitelist']); ?></textarea>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e('Number of Login Attempts Before Lockout', 'secure-login-customizer'); ?></th>
+				<td>
+					<input type="number" name="slc_security_settings[login_attempts_before_lockout]" value="<?php echo esc_attr($options['login_attempts_before_lockout']); ?>" min="0" max="20">
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e('Account Lockout Time (in seconds)', 'secure-login-customizer'); ?></th>
+				<td>
+					<input type="number" name="slc_security_settings[account_lockout_time]" value="<?php echo esc_attr($options['account_lockout_time']); ?>" min="0" max="300">
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<?php
+}
 
 
 
