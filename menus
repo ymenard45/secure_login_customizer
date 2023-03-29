@@ -288,9 +288,10 @@ function slc_enable_backup_codes_callback() {
 function slc_disable_2fa_disabling_callback() {
     $options = get_option('slc_2fa_settings');
     ?>
-    <input type="checkbox" name="slc_2fa_settings[disable_2fa_disabling]" value="1" <?php checked(1, $options['disable_2fa_disabling'], true); ?>>
+    <input type="checkbox" name="slc_2fa_settings[disable_2fa_disabling]" value="1" <?php checked(1, isset($options['disable_2fa_disabling']) ? $options['disable_2fa_disabling'] : '', true); ?>>
     <?php
 }
+
 
 // fonction activation 2FA pour les roles 
 function slc_enable_2fa_for_groups_callback() {
@@ -357,6 +358,49 @@ function slc_security_group_callback() {
 
 /* Fonctions pour gérer l'onglet 2 */
 
+function slc_security_settings_init() {
+
+	// Register a setting and its sanitization callback function
+	register_setting( 'slc_security_settings', 'slc_security_settings', 'slc_security_settings_sanitize' );
+
+	// Add a section to the settings page
+	add_settings_section(
+		'slc_security_section',
+		__( 'Security', 'slc' ),
+		'slc_security_section_callback',
+		'slc_security_settings'
+	);
+
+	// Add fields to the settings section
+	add_settings_field(
+		'enable_security_headers',
+		__( 'Enable Security Headers', 'slc' ),
+		'slc_enable_security_headers_callback',
+		'slc_security_settings',
+		'slc_security_section'
+	);
+	
+		add_settings_field(
+		'anonymize_messages',
+		__( 'Anonymize Messages', 'slc' ),
+		'slc_anonymize_messages_callback',
+		'slc_security_settings',
+		'slc_security_section'
+	);
+
+}
+
+function slc_anonymize_messages_callback() {
+	$options = get_option('slc_security_settings');
+	?>
+	<input type="checkbox" name="slc_security_settings[anonymize_messages]" value="1" <?php checked(1, isset($options['anonymize_messages']) ? $options['anonymize_messages'] : '', true); ?>>
+	<?php
+}
+// Ajout des champs à l'onglet Sécurité
+add_settings_field('enable_message_anonymization', __('Activer l’anonymisation des messages', 'slc'), 'slc_security_fields_callback', 'slc_security_settings', 'slc_security_section');
+
+
+
 // fonction pour enregistrer les paramètres de onglet 2
  
 	function slc_register_security_settings() {
@@ -378,16 +422,17 @@ function slc_security_group_callback() {
 		add_settings_field('enable_security_headers', __('Activer Security headers', 'secure-login-customizer'), 'slc_enable_security_headers_callback', 'slc_security_settings', 'slc_security_section');
 		// Ajoutez les autres champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
 	}
-	 
 	add_action('admin_init', 'slc_add_security_fields');
 
 	// champ security headers
 	function slc_enable_security_headers_callback() {
-		$options = get_option('slc_security_settings');
-		?>
-		<input type="checkbox" name="slc_security_settings[enable_security_headers]" value="1" <?php checked(1, $options['enable_security_headers'], true); ?>>
-		<?php
-	}
+	$options = get_option('slc_security_settings');
+	$checked = isset($options['enable_security_headers']) && $options['enable_security_headers'] == 1 ? 'checked' : '';
+	?>
+	<input type="checkbox" name="slc_security_settings[enable_security_headers]" value="1" <?php echo $checked; ?>>
+	<?php
+}
+
 /* Fonctions pour gérer l'onglet 3 */
  
  // Ligne 1
