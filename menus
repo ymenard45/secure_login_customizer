@@ -1,476 +1,553 @@
 <?php
-/**
- * Plugin Name: Secure Login Customizer
- * Plugin URI: https://example.com/secure-login-customizer
- * Description: Un plugin pour customiser l'écran de connexion et ajouter des options de sécurité.
- * Version: 1.0
- * Author: Your Name
- * Author URI: https://example.com
- * Text Domain: secure-login-customizer
- * Domain Path: /languages
- * License: GPL v2 or later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+/*
+Plugin Name: SecureLoginCustomizer
+Plugin URI: https://www.example.com/
+Description: A plugin for customizing login and security settings in WordPress.
+Version: 1.0
+Author: Your Name
+Author URI: https://www.example.com/
+Text Domain: secure-login-customizer
+*/
+
+// Load the language files
+/* function secure_login_customizer_load_textdomain() {
+    load_plugin_textdomain( 'secure-login-customizer', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+}
+add_action( 'plugins_loaded', 'secure_login_customizer_load_textdomain' );
  */
-
-// Ligne 1
-function slc_plugin_action_links($links) {
-    $settings_link = '<a href="options-general.php?page=secure-login-customizer">' . __('Settings', 'secure-login-customizer') . '</a>';
-    array_unshift($links, $settings_link);
-    return $links;
-}
-// Ligne 5
-add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'slc_plugin_action_links');
-
-// Charge le fichier de traduction du plugin.
-function slc_load_plugin_textdomain() {
-    load_plugin_textdomain('secure-login-customizer', false, basename(dirname(__FILE__)) . '/languages');
-}
-// Ligne 10
-add_action('plugins_loaded', 'slc_load_plugin_textdomain');
-
-// Ligne 1
-function slc_add_plugin_menu() {
-    add_options_page(
-        __('Secure Login Customizer', 'secure-login-customizer'),
-        __('Secure Login Customizer', 'secure-login-customizer'),
+ 
+// Create the menu in WordPress
+function secure_login_customizer_create_menu() {
+    add_submenu_page(
+        'plugins.php',
+        __( 'Secure Login Customizer', 'secure-login-customizer' ),
+        __( 'Secure Login Customizer', 'secure-login-customizer' ),
         'manage_options',
-        'secure-login-customizer',
-        'slc_render_plugin_settings_page'
+        'secure-login-customizer-settings',
+        'secure_login_customizer_settings_page'
     );
 }
-// Ligne 7
-add_action('admin_menu', 'slc_add_plugin_menu');
+add_action( 'admin_menu', 'secure_login_customizer_create_menu' );
 
-// strcuture html pour les onglets
-() {
+// Render the settings page
+function secure_login_customizer_settings_page() {
     ?>
-		<div class="wrap">
-		<div class="slc-title-container">
-        <span class="dashicons dashicons-shield"></span>
-        <h1><?php _e('Secure Login Customizer', 'secure-login-customizer'); ?></h1>
-		<span class="dashicons dashicons-shield"></span>
-		</div>
-				<style>
-					.tab-content p:first-child  {
-					margin-top: 15px; /* Ajustez cette valeur en fonction de l'espace souhaité */
-					}
-					.dashicons-shield {
-					font-size: 36px; /* Ajustez la taille de l'icône */
-					margin-right: 10px; /* Ajoutez une marge à droite pour l'espacement entre l'icône et le texte */
-					vertical-align: middle; /* Alignement vertical avec le texte */
-					}
-					
-					.form{
-					margin-top:15 px;	
-					}
-					.wrap > h1 {
-					color:blue;	
-					margin-bottom: 30px;
-				    }
-
-					.tab-content {
-					margin-left: 25px;
-					}
-				
-					h1.slc-plugin-title,
-					.tab-content h2 {
-					display: none;
-					}
-					
-					.slc-title-container {
-						text-align: center;
-					}
-
-					.slc-title-container h1 {
-						display: inline-block;
-						vertical-align: middle;
-						margin-left: 15px;
-						margin-right: 10px;
-						font-size:36px;
-						color:blue;
-					}
-					
-					.nav-tab {padding-top:10px;
-							   padding-bottom:10px;
-							   margin-top:20px;
-							   margin-bottom:20px}
-
-					.dashicons-shield {
-						font-size: 36px;
-						margin-right: 5px;
-						vertical-align: middle;
-					}
-										
-										
-			 </style>
-
-        
+    <div class="wrap">
+        <h1><?php echo __('Secure Login Customizer', 'secure-login-customizer'); ?></h1>
         <h2 class="nav-tab-wrapper">
-            <a href="#tab-1" class="nav-tab"><?php _e('2FA', 'secure-login-customizer'); ?></a>
-            <a href="#tab-2" class="nav-tab"><?php _e('Sécurité', 'secure-login-customizer'); ?></a>
-            <a href="#tab-3" class="nav-tab"><?php _e('Customisation login screen', 'secure-login-customizer'); ?></a>
-            <a href="#tab-4" class="nav-tab"><?php _e('Customisation message', 'secure-login-customizer'); ?></a>
-            <a href="#tab-5" class="nav-tab"><?php _e('Lorem Ipsum', 'secure-login-customizer'); ?></a>
+            <a href="#" class="nav-tab"><?php echo __('Tab 1', 'secure-login-customizer'); ?></a>
+            <a href="#" class="nav-tab"><?php echo __('Tab 2', 'secure-login-customizer'); ?></a>
+            <a href="#" class="nav-tab"><?php echo __('Tab 3', 'secure-login-customizer'); ?></a>
+            <a href="#" class="nav-tab"><?php echo __('Tab 4', 'secure-login-customizer'); ?></a>
+            <a href="#" class="nav-tab"><?php echo __('Tab 5', 'secure-login-customizer'); ?></a>
         </h2>
-    </div>
-    <?php
-	
-    // gestion de chaque onglets
- 
-    // Contenu de l'onglet 1
-    ?>
-    <div id="tab-1" class="tab-content">
-        <h2><?php _e('2FA', 'secure-login-customizer'); ?></h2>
         <form method="post" action="options.php">
             <?php
-			
-			settings_fields('slc_2fa_settings');
-			do_settings_sections('slc_2fa_settings');
-			submit_button();
-
-			
-            // Nous ajouterons des champs de formulaire et des sections ici plus tard.
+            settings_fields('secure-login-customizer');
+            do_settings_sections('secure-login-customizer');
+            submit_button();
             ?>
         </form>
     </div>
     <?php
-
-    // Contenu de l'onglet 2
-    ?>
-    <div id="tab-2" class="tab-content">
-        <h2><?php _e('Sécurité', 'secure-login-customizer'); ?></h2>
-        <form method="post" action="options.php">
-              
-			<?php
-			  // champs de formulaire onglet 2
-				settings_fields('slc_security_settings');
-				do_settings_sections('slc_security_settings');
-				submit_button();
-
-			?>
-        </form>
-    </div>
-    <?php
-
-    // Contenu de l'onglet 3
-    ?>
-    <div id="tab-3" class="tab-content">
-        <h2><?php _e('Customisation login screen', 'secure-login-customizer'); ?></h2>
-        <form method="post" action="options.php">
-            <?php
-            //  champs de formulaire onglet 3
-			
-			settings_fields('slc_custom_login_screen_settings');
-			do_settings_sections('slc_custom_login_screen_settings');
-			submit_button();
-
-			
-			
-			
-            ?>
-        </form>
-    </div>
-    <?php
-
-    // Contenu de l'onglet 4
-    ?>
-    <div id="tab-4" class="tab-content">
-        <h2><?php _e('Customisation message', 'secure-login-customizer'); ?></h2>
-        <form method="post" action="options.php">
-            <?php
-            // champs de formulaire onglet 4
-			settings_fields('slc_custom_message_settings');
-			do_settings_sections('slc_custom_message_settings');
-			submit_button();
-
-			
-			
-            ?>
-        </form>
-    </div>
-    <?php
-
-    // Contenu de l'onglet 5
-    ?>
-    <div id="tab-5" class="tab-content">
-        <h2><?php _e('Lorem Ipsum', 'secure-login-customizer'); ?></h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod orci ut ullamcorper tincidunt. Sed auctor sapien ut facilisis fermentum.</p>
-        <p>In hac habitasse platea dictumst. Vestibulum pellentesque elit et erat congue, id ultricies metus vestibulum. Duis commodo augue ac magna laoreet ultrices.</p>
-    </div>
-    <?php
-	
-	
-}   // fin function slc_render_plugin_settings_page
-
-// gestion des onglets avec javascript
-function slc_admin_scripts() {
-    ?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.nav-tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const target = event.target.getAttribute('href');
-                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('nav-tab-active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-                    event.target.classList.add('nav-tab-active');
-                    document.querySelector(target).style.display = 'block';
-                });
-            });
-            tabs[0].click();
-        });
-    </script>
-    <?php
-}
-// activation onglets
-add_action('admin_footer', 'slc_admin_scripts');
-
-//  fonction pour enregistrer les paramètres de l'onglet 1
-function slc_register_2fa_settings() {
-    register_setting('slc_2fa_settings', 'slc_2fa_settings', 'slc_sanitize_2fa_settings');
-
-    add_settings_section('slc_2fa_section', __('Paramètres 2FA', 'secure-login-customizer'), 'slc_2fa_section_callback', 'slc_2fa_settings');
-
-    // Ajoutez les champs de l'onglet 1 ici (nous le ferons dans les prochaines étapes).
 }
 
-// Enregistre les groupes de sécurité sélectionnés
-register_setting('slc_2fa', 'slc_security_group', array(
-    'type' => 'array',
-    'sanitize_callback' => 'slc_sanitize_security_group',
-));
-
-add_action('admin_init', 'slc_register_2fa_settings');
-
-// focntion pour les champs de l'onglet 1
-function slc_2fa_section_callback() {
-    _e('Paramètres de l\'authentification à deux facteurs (2FA).', 'secure-login-customizer');
-}
-
-// Ligne 1
-function slc_add_2fa_fields() {
-    add_settings_field('enable_2fa', __('Activer 2FA authentification', 'secure-login-customizer'), 'slc_enable_2fa_callback', 'slc_2fa_settings', 'slc_2fa_section');
-    add_settings_field('enable_backup_codes', __('Activer code de secours', 'secure-login-customizer'), 'slc_enable_backup_codes_callback', 'slc_2fa_settings', 'slc_2fa_section');
-    add_settings_field('disable_2fa_disabling', __('Interdire la désactivation de 2FA authentification', 'secure-login-customizer'), 'slc_disable_2fa_disabling_callback', 'slc_2fa_settings', 'slc_2fa_section');
-	add_settings_field(
-		'slc_security_group', // field ID
-		'Activer l\'authentification à deux facteurs (2FA) pour les groupes d\'utilisateurs suivants :', // field title 
-		'slc_security_group_callback', // callback function
-		'slc_2fa_settings', // settings page slug
-		'slc_2fa_section' // section ID
-	);
-	
-}
-// Ligne 5
-add_action('admin_init', 'slc_add_2fa_fields');
-
-// focntion pour gerer activer option activer 2FA de l'onglet 1
-// focntion pour gerer activer option activer 2FA de l'onglet 1
-function slc_enable_2fa_callback() {
-    $options = get_option('slc_2fa_settings');
-    $checked = isset($options['enable_2fa']) ? $options['enable_2fa'] : false;
-    ?>
-    <input type="checkbox" name="slc_2fa_settings[enable_2fa]" value="1" <?php checked(1, $checked, true); ?>>
-    <?php
-}
-
-// focntion pour gerer l'option 'code de securité'
-function slc_enable_backup_codes_callback() {
-    $options = get_option('slc_2fa_settings');
-    $checked = isset($options['enable_backup_codes']) ? $options['enable_backup_codes'] : false;
-    ?>
-    <input type="checkbox" name="slc_2fa_settings[enable_backup_codes]" value="1" <?php checked(1, $checked, true); ?>>
-    <?php
-}
-
-// focntion pour gerer desactiver option activer 2FA de l'onglet 1
-function slc_disable_2fa_disabling_callback() {
-    $options = get_option('slc_2fa_settings');
-    ?>
-    <input type="checkbox" name="slc_2fa_settings[disable_2fa_disabling]" value="1" <?php checked(1, isset($options['disable_2fa_disabling']) ? $options['disable_2fa_disabling'] : '', true); ?>>
-    <?php
-}
-
-
-// fonction activation 2FA pour les roles 
-function slc_enable_2fa_for_groups_callback() {
-    $options = get_option('slc_options');
-    $user_roles = slc_list_user_roles(); 
-    $all_roles = $wp_roles->roles;
-
-    foreach ($all_roles as $role_key => $role) {
-        $checked = isset($options['enable_2fa_for_groups'][$role_key]) ? 'checked' : '';
-        echo '<input type="checkbox" name="slc_options[enable_2fa_for_groups][' . $role_key . ']" value="1" ' . $checked . '> ' . $role['name'] . '<br>';
-    }
-}
-
-// selection des roles
-function slc_list_user_roles() {
-    global $wp_roles;
-    if (!isset($wp_roles)) {
-        $wp_roles = new WP_Roles();
-    }
-    return $wp_roles->get_names();
-}
-
-
-function slc_sanitize_security_group($input) {
-    $valid_roles = array_keys(get_editable_roles());
-
-    if (is_array($input)) {
-        foreach ($input as $role) {
-            if (!in_array($role, $valid_roles)) {
-                return array();
-            }
-        }
-    } else {
-        return array();
-    }
-
-    return $input;
-}
-
-
-function slc_security_group_callback() {
-     $slc_options = get_option('slc_2fa_settings');
-    
-    if (!is_array($slc_options)) {
-        $slc_options = array();
-    }
-
-    $roles = array(
-        'administrator' => __('Administrateur', 'secure-login-customizer'),
-        'editor' => __('Éditeur', 'secure-login-customizer'),
-        'author' => __('Auteur', 'secure-login-customizer'),
-        'contributor' => __('Contributeur', 'secure-login-customizer'),
-        'subscriber' => __('Abonné', 'secure-login-customizer'),
+// Register the settings sections and fields
+add_action('admin_init', 'secure_login_customizer_register_settings');
+function secure_login_customizer_register_settings() {
+    // Tab 1
+    add_settings_section(
+        'secure-login-customizer-tab1',
+        __('Tab 1 Settings', 'secure-login-customizer'),
+        'secure_login_customizer_tab1_section',
+        'secure-login-customizer'
     );
-
-    // Ajoutez les groupes de sécurité supplémentaires pour WooCommerce ici, si nécessaire
-    // $roles['woocommerce_role'] = __('WooCommerce Role', 'secure-login-customizer');
-
-    foreach ($roles as $role => $role_name) {
-        $checked = isset($slc_options['slc_security_group'][$role]) ? 'checked' : '';
-        echo "<input type='checkbox' name='slc_2fa_settings[slc_security_group][{$role}]' {$checked}>{$role_name}<br>";
-    }
-}
-
-/* Fonctions pour gérer l'onglet 2 */
-
-// fonction pour enregistrer les paramètres de onglet 2
- 
-	function slc_register_security_settings() {
-		register_setting('slc_security_settings', 'slc_security_settings', 'slc_sanitize_security_settings');
-
-		add_settings_section('slc_security_section', __('Paramètres de sécurité', 'secure-login-customizer'), 'slc_security_section_callback', 'slc_security_settings');
-
-		// Ajoutez les champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
-	}
- 
-	add_action('admin_init', 'slc_register_security_settings');
-
-	function slc_security_section_callback() {
-		_e('Paramètres de sécurité pour le site.', 'secure-login-customizer');
-	}
-
-	// Ligne 1
-	function slc_add_security_fields() {
-		add_settings_field('enable_security_headers', __('Activer Security headers', 'secure-login-customizer'), 'slc_enable_security_headers_callback', 'slc_security_settings', 'slc_security_section');
-		// Ajoutez les autres champs de l'onglet 2 ici (nous le ferons dans les prochaines étapes).
-	}
-	 
-	add_action('admin_init', 'slc_add_security_fields');
-
-	// champ security headers
-	function slc_enable_security_headers_callback() {
-	$options = get_option('slc_security_settings');
-	$checked = isset($options['enable_security_headers']) && $options['enable_security_headers'] == 1 ? 'checked' : '';
-	?>
-	<input type="checkbox" name="slc_security_settings[enable_security_headers]" value="1" <?php echo $checked; ?>>
-	<?php
-}
-
-/* Fonctions pour gérer l'onglet 3 */
- 
- // Ligne 1
- 
-	function slc_register_custom_login_screen_settings() {
-		register_setting('slc_custom_login_screen_settings', 'slc_custom_login_screen_settings', 'slc_sanitize_custom_login_screen_settings');
-
-		add_settings_section('slc_custom_login_screen_section', __('Paramètres de customisation de l’écran de connexion', 'secure-login-customizer'), 'slc_custom_login_screen_section_callback', 'slc_custom_login_screen_settings');
-
-		// Ajoutez les champs de l'onglet 3 ici (nous le ferons dans les prochaines étapes).
-	}    // fin slc_register_custom_login_screen_settings
-		add_action('admin_init', 'slc_register_custom_login_screen_settings');
-
-	function slc_custom_login_screen_section_callback() {
-		_e('Paramètres de customisation de l’écran de connexion.', 'secure-login-customizer');
-	}
- 
-	function slc_add_custom_login_screen_fields() {
-		add_settings_field('logo_url', __('URL du logo', 'secure-login-customizer'), 'slc_logo_url_callback', 'slc_custom_login_screen_settings', 'slc_custom_login_screen_section');
-		// Ajoutez les autres champs de l'onglet 3 ici (nous le ferons dans les prochaines étapes).
-	}
-	// Ligne 4
-	add_action('admin_init', 'slc_add_custom_login_screen_fields');
-
-// Ligne 1
-	function slc_logo_url_callback() {
-    $options = get_option('slc_custom_login_screen_settings');
-    ?>
-    <input type="text" name="slc_custom_login_screen_settings[logo_url]" value="<?php echo esc_attr($options['logo_url']); ?>" size="75">
-    <?php
-}
-
-/* Fonctions pour gérer l'onglet 4 */
-
-	function slc_register_custom_message_settings() {
-    register_setting('slc_custom_message_settings', 'slc_custom_message_settings', 'slc_sanitize_custom_message_settings');
-
-    add_settings_section('slc_custom_message_section', __('Paramètres de customisation des messages', 'secure-login-customizer'), 'slc_custom_message_section_callback', 'slc_custom_message_settings');
-
-    // Ajoutez les champs de l'onglet 4 ici (nous le ferons dans les prochaines étapes).
-	}
-	add_action('admin_init', 'slc_register_custom_message_settings');
-
-	function slc_custom_message_section_callback() {
-    _e('Paramètres de customisation des messages.', 'secure-login-customizer');
-	}
-
-	function slc_add_custom_message_fields() {
-    add_settings_field('qr_code_info_url', __('URL de la page pour information QR-CODE', 'secure-login-customizer'), 'slc_qr_code_info_url_callback', 'slc_custom_message_settings', 'slc_custom_message_section');
-    // Ajoutez les autres champs de l'onglet 4 ici (nous le ferons dans les prochaines étapes).
-	}
-	add_action('admin_init', 'slc_add_custom_message_fields');
-
-function slc_qr_code_info_url_callback() {
-    $options = get_option('slc_custom_message_settings');
-    ?>
-    <input type="text" name="slc_custom_message_settings[qr_code_info_url]" value="<?php echo esc_attr($options['qr_code_info_url']); ?>" size="75">
-    <?php
-}
-
- 
-
-
-/* Fonctions pour gérer l'onglet 5 non necessaires */
-
-/* Fonctions pour créer le menu */
-
-
-
-// Créer le menu de l'extension
-function slc_add_plugin_page() {
-    add_menu_page(
-        'Secure Login Customizer',
-        'Secure Login Customizer',
-        'manage_options',
+    add_settings_field(
+        'secure-login-customizer-enable-2fa',
+        __('Enable 2FA authentication', 'secure-login-customizer'),
+        'secure_login_customizer_enable_2fa_field',
         'secure-login-customizer',
-        'slc_render_plugin_settings_page',
-        'dashicons-lock',
-        100
+        'secure-login-customizer-tab1'
     );
-}
-add_action('admin_menu', 'slc_add_plugin_page');
+    add_settings_field(
+        'secure-login-customizer-enable-backup-codes',
+        __('Enable backup codes', 'secure-login-customizer'),
+        'secure_login_customizer_enable_backup_codes_field',
+        'secure-login-customizer',
+        'secure-login-customizer-tab1'
+    );
+    add_settings_field(
+        'secure-login-customizer-disable-2fa-deactivation',
+        __('Disable 2FA deactivation', 'secure-login-customizer'),
+        'secure_login_customizer_disable_2fa_deactivation_field',
+        'secure-login-customizer',
+        'secure-login-customizer-tab1'
+    );
+    add_settings_field(
+        'secure-login-customizer-select-security-groups',
+        __('Select security groups', 'secure-login-customizer'),
+        'secure_login_customizer_select_security_groups_field',
+        'secure-login-customizer',
+        'secure-login-customizer-tab1'
+    );
+    
+	// Tab 2 - Security
+	add_settings_section(
+		'securelogincustomizer_security_section',
+		__('Security', 'securelogincustomizer'),
+		'securelogincustomizer_security_section_cb',
+		'securelogincustomizer_security'
+	);
 
+	// Security headers
+	add_settings_field(
+		'securelogincustomizer_security_headers',
+		__('Activate Security Headers', 'securelogincustomizer'),
+		'securelogincustomizer_checkbox_field_cb',
+		'securelogincustomizer_security',
+		'securelogincustomizer_security_section',
+		[
+			'id' => 'securelogincustomizer_security_headers',
+			'name' => 'securelogincustomizer_settings[security_headers]',
+			'description' => __('Activate security headers to enhance website security', 'securelogincustomizer'),
+			'value' => isset($settings['security_headers']) ? $settings['security_headers'] : '',
+		]
+	);
+
+	// Anonymize login error messages
+	add_settings_field(
+		'securelogincustomizer_anonymize_login_errors',
+		__('Anonymize Login Error Messages', 'securelogincustomizer'),
+		'securelogincustomizer_checkbox_field_cb',
+		'securelogincustomizer_security',
+		'securelogincustomizer_security_section',
+		[
+			'id' => 'securelogincustomizer_anonymize_login_errors',
+			'name' => 'securelogincustomizer_settings[anonymize_login_errors]',
+			'description' => __('Hide error messages on login page to prevent information leakage', 'securelogincustomizer'),
+			'value' => isset($settings['anonymize_login_errors']) ? $settings['anonymize_login_errors'] : '',
+		]
+	);
+
+	// Block connections from proxy servers
+	add_settings_field(
+		'securelogincustomizer_block_proxy_connections',
+		__('Block Connections from Proxy Servers', 'securelogincustomizer'),
+		'securelogincustomizer_checkbox_field_cb',
+		'securelogincustomizer_security',
+		'securelogincustomizer_security_section',
+		[
+			'id' => 'securelogincustomizer_block_proxy_connections',
+			'name' => 'securelogincustomizer_settings[block_proxy_connections]',
+			'description' => __('Block connections from proxy servers to prevent attacks and spam', 'securelogincustomizer'),
+			'value' => isset($settings['block_proxy_connections']) ? $settings['block_proxy_connections'] : '',
+		]
+	);
+
+	// Block weak passwords
+	add_settings_field(
+	'securelogincustomizer_block_weak_passwords',
+	__('Block Weak Passwords', 'securelogincustomizer'),
+	'securelogincustomizer_checkbox_field_cb',
+	'securelogincustomizer_security',
+	'securelogincustomizer_security_section',
+	[
+	'id' => 'securelogincustomizer_block_weak_passwords',
+	'name' => 'securelogincustomizer_settings[block_weak_passwords]',
+	'description' => __('Block weak passwords to enhance website security', 'securelogincustomizer'),
+	'value' => isset($settings['block_weak_passwords']) ? $settings['block_weak_passwords'] : '',
+	]
+	);
+
+	// Blacklist
+	add_settings_field(
+	'securelogincustomizer_blacklist',
+	__('Blacklist', 'securelogincustomizer'),
+	'securelogincustomizer_textarea_field_cb',
+	'securelogincustomizer_security',
+	'securelogincustomizer_security_section',
+	[
+	'id' => 'securelogincustomizer_blacklist',
+	'name' => 'securelogincustomizer_settings[blacklist]',
+	'description' => __('Enter IP addresses that you want to block. Separate each IP address with a comma.', 'securelogincustomizer'),
+	'value' => isset($settings['blacklist']) ? $settings['blacklist'] : '',
+	]
+	);
+
+	// Whitelist
+	add_settings_field(
+	'securelogincustomizer_whitelist',
+	__('Whitelist', 'securelogincustomizer'),
+	'securelogincustomizer_textarea_field_cb',
+	'securelogincustomizer_security',
+	'securelogincustomizer_security_section',
+	[
+	'id' => 'securelogincustomizer_whitelist',
+	'name' => 'securelogincustomizer_settings[whitelist]',
+	'description' => __('Enter IP addresses that you want to whitelist. Separate each IP address with a comma.', 'securelogincustomizer'),
+	'value' => isset($settings['whitelist']) ? $settings['whitelist'] : '',
+	]
+	);
+
+	// Number of login attempts before disabling account
+	add_settings_field(
+		'securelogincustomizer_login_attempts_before_disabling',
+		__('Number of login attempts before disabling account', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_security',
+		'securelogincustomizer_security_section',
+		[
+			'id' => 'securelogincustomizer_login_attempts_before_disabling',
+			'name' => 'securelogincustomizer_settings[login_attempts_before_disabling]',
+			'description' => __('Enter the number of failed login attempts before the user account is disabled. Set to 0 for never disabling the user account.', 'securelogincustomizer'),
+			'value' => isset($settings['login_attempts_before_disabling']) ? $settings['login_attempts_before_disabling'] : '',
+			'type' => 'number',
+			'min' => 0,
+			'max' => 20,
+		]
+	);
+
+	// Account blocking time
+	add_settings_field(
+		'securelogincustomizer_account_blocking_time',
+		__('Account Blocking Time', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_security',
+		'securelogincustomizer_security_section',
+		[
+			'id' => 'securelogincustomizer_account_blocking_time',
+			'name' => 'securelogincustomizer_settings[account_blocking_time]',
+			'description' => __('Enter the time in minutes for blocking the user account after the maximum number of failed login attempts is reached. Set to 0 for no blocking time.', 'securelogincustomizer'),
+			'value' => isset($settings['account_blocking_time']) ? $settings['account_blocking_time'] : '',
+			'type' => 'number',
+			'min' => 0,
+			'max' => 300,
+		]
+	);
+
+	// Security headers
+	add_settings_field(
+	'securelogincustomizer_security_headers',
+	__('Security Headers', 'securelogincustomizer'),
+	'securelogincustomizer_checkbox_field_cb',
+	'securelogincustomizer_security',
+	'securelogincustomizer_security_section',
+	[
+	'id' => 'securelogincustomizer_security_headers',
+	'name' => 'securelogincustomizer_settings[security_headers]',
+	'description' => __('Add security headers to enhance website security', 'securelogincustomizer'),
+	'value' => isset($settings['security_headers']) ? $settings['security_headers'] : '',
+	]
+	);
+
+	// Anonymize user messages
+	add_settings_field(
+	'securelogincustomizer_anonymize_messages',
+	__('Anonymize User Messages', 'securelogincustomizer'),
+	'securelogincustomizer_checkbox_field_cb',
+	'securelogincustomizer_security',
+	'securelogincustomizer_security_section',
+	[
+	'id' => 'securelogincustomizer_anonymize_messages',
+	'name' => 'securelogincustomizer_settings[anonymize_messages]',
+	'description' => __('Anonymize user messages to prevent sensitive data leakage', 'securelogincustomizer'),
+	'value' => isset($settings['anonymize_messages']) ? $settings['anonymize_messages'] : '',
+	]
+	);
+
+	// Block connections from proxy
+	add_settings_field(
+	'securelogincustomizer_block_proxy_connections',
+	__('Block Proxy Connections', 'securelogincustomizer'),
+	'securelogincustomizer_checkbox_field_cb',
+	'securelogincustomizer_security',
+	'securelogincustomizer_security_section',
+	[
+	'id' => 'securelogincustomizer_block_proxy_connections',
+	'name' => 'securelogincustomizer_settings[block_proxy_connections]',
+	'description' => __('Block connections from proxy to enhance website security', 'securelogincustomizer'),
+	'value' => isset($settings['block_proxy_connections']) ? $settings['block_proxy_connections'] : '',
+	]
+	);
+
+	// Whitelist IPs
+	add_settings_field(
+	'securelogincustomizer_whitelist_ips',
+	__('Whitelist IPs', 'securelogincustomizer'),
+	'securelogincustomizer_text_field_cb',
+	'securelogincustomizer_security',
+	'securelogincustomizer_security_section',
+	[
+	'id' => 'securelogincustomizer_whitelist_ips',
+	'name' => 'securelogincustomizer_settings[whitelist_ips]',
+	'description' => __('Comma separated list of IPs to whitelist', 'securelogincustomizer'),
+	'value' => isset($settings['whitelist_ips']) ? $settings['whitelist_ips'] : '',
+	]
+	);
+
+	// Blacklist IPs
+	add_settings_field(
+	'securelogincustomizer_blacklist_ips',
+	__('Blacklist IPs', 'securelogincustomizer'),
+	'securelogincustomizer_text_field_cb',
+	'securelogincustomizer_security',
+	'securelogincustomizer_security_section',
+	[
+	'id' => 'securelogincustomizer_blacklist_ips',
+	'name' => 'securelogincustomizer_settings[blacklist_ips]',
+	'description' => __('Comma separated list of IPs to blacklist', 'securelogincustomizer'),
+	'value' => isset($settings['blacklist_ips']) ? $settings['blacklist_ips'] : '',
+	]
+	);
+
+	// Block weak passwords
+	add_settings_field(
+	'securelogincustomizer_block_weak_passwords',
+	__('Block Weak Passwords', 'securelogincustomizer'),
+	'securelogincustomizer_checkbox_field_cb',
+	'securelogincustomizer_security',
+	'securelogincustomizer_security_section',
+	[
+	'id' => 'securelogincustomizer_block_weak_passwords',
+	'name' => 'securelogincustomizer_settings[block_weak_passwords]',
+	'description' => __('Block weak passwords to enhance website security', 'securelogincustomizer'),
+	'value' => isset($settings['block_weak_passwords']) ? $settings['block_weak_passwords'] : '',
+	]
+	);
+
+	// Anonymize error messages
+	add_settings_field(
+		'securelogincustomizer_anonymize_error_messages',
+		__('Anonymize Error Messages', 'securelogincustomizer'),
+		'securelogincustomizer_checkbox_field_cb',
+		'securelogincustomizer_security',
+		'securelogincustomizer_security_section',
+		[
+			'id' => 'securelogincustomizer_anonymize_error_messages',
+			'name' => 'securelogincustomizer_settings[anonymize_error_messages]',
+			'description' => __('Anonymize error messages for security reasons', 'securelogincustomizer'),
+			'value' => isset($settings['anonymize_error_messages']) ? $settings['anonymize_error_messages'] : '',
+		]
+	);
+
+	// Blacklist
+	add_settings_field(
+		'securelogincustomizer_blacklist',
+		__('Blacklist', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_security',
+		'securelogincustomizer_security_section',
+		[
+			'id' => 'securelogincustomizer_blacklist',
+			'name' => 'securelogincustomizer_settings[blacklist]',
+			'description' => __('Enter IPs or CIDR ranges to blacklist, separated by comma', 'securelogincustomizer'),
+			'value' => isset($settings['blacklist']) ? $settings['blacklist'] : '',
+			'type' => 'textarea',
+			'rows' => 3,
+		]
+	);
+
+	// Whitelist
+	add_settings_field(
+		'securelogincustomizer_whitelist',
+		__('Whitelist', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_security',
+		'securelogincustomizer_security_section',
+		[
+			'id' => 'securelogincustomizer_whitelist',
+			'name' => 'securelogincustomizer_settings[whitelist]',
+			'description' => __('Enter IPs or CIDR ranges to whitelist, separated by comma', 'securelogincustomizer'),
+			'value' => isset($settings['whitelist']) ? $settings['whitelist'] : '',
+			'type' => 'textarea',
+			'rows' => 3,
+		]
+	);
+
+	// Account blocking duration
+	add_settings_field(
+		'securelogincustomizer_account_blocking_duration',
+		__('Account Blocking Duration', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_security',
+		'securelogincustomizer_security_section',
+		[
+			'id' => 'securelogincustomizer_account_blocking_duration',
+			'name' => 'securelogincustomizer_settings[account_blocking_duration]',
+			'description' => __('Enter the duration in minutes for blocking the user account after a certain number of failed login attempts. Set to 0 for not blocking the user account.', 'securelogincustomizer'),
+			'value' => isset($settings['account_blocking_duration']) ? $settings['account_blocking_duration'] : '',
+			'type' => 'number',
+			'min' => 0,
+			'max' => 300,
+		]
+	);
+
+	// Tab 3: Custom Login Screen
+	add_settings_section(
+		'securelogincustomizer_login_screen_section',
+		__('Custom Login Screen', 'securelogincustomizer'),
+		'securelogincustomizer_login_screen_section_cb',
+		'securelogincustomizer_login_screen'
+	);
+
+	// Logo URL field
+	add_settings_field(
+		'securelogincustomizer_logo_url',
+		__('Logo URL', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_login_screen',
+		'securelogincustomizer_login_screen_section',
+		[
+			'id' => 'securelogincustomizer_logo_url',
+			'name' => 'securelogincustomizer_settings[logo_url]',
+			'description' => __('Enter the URL of your logo', 'securelogincustomizer'),
+			'value' => isset($settings['logo_url']) ? $settings['logo_url'] : '',
+		]
+	);
+
+	// Desktop Image URL field
+	add_settings_field(
+		'securelogincustomizer_desktop_image_url',
+		__('Desktop Image URL', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_login_screen',
+		'securelogincustomizer_login_screen_section',
+		[
+			'id' => 'securelogincustomizer_desktop_image_url',
+			'name' => 'securelogincustomizer_settings[desktop_image_url]',
+			'description' => __('Enter the URL of your desktop image', 'securelogincustomizer'),
+			'value' => isset($settings['desktop_image_url']) ? $settings['desktop_image_url'] : '',
+		]
+	);
+
+	// Mobile Image URL field
+	add_settings_field(
+		'securelogincustomizer_mobile_image_url',
+		__('Mobile Image URL', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_login_screen',
+		'securelogincustomizer_login_screen_section',
+		[
+			'id' => 'securelogincustomizer_mobile_image_url',
+			'name' => 'securelogincustomizer_settings[mobile_image_url]',
+			'description' => __('Enter the URL of your mobile image', 'securelogincustomizer'),
+			'value' => isset($settings['mobile_image_url']) ? $settings['mobile_image_url'] : '',
+		]
+	);
+
+	// Button Color field
+	add_settings_field(
+		'securelogincustomizer_button_color',
+		__('Button Color', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_login_screen',
+		'securelogincustomizer_login_screen_section',
+		[
+			'id' => 'securelogincustomizer_button_color',
+			'name' => 'securelogincustomizer_settings[button_color]',
+			'description' => __('Enter the color of your button in hexadecimal format (#000000)', 'securelogincustomizer'),
+			'value' => isset($settings['button_color']) ? $settings['button_color'] : '',
+		]
+	);
+
+	// Background Color field
+	add_settings_field(
+		'securelogincustomizer_background_color',
+		__('Background Color', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_login_screen',
+		'securelogincustomizer_login_screen_section',
+		[
+			'id' => 'securelogincustomizer_background_color',
+			'name' => 'securelogincustomizer_settings[background_color]',
+			'description' => __('Enter the color of your background in hexadecimal format (#000000)', 'securelogincustomizer'),
+			'value' => isset($settings['background_color']) ? $settings['background_color'] : '',
+		]
+	);
+
+	// Text Color field
+	add_settings_field(
+		'securelogincustomizer_text_color',
+		__('Text Color', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_login_screen',
+		'securelogincustomizer_login_screen_section',
+		[
+			'id' => 'securelogincustomizer_text_color',
+			'name' => 'securelogincustomizer_settings[text_color]',
+			'description' => __('Enter the color of your text in hexadecimal format (#000000)', 'securelogincustomizer'),
+			'value' => isset($settings['text_color']) ? $settings['text_color'] : '',
+		]
+	);
+
+	// Border Color field
+	add_settings_field(
+		'securelogincustomizer_border_color',
+		__('Border Color', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_login_screen',
+		'securelogincustomizer_login_screen_section',
+		[
+			'id' => 'securelogincustomizer_border_color',
+			'name' => 'securelogincustomizer_settings[border_color]',
+			'description' => __('Enter the color of your border in hexadecimal format (#000000)', 'securelogincustomizer'),
+			'value' => isset($settings['border_color']) ? $settings['border_color'] : '',
+		]
+	);
+
+	// Transparency Level field
+	add_settings_field(
+		'securelogincustomizer_transparency_level',
+		__('Transparency Level', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_login_screen',
+		'securelogincustomizer_login_screen_section',
+		[
+			'id' => 'securelogincustomizer_transparency_level',
+			'name' => 'securelogincustomizer_settings[transparency_level]',
+			'description' => __('Enter the transparency level of your login screen background (0-100)', 'securelogincustomizer'),
+			'value' => isset($settings['transparency_level']) ? $settings['transparency_level'] : '',
+			'type' => 'number',
+			'min' => 0,
+			'max' => 100,
+		]
+	);
+
+	 add_settings_field(
+		'securelogincustomizer_background_color',
+		__('Background Color', 'securelogincustomizer'),
+		'securelogincustomizer_text_field_cb',
+		'securelogincustomizer_login_screen',
+		'securelogincustomizer_login_screen_section',
+		[
+			'id' => 'securelogincustomizer_background_color',
+			'name' => 'securelogincustomizer_settings[background_color]',
+			'description' => __('Enter the color of your background in hexadecimal format (#000000)', 'securelogincustomizer'),
+			'value' => isset($settings['background_color']) ? $settings['background_color'] : '',
+		]
+	);
+
+	// Tab 5 - Miscellaneous
+	add_settings_section(
+	'securelogincustomizer_miscellaneous_section',
+	__('Miscellaneous', 'securelogincustomizer'),
+	'securelogincustomizer_miscellaneous_section_cb',
+	'securelogincustomizer_miscellaneous'
+	);
+
+	// Textarea field
+	add_settings_field(
+	'securelogincustomizer_miscellaneous_textarea',
+	__('Miscellaneous Textarea', 'securelogincustomizer'),
+	'securelogincustomizer_textarea_field_cb',
+	'securelogincustomizer_miscellaneous',
+	'securelogincustomizer_miscellaneous_section',
+	[
+	'id' => 'securelogincustomizer_miscellaneous_textarea',
+	'name' => 'securelogincustomizer_settings[miscellaneous_textarea]',
+	'description' => __('Enter any miscellaneous text or information you would like to display here', 'securelogincustomizer'),
+	'value' => isset($settings['miscellaneous_textarea']) ? $settings['miscellaneous_textarea'] : '',
+	'rows' => 5,
+	]
+	);
+}
