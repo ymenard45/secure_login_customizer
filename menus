@@ -41,166 +41,520 @@ function slc_add_plugin_menu() {
 // Ligne 7
 add_action('admin_menu', 'slc_add_plugin_menu');
 
+
+function secure_login_customizer_tab_one() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+    
+    if (isset($_POST['submit'])) {
+        // Enregistrer les options dans la base de données
+        update_option('secure_login_customizer_tab_one_2fa', isset($_POST['2fa']));
+        update_option('secure_login_customizer_tab_one_backup_code', isset($_POST['backup_code']));
+        update_option('secure_login_customizer_tab_one_2fa_disable', isset($_POST['2fa_disable']));
+        update_option('secure_login_customizer_tab_one_2fa_security_groups', isset($_POST['2fa_security_groups']) ? $_POST['2fa_security_groups'] : []);
+        
+        // Afficher un message de confirmation
+        echo '<div class="notice notice-success is-dismissible"><p>' . __('Options saved.', 'secure-login-customizer') . '</p></div>';
+    }
+    
+    $tab_one_2fa = get_option('secure_login_customizer_tab_one_2fa');
+    $tab_one_backup_code = get_option('secure_login_customizer_tab_one_backup_code');
+    $tab_one_2fa_disable = get_option('secure_login_customizer_tab_one_2fa_disable');
+    $tab_one_2fa_security_groups = get_option('secure_login_customizer_tab_one_2fa_security_groups');
+    
+    ?>
+    <h2><?php _e('Tab 1', 'secure-login-customizer'); ?></h2>
+    <form method="post">
+        <table class="form-table">
+            <tbody>
+                <tr>
+                    <th scope="row"><?php _e('Enable 2FA authentication', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="checkbox" name="2fa" value="1" <?php checked($tab_one_2fa, true); ?>>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Enable backup code', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="checkbox" name="backup_code" value="1" <?php checked($tab_one_backup_code, true); ?>>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Disallow 2FA authentication deactivation', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="checkbox" name="2fa_disable" value="1" <?php checked($tab_one_2fa_disable, true); ?>>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Security groups for 2FA authentication', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <select name="2fa_security_groups[]" multiple>
+                            <?php
+                                $groups = get_terms([
+                                    'taxonomy' => 'security_groups',
+                                    'hide_empty' => false,
+                                ]);
+                                foreach ($groups as $group) {
+                                    $selected = in_array($group->term_id, $tab_one_2fa_security_groups) ? ' selected' : '';
+                                    echo '<option value="' . esc_attr($group->term_id) . '"' . $selected . '>' . esc_html($group->name) . '</option>';
+                                }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <?php submit_button(__('Save changes', 'secure-login-customizer')); ?>
+    </form>
+    <?php
+}
+
+
+function secure_login_customizer_tab_two() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+    
+    if (isset($_POST['submit'])) {
+        // Enregistrer les options dans la base de données
+        update_option('secure_login_customizer_tab_two_security_headers', isset($_POST['security_headers']));
+        update_option('secure_login_customizer_tab_two_anonymize_messages', isset($_POST['anonymize_messages']));
+        update_option('secure_login_customizer_tab_two_deny_proxy_connections', isset($_POST['deny_proxy_connections']));
+        update_option('secure_login_customizer_tab_two_disallow_weak_passwords', isset($_POST['disallow_weak_passwords']));
+        update_option('secure_login_customizer_tab_two_blacklist', isset($_POST['blacklist']) ? sanitize_text_field($_POST['blacklist']) : '');
+        update_option('secure_login_customizer_tab_two_whitelist', isset($_POST['whitelist']) ? sanitize_text_field($_POST['whitelist']) : '');
+        update_option('secure_login_customizer_tab_two_login_attempts', isset($_POST['login_attempts']) ? absint($_POST['login_attempts']) : 0);
+        update_option('secure_login_customizer_tab_two_account_lockout', isset($_POST['account_lockout']) ? absint($_POST['account_lockout']) : 0);
+        
+        // Afficher un message de confirmation
+        echo '<div class="notice notice-success is-dismissible"><p>' . __('Options saved.', 'secure-login-customizer') . '</p></div>';
+    }
+    
+    $tab_two_security_headers = get_option('secure_login_customizer_tab_two_security_headers');
+    $tab_two_anonymize_messages = get_option('secure_login_customizer_tab_two_anonymize_messages');
+    $tab_two_deny_proxy_connections = get_option('secure_login_customizer_tab_two_deny_proxy_connections');
+    $tab_two_disallow_weak_passwords = get_option('secure_login_customizer_tab_two_disallow_weak_passwords');
+    $tab_two_blacklist = get_option('secure_login_customizer_tab_two_blacklist');
+    $tab_two_whitelist = get_option('secure_login_customizer_tab_two_whitelist');
+    $tab_two_login_attempts = get_option('secure_login_customizer_tab_two_login_attempts');
+    $tab_two_account_lockout = get_option('secure_login_customizer_tab_two_account_lockout');
+    
+    ?>
+        <h2><?php _e('Tab 2', 'secure-login-customizer'); ?></h2>
+    <form method="post">
+        <table class="form-table">
+            <tbody>
+                <tr>
+                    <th scope="row"><?php _e('Enable security headers', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="checkbox" name="security_headers" value="1" <?php checked($tab_two_security_headers, true); ?>>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Anonymize error messages', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="checkbox" name="anonymize_messages" value="1" <?php checked($tab_two_anonymize_messages, true); ?>>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Deny proxy connections', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="checkbox" name="deny_proxy_connections" value="1" <?php checked($tab_two_deny_proxy_connections, true); ?>>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Disallow weak passwords', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="checkbox" name="disallow_weak_passwords" value="1" <?php checked($tab_two_disallow_weak_passwords, true); ?>>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Blacklist', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="blacklist" value="<?php echo esc_attr($tab_two_blacklist); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Whitelist', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="whitelist" value="<?php echo esc_attr($tab_two_whitelist); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Number of login attempts before lockout', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="number" name="login_attempts" value="<?php echo esc_attr($tab_two_login_attempts); ?>" class="regular-text" min="0" max="20">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Account lockout time (in seconds)', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="number" name="account_lockout" value="<?php echo esc_attr($tab_two_account_lockout); ?>" class="regular-text" min="0" max="300">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <?php submit_button(__('Save changes', 'secure-login-customizer')); ?>
+    </form>
+    <?php
+}
+
+
+function secure_login_customizer_tab_three() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+    
+    if (isset($_POST['submit'])) {
+        // Enregistrer les options dans la base de données
+        update_option('secure_login_customizer_tab_three_logo_url', isset($_POST['logo_url']) ? esc_url($_POST['logo_url']) : '');
+        update_option('secure_login_customizer_tab_three_desktop_url', isset($_POST['desktop_url']) ? esc_url($_POST['desktop_url']) : '');
+        update_option('secure_login_customizer_tab_three_mobile_url', isset($_POST['mobile_url']) ? esc_url($_POST['mobile_url']) : '');
+        update_option('secure_login_customizer_tab_three_button_color', isset($_POST['button_color']) ? sanitize_hex_color($_POST['button_color']) : '');
+        update_option('secure_login_customizer_tab_three_background_color', isset($_POST['background_color']) ? sanitize_hex_color($_POST['background_color']) : '');
+        update_option('secure_login_customizer_tab_three_text_color', isset($_POST['text_color']) ? sanitize_hex_color($_POST['text_color']) : '');
+        update_option('secure_login_customizer_tab_three_border_color', isset($_POST['border_color']) ? sanitize_hex_color($_POST['border_color']) : '');
+        update_option('secure_login_customizer_tab_three_opacity', isset($_POST['opacity']) ? absint($_POST['opacity']) : '');
+        
+        // Afficher un message de confirmation
+        echo '<div class="notice notice-success is-dismissible"><p>' . __('Options saved.', 'secure-login-customizer') . '</p></div>';
+    }
+    
+    $tab_three_logo_url = get_option('secure_login_customizer_tab_three_logo_url');
+    $tab_three_desktop_url = get_option('secure_login_customizer_tab_three_desktop_url');
+    $tab_three_mobile_url = get_option('secure_login_customizer_tab_three_mobile_url');
+    $tab_three_button_color = get_option('secure_login_customizer_tab_three_button_color');
+    $tab_three_background_color = get_option('secure_login_customizer_tab_three_background_color');
+    $tab_three_text_color = get_option('secure_login_customizer_tab_three_text_color');
+    $tab_three_border_color = get_option('secure_login_customizer_tab_three_border_color');
+    $tab_three_opacity = get_option('secure_login_customizer_tab_three_opacity');
+    
+    ?>
+      <h2><?php _e('Tab 3', 'secure-login-customizer'); ?></h2>
+    <form method="post">
+        <table class="form-table">
+            <tbody>
+                <tr>
+                    <th scope="row"><?php _e('Logo URL', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="logo_url" value="<?php echo esc_url($tab_three_logo_url); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Desktop URL', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="desktop_url" value="<?php echo esc_url($tab_three_desktop_url); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Mobile URL', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="mobile_url" value="<?php echo esc_url($tab_three_mobile_url); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Button color', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="button_color" value="<?php echo esc_attr($tab_three_button_color); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Background color', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="background_color" value="<?php echo esc_attr($tab_three_background_color); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Text color', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="text_color" value="<?php echo esc_attr($tab_three_text_color); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Border color', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="border_color" value="<?php echo esc_attr($tab_three_border_color); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Opacity', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="number" name="opacity" value="<?php echo esc_attr($tab_three_opacity); ?>" class="regular-text" min="0" max="100">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <?php submit_button(__('Save changes', 'secure-login-customizer'), 'primary', 'submit', true); ?>
+    </form>
+    <?php
+}
+
+
+function secure_login_customizer_tab_four() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+    
+    if (isset($_POST['submit'])) {
+        // Enregistrer les options dans la base de données
+        update_option('secure_login_customizer_tab_four_qr_url', isset($_POST['qr_url']) ? esc_url($_POST['qr_url']) : '');
+        update_option('secure_login_customizer_tab_four_code_url', isset($_POST['code_url']) ? esc_url($_POST['code_url']) : '');
+        update_option('secure_login_customizer_tab_four_deactivation_url', isset($_POST['deactivation_url']) ? esc_url($_POST['deactivation_url']) : '');
+        
+        // Afficher un message de confirmation
+        echo '<div class="notice notice-success is-dismissible"><p>' . __('Options saved.', 'secure-login-customizer') . '</p></div>';
+    }
+    
+    $tab_four_qr_url = get_option('secure_login_customizer_tab_four_qr_url');
+    $tab_four_code_url = get_option('secure_login_customizer_tab_four_code_url');
+    $tab_four_deactivation_url = get_option('secure_login_customizer_tab_four_deactivation_url');
+    
+    ?>
+    <h2><?php _e('Tab 4', 'secure-login-customizer'); ?></h2>
+    <form method="post">
+        <table class="form-table">
+            <tbody>
+                <tr>
+                    <th scope="row"><?php _e('QR code URL', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="qr_url" value="<?php echo esc_url($tab_four_qr_url); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Code URL', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="code_url" value="<?php echo esc_url($tab_four_code_url); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php _e('Deactivation URL', 'secure-login-customizer'); ?></th>
+                    <td>
+                        <input type="text" name="deactivation_url" value="<?php echo esc_url($tab_four_deactivation_url); ?>" class="regular-text">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <?php submit_button(__('Save changes', 'secure-login-customizer'), 'primary', 'submit', true); ?>
+    </form>
+    <?php
+}
+
+function secure_login_customizer_tab_five() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+    
+    ?>
+    <h2><?php _e('Tab 5', 'secure-login-customizer'); ?></h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam quis elit euismod, iaculis dolor vel, sagittis massa. Nulla facilisi. Aliquam id tellus auctor, faucibus eros vel, ultrices enim. Donec malesuada aliquam diam ac scelerisque. Donec at varius lorem. Morbi sit amet quam vel urna faucibus mollis. In fringilla massa ac lorem pharetra, quis lacinia justo viverra. Sed quis erat nibh. Vestibulum quis lorem velit.</p>
+    <p>Donec a metus sit amet eros tempor vestibulum. Nunc a lectus vel dolor ullamcorper sagittis eu id mauris. Nunc imperdiet est quis ipsum facilisis scelerisque. Nulla facilisi. Sed eleifend ipsum sit amet massa laoreet, sit amet facilisis eros efficitur. Donec aliquet sem at ante vestibulum interdum. Suspendisse luctus orci id nunc rutrum, sed laoreet augue venenatis. Vivamus blandit, sapien eget iaculis placerat, lacus dui fermentum orci, eu suscipit sapien quam nec neque. Fusce eget turpis vel augue lacinia laoreet eu vel enim. Donec quis feugiat quam. Donec bibendum euismod urna, ac pellentesque urna pellentesque et.</p>
+    <p>Sed vel ipsum sed enim euismod dictum vel ut velit. Sed ut ligula a quam suscipit dictum. Curabitur non nibh condimentum, finibus est quis, varius lectus. Nunc euismod volutpat ante, sed fringilla urna commodo ut. Vivamus at ligula sed odio suscipit lacinia vel ac quam. Donec viverra gravida sapien, in ullamcorper nibh eleifend quis. Sed pharetra elit velit, sed faucibus odio euismod vel. Duis efficitur neque in massa aliquam, vel bibendum nisl vestibulum. Praesent eu tellus eu eros blandit suscipit non non nibh. Pellentesque eu velit id nulla congue faucibus. Sed tincidunt libero ut felis venenatis, id vehicula neque bibendum. Integer dignissim tristique orci, sit amet suscipit nisl ultricies vel. Donec facilisis turpis vel laoreet fermentum. Donec at interdum ipsum, a porttitor velit.</p>
+    <?php
+}
+
 // strcuture html pour les onglets
+
 function slc_render_plugin_settings_page() {
     ?>
-		<div class="wrap">
-		<div class="slc-title-container">
-        <span class="dashicons dashicons-shield"></span>
+    <div class="wrap">
         <h1><?php _e('Secure Login Customizer', 'secure-login-customizer'); ?></h1>
-		<span class="dashicons dashicons-shield"></span>
-		</div>
-				<style>
-					.tab-content p:first-child  {
-					margin-top: 15px; /* Ajustez cette valeur en fonction de l'espace souhaité */
-					}
-					.dashicons-shield {
-					font-size: 36px; /* Ajustez la taille de l'icône */
-					margin-right: 10px; /* Ajoutez une marge à droite pour l'espacement entre l'icône et le texte */
-					vertical-align: middle; /* Alignement vertical avec le texte */
-					}
-					
-					.form{
-					margin-top:15 px;	
-					}
-					.wrap > h1 {
-					color:blue;	
-					margin-bottom: 30px;
-				    }
-
-					.tab-content {
-					margin-left: 25px;
-					}
-				
-					h1.slc-plugin-title,
-					.tab-content h2 {
-					display: none;
-					}
-					
-					.slc-title-container {
-						text-align: center;
-					}
-
-					.slc-title-container h1 {
-						display: inline-block;
-						vertical-align: middle;
-						margin-left: 15px;
-						margin-right: 10px;
-						font-size:36px;
-						color:blue;
-					}
-					
-					.nav-tab {padding-top:10px;
-							   padding-bottom:10px;
-							   margin-top:20px;
-							   margin-bottom:20px}
-
-					.dashicons-shield {
-						font-size: 36px;
-						margin-right: 5px;
-						vertical-align: middle;
-					}
-										
-										
-			 </style>
-
-        
         <h2 class="nav-tab-wrapper">
-            <a href="#tab-1" class="nav-tab"><?php _e('2FA', 'secure-login-customizer'); ?></a>
-            <a href="#tab-2" class="nav-tab"><?php _e('Sécurité', 'secure-login-customizer'); ?></a>
-            <a href="#tab-3" class="nav-tab"><?php _e('Customisation login screen', 'secure-login-customizer'); ?></a>
-            <a href="#tab-4" class="nav-tab"><?php _e('Customisation message', 'secure-login-customizer'); ?></a>
-            <a href="#tab-5" class="nav-tab"><?php _e('Lorem Ipsum', 'secure-login-customizer'); ?></a>
+            <a href="#tab1" class="nav-tab"><?php _e('Tab 1', 'secure-login-customizer'); ?></a>
+            <a href="#tab2" class="nav-tab"><?php _e('Tab 2', 'secure-login-customizer'); ?></a>
+            <a href="#tab3" class="nav-tab"><?php _e('Tab 3', 'secure-login-customizer'); ?></a>
+            <a href="#tab4" class="nav-tab"><?php _e('Tab 4', 'secure-login-customizer'); ?></a>
+            <a href="#tab5" class="nav-tab"><?php _e('Tab 5', 'secure-login-customizer'); ?></a>
         </h2>
-    </div>
-    <?php
-	
-    // gestion de chaque onglets
- 
-    // Contenu de l'onglet 1
-    ?>
-    <div id="tab-1" class="tab-content">
-        <h2><?php _e('2FA', 'secure-login-customizer'); ?></h2>
-        <form method="post" action="options.php">
-            <?php
-			
-			settings_fields('slc_2fa_settings');
-			do_settings_sections('slc_2fa_settings');
-			submit_button();
-
-			
-            // Nous ajouterons des champs de formulaire et des sections ici plus tard.
-            ?>
+        <form action="options.php" method="post">
+            <?php settings_fields('secure_login_customizer_options'); ?>
+            <?php do_settings_sections('secure-login-customizer'); ?>
+            <div id="tab1" class="tab-content">
+                <?php secure_login_customizer_tab_one(); ?>
+            </div>
+            <div id="tab2" class="tab-content">
+                <?php secure_login_customizer_tab_two(); ?>
+            </div>
+            <div id="tab3" class="tab-content">
+                <?php secure_login_customizer_tab_three(); ?>
+            </div>
+            <div id="tab4" class="tab-content">
+                <?php secure_login_customizer_tab_four(); ?>
+            </div>
+            <div id="tab5" class="tab-content">
+                <?php secure_login_customizer_tab_five(); ?>
+            </div>
+            <?php submit_button(); ?>
         </form>
     </div>
     <?php
+}
 
-    // Contenu de l'onglet 2
+
+// fin function slc_render_plugin_settings_page
+
+function slc_save_tab_one_settings() {
+    // Vérifier que l'utilisateur a la permission de modifier les paramètres
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    // Vérifier que le nonce est valide
+    if ( ! isset( $_POST['slc_settings_nonce'] ) || ! wp_verify_nonce( $_POST['slc_settings_nonce'], 'slc_save_settings' ) ) {
+        return;
+    }
+
+    // Enregistrer les paramètres soumis
+    update_option( 'slc_tab_one_setting_one', isset( $_POST['slc_tab_one_setting_one'] ) ? sanitize_text_field( $_POST['slc_tab_one_setting_one'] ) : '' );
+    update_option( 'slc_tab_one_setting_two', isset( $_POST['slc_tab_one_setting_two'] ) ? sanitize_text_field( $_POST['slc_tab_one_setting_two'] ) : '' );
+    update_option( 'slc_tab_one_setting_three', isset( $_POST['slc_tab_one_setting_three'] ) ? sanitize_text_field( $_POST['slc_tab_one_setting_three'] ) : '' );
+    update_option( 'slc_tab_one_setting_four', isset( $_POST['slc_tab_one_setting_four'] ) ? sanitize_text_field( $_POST['slc_tab_one_setting_four'] ) : '' );
+}
+add_action( 'admin_post_slc_save_tab_one_settings', 'slc_save_tab_one_settings' );
+
+// Fonction pour enregistrer les paramètres de l'onglet 2
+function slc_save_tab_two_settings() {
+    // Vérifier que l'utilisateur a la permission de modifier les paramètres
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    // Vérifier que le nonce est valide
+    if ( ! isset( $_POST['slc_settings_nonce'] ) || ! wp_verify_nonce( $_POST['slc_settings_nonce'], 'slc_save_settings' ) ) {
+        return;
+    }
+
+    // Enregistrer les paramètres soumis
+    update_option( 'slc_tab_two_setting_one', isset( $_POST['slc_tab_two_setting_one'] ) ? sanitize_text_field( $_POST['slc_tab_two_setting_one'] ) : '' );
+    update_option( 'slc_tab_two_setting_two', isset( $_POST['slc_tab_two_setting_two'] ) ? sanitize_text_field( $_POST['slc_tab_two_setting_two'] ) : '' );
+    update_option( 'slc_tab_two_setting_three', isset( $_POST['slc_tab_two_setting_three'] ) ? sanitize_text_field( $_POST['slc_tab_two_setting_three'] ) : '' );
+    update_option( 'slc_tab_two_setting_four', isset( $_POST['slc_tab_two_setting_four'] ) ? sanitize_text_field( $_POST['slc_tab_two_setting_four'] ) : '' );
+    update_option( 'slc_tab_two_setting_five', isset( $_POST['slc_tab_two_setting_five'] ) ? sanitize_text_field( $_POST['slc_tab_two_setting_five'] ) : '' );
+    update_option( 'slc_tab_two_setting_six', isset( $_POST['slc_tab_two_setting_six'] ) ? sanitize_text_field( $_POST['slc_tab_two_setting_six'] ) : '' );
+    update_option( 'slc_tab_two_setting_seven', isset( $_POST['slc_tab_two_setting_seven'] ) ? sanitize_text_field( $_POST['slc_tab_two_setting_seven'] ) : '' );
+    update_option( 'slc_tab_two_setting_eight', isset( $_POST['slc_tab_two_setting_eight'] ) ? sanitize_text_field( $_POST['slc_tab_two_setting_eight'] ) : '' );
+}
+
+// Enregistrer les paramètres de l'onglet 2
+add_action( 'admin_post_slc_save_tab_two_settings', 'slc_save_tab_two_settings' );
+
+// Fonction pour enregistrer les paramètres de l'onglet 3
+function slc_save_tab_three_settings() {
+    // Vérifier que l'utilisateur a la permission de modifier les paramètres
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    // Vérifier que le nonce est valide
+    if ( ! isset( $_POST['slc_settings_nonce'] ) || ! wp_verify_nonce( $_POST['slc_settings_nonce'], 'slc_save_settings' ) ) {
+        return;
+    }
+}
+	// Enregistrer les paramètres soumis de l'onglet 2
+	update_option( 'slc_tab_two_setting_one', isset( $_POST['slc_tab_two_setting_one'] ) ? sanitize_text_field( $_POST['slc_tab_two_setting_one'] ) : '' );
+	update_option( 'slc_tab_two_setting_two', isset( $_POST['slc_tab_two_setting_two'] ) ? sanitize_text_field( $_POST['slc_tab_two_setting_two'] ) : '' );
+
+	// Enregistrer les paramètres de l'onglet 3
+	add_action( 'admin_post_slc_save_tab_three_settings', 'slc_save_tab_three_settings' );
+
+// Fonction pour enregistrer les paramètres de l'onglet 4
+function slc_save_tab_four_settings() {
+    // Vérifier que l'utilisateur a la permission de modifier les paramètres
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    // Vérifier que le nonce est valide
+    if ( ! isset( $_POST['slc_settings_nonce'] ) || ! wp_verify_nonce( $_POST['slc_settings_nonce'], 'slc_save_settings' ) ) {
+        return;
+    }
+
+    // Enregistrer les paramètres soumis
+    update_option( 'slc_tab_four_setting_one', isset( $_POST['slc_tab_four_setting_one'] ) ? sanitize_text_field( $_POST['slc_tab_four_setting_one'] ) : '' );
+    update_option( 'slc_tab_four_setting_two', isset( $_POST['slc_tab_four_setting_two'] ) ? sanitize_text_field( $_POST['slc_tab_four_setting_two'] ) : '' );
+    update_option( 'slc_tab_four_setting_three', isset( $_POST['slc_tab_four_setting_three'] ) ? sanitize_text_field( $_POST['slc_tab_four_setting_three'] ) : '' );
+}
+
+// Enregistrer les paramètres de l'onglet 4
+add_action( 'admin_post_slc_save_tab_four_settings', 'slc_save_tab_four_settings' );
+
+// Fonction pour enregistrer les paramètres de l'onglet 5
+function slc_save_tab_five_settings() {
+    // Vérifier que l'utilisateur a la permission de modifier les paramètres
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    // Vérifier que le nonce est valide
+    if ( ! isset( $_POST['slc_settings_nonce'] ) || ! wp_verify_nonce( $_POST['slc_settings_nonce'], 'slc_save_settings' ) ) {
+        return;
+    }
+
+    // Enregistrer les paramètres soumis
+    update_option( 'slc_tab_five_setting_one', isset( $_POST['slc_tab_five_setting_one'] ) ? sanitize_text_field( $_POST['slc_tab_five_setting_one'] ) : '' );
+    update_option( 'slc_tab_five_setting_two', isset( $_POST['slc_tab_five_setting_two'] ) ? sanitize_text_field( $_POST['slc_tab_five_setting_two'] ) : '' );
+    update_option( 'slc_tab_five_setting_three', isset( $_POST['slc_tab_five_setting_three'] ) ? sanitize_text_field( $_POST['slc_tab_five_setting_three'] ) : '' );
+}
+
+// Enregistrer les paramètres de l'onglet 5
+add_action( 'admin_post_slc_save_tab_five_settings', 'slc_save_tab_five_settings' );
+
+
+
+// Styles personnalisés
+function slc_custom_styles() {
     ?>
-    <div id="tab-2" class="tab-content">
-        <h2><?php _e('Sécurité', 'secure-login-customizer'); ?></h2>
-        <form method="post" action="options.php">
-              
-			<?php
-			  // champs de formulaire onglet 2
-				settings_fields('slc_security_settings');
-				do_settings_sections('slc_security_settings');
-				submit_button();
-
-			?>
-        </form>
-    </div>
+    <style>
+        .tab-content p:first-child {
+            margin-top: 15px;
+        }
+        .dashicons-shield {
+            font-size: 36px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .form {
+            margin-top: 15px;
+        }
+        .wrap > h1 {
+            color: blue;
+            margin-bottom: 30px;
+        }
+        .tab-content {
+            margin-left: 25px;
+        }
+        h1.slc-plugin-title,
+        .tab-content h2 {
+            display: none;
+        }
+        .slc-title-container {
+            text-align: center;
+        }
+        .slc-title-container h1 {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 15px;
+            margin-right: 10px;
+            font-size: 36px;
+            color: blue;
+        }
+        .nav-tab {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .dashicons-shield {
+            font-size: 36px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+    </style>
     <?php
+}
+add_action('admin_head', 'slc_custom_styles');
 
-    // Contenu de l'onglet 3
-    ?>
-    <div id="tab-3" class="tab-content">
-        <h2><?php _e('Customisation login screen', 'secure-login-customizer'); ?></h2>
-        <form method="post" action="options.php">
-            <?php
-            //  champs de formulaire onglet 3
-			
-			settings_fields('slc_custom_login_screen_settings');
-			do_settings_sections('slc_custom_login_screen_settings');
-			submit_button();
 
-			
-			
-			
-            ?>
-        </form>
-    </div>
-    <?php
-
-    // Contenu de l'onglet 4
-    ?>
-    <div id="tab-4" class="tab-content">
-        <h2><?php _e('Customisation message', 'secure-login-customizer'); ?></h2>
-        <form method="post" action="options.php">
-            <?php
-            // champs de formulaire onglet 4
-			settings_fields('slc_custom_message_settings');
-			do_settings_sections('slc_custom_message_settings');
-			submit_button();
-
-			
-			
-            ?>
-        </form>
-    </div>
-    <?php
-
-    // Contenu de l'onglet 5
-    ?>
-    <div id="tab-5" class="tab-content">
-        <h2><?php _e('Lorem Ipsum', 'secure-login-customizer'); ?></h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod orci ut ullamcorper tincidunt. Sed auctor sapien ut facilisis fermentum.</p>
-        <p>In hac habitasse platea dictumst. Vestibulum pellentesque elit et erat congue, id ultricies metus vestibulum. Duis commodo augue ac magna laoreet ultrices.</p>
-    </div>
-    <?php
-	
-	
-}   // fin function slc_render_plugin_settings_page
 
 // gestion des onglets avec javascript
 function slc_admin_scripts() {
