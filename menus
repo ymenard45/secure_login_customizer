@@ -395,6 +395,53 @@ function slc_security_group_callback() {
 	add_action('admin_init', 'slc_add_security_fields');
 
 	/* Fonctions pour l'onglet 2 */
+	
+	function slc_security_settings_init() {
+    register_setting('slc_security_settings', 'slc_security_settings');
+
+    add_settings_section(
+        'slc_security_section',
+        __('Security Headers Settings', 'slc'),
+        'slc_security_settings_section_callback',
+        'slc_security'
+    );
+
+    add_settings_field(
+        'enable_security_headers',
+        __('Enable Security Headers', 'slc'),
+        'slc_enable_security_headers_callback',
+        'slc_security',
+        'slc_security_section'
+    );
+	
+	add_settings_field(
+		'slc_enable_message_anonymization', // ID du champ
+		__('Activer l’anonymisation des messages', 'slc'), // Libellé du champ
+		'slc_enable_message_anonymization_callback', // Fonction de rappel pour afficher le champ
+		'slc_security_settings', // Page d'administration sur laquelle afficher le champ
+		'slc_security_settings_section' // Section sur laquelle afficher le champ
+	);
+	
+	add_settings_field(
+		'slc_reject_proxy_connections', // ID du champ
+		__('Refuser les connexions depuis un proxy', 'slc'), // Libellé du champ
+		'slc_reject_proxy_connections_callback', // Fonction de rappel pour afficher le champ
+		'slc_security_settings', // Page d'administration sur laquelle afficher le champ
+		'slc_security_settings_section' // Section sur laquelle afficher le champ
+	);
+	
+	add_settings_field(
+		'slc_disable_weak_passwords', // ID du champ
+		__('Interdire les Mots de passe à faible sécurité', 'slc'), // Libellé du champ
+		'slc_disable_weak_passwords_callback', // Fonction de rappel pour afficher le champ
+		'slc_security_settings', // Page d'administration sur laquelle afficher le champ
+		'slc_security_settings_section' // Section sur laquelle afficher le champ
+	);
+    // Ajouter d'autres champs ici pour l'onglet de sécurité
+
+	} // slc_security_settings_init
+	add_action('admin_init', 'slc_security_settings_init');
+	
 	// champ security headers
 	
 	function slc_enable_security_headers_callback() {
