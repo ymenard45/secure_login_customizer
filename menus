@@ -17,9 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Déclarations :
-define( 'SLC_PLUGIN_VERSION', '1.0.0' );
-define( 'SLC_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'SLC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+ define( 'SLC_PLUGIN_VERSION', '1.0.0' );
+ define( 'SLC_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+ define( 'SLC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 // Initialisation :
 add_action( 'admin_menu', 'slc_add_admin_menu' );
@@ -46,12 +46,8 @@ function slc_settings_init() {
     );
 
     // Ajouter les onglets
-    add_settings_section(
-        'slc_tab1_section',
-        __( 'Tab 1', 'slc' ),
-        'slc_tab1_section_callback',
-        'slc_options_group'
-    );
+	add_settings_section( 'slc_tab1_section', __( '2FA Settings', 'slc' ), 'slc_tab1_callback', 'slc_options_group' );
+
     add_settings_section(
         'slc_tab2_section',
         __( 'Tab 2', 'slc' ),
@@ -87,7 +83,7 @@ function slc_settings_init() {
 
 // Fonction générale pour l'affichage des options et des onglets 
 function slc_options_page() {
-    $active_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'slc_tab1_section';
+    $active_tab = $_GET['tab'] ?? 'slc_tab1_section';
 	?>
     <div class="wrap">
         <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -100,284 +96,10 @@ function slc_options_page() {
     <?php
 }
 
-// Fonctions spécifiques aux onglets:
- 
-// Onglet 1
-function slc_tab1_settings_init() {
-    // Section 1
-    add_settings_section(
-        'slc_tab1_section',
-        __( '2FA Authentication', 'slc' ),
-        'slc_tab1_section_callback',
-        'slc_options_tab1'
-    );
-
-    // Champ de saisie "Enable 2FA"
-    add_settings_field(
-        'slc_enable_2fa',
-        __( 'Enable 2FA Authentication', 'slc' ),
-        'slc_enable_2fa_callback',
-        'slc_options_tab1',
-        'slc_tab1_section'
-    );
-
-    // Champ de saisie "Enable Backup Code"
-    add_settings_field(
-        'slc_enable_backup_code',
-        __( 'Enable Backup Code', 'slc' ),
-        'slc_enable_backup_code_callback',
-        'slc_options_tab1',
-        'slc_tab1_section'
-    );
-
-    // Champ de saisie "Restrict 2FA Deactivation"
-    add_settings_field(
-        'slc_restrict_2fa_deactivation',
-        __( 'Restrict 2FA Deactivation', 'slc' ),
-        'slc_restrict_2fa_deactivation_callback',
-        'slc_options_tab1',
-        'slc_tab1_section'
-    );
-
-    // Champ de saisie "2FA Security Groups"
-    add_settings_field(
-        'slc_2fa_security_groups',
-        __( '2FA Security Groups', 'slc' ),
-        'slc_2fa_security_groups_callback',
-        'slc_options_tab1',
-        'slc_tab1_section'
-    );
-}
-
-
-// Onglet 2
-function slc_tab2_settings_init() {
-    // Section 1
-    add_settings_section(
-        'slc_tab2_section',
-        __( 'Security Headers', 'slc' ),
-        'slc_tab2_section_callback',
-        'slc_options_tab2'
-    );
-
-    // Champ de saisie "Enable Security Headers"
-    add_settings_field(
-        'slc_enable_security_headers',
-        __( 'Enable Security Headers', 'slc' ),
-        'slc_enable_security_headers_callback',
-        'slc_options_tab2',
-        'slc_tab2_section'
-    );
-
-    // Champ de saisie "Anonymize Messages"
-    add_settings_field(
-        'slc_anonymize_messages',
-        __( 'Anonymize Messages', 'slc' ),
-        'slc_anonymize_messages_callback',
-        'slc_options_tab2',
-        'slc_tab2_section'
-    );
-
-    // Champ de saisie "Disallow Proxy Connections"
-    add_settings_field(
-        'slc_disallow_proxy_connections',
-        __( 'Disallow Proxy Connections', 'slc' ),
-        'slc_disallow_proxy_connections_callback',
-        'slc_options_tab2',
-        'slc_tab2_section'
-    );
-
-    // Champ de saisie "Disallow Weak Passwords"
-    add_settings_field(
-        'slc_disallow_weak_passwords',
-        __( 'Disallow Weak Passwords', 'slc' ),
-        'slc_disallow_weak_passwords_callback',
-        'slc_options_tab2',
-        'slc_tab2_section'
-    );
-
-    // Champ de saisie "Blacklist"
-    add_settings_field(
-        'slc_blacklist',
-        __( 'Blacklist', 'slc' ),
-        'slc_blacklist_callback',
-        'slc_options_tab2',
-        'slc_tab2_section'
-    );
-
-    // Champ de saisie "Whitelist"
-    add_settings_field(
-        'slc_whitelist',
-        __( 'Whitelist', 'slc' ),
-        'slc_whitelist_callback',
-        'slc_options_tab2',
-        'slc_tab2_section'
-    );
-
-    // Champ de saisie "Max Login Attempts"
-    add_settings_field(
-        'slc_max_login_attempts',
-        __( 'Max Login Attempts', 'slc' ),
-        'slc_max_login_attempts_callback',
-        'slc_options_tab2',
-        'slc_tab2_section'
-    );
-
-    // Champ de saisie "Account Block Time"
-    add_settings_field(
-        'slc_account_block_time',
-        __( 'Account Block Time', 'slc' ),
-        'slc_account_block_time_callback',
-        'slc_options_tab2',
-        'slc_tab2_section'
-    );
-}
-
-// Onglet 3
-function slc_tab3_settings_init() {
-    // Section 1
-    add_settings_section(
-        'slc_tab3_section',
-        __( 'Login Screen Customization', 'slc' ),
-        'slc_tab3_section_callback',
-        'slc_options_tab3'
-    );
-
-    // Champ de saisie "Logo URL"
-    add_settings_field(
-        'slc_logo_url',
-        __( 'Logo URL', 'slc' ),
-        'slc_logo_url_callback',
-        'slc_options_tab3',
-        'slc_tab3_section'
-    );
-
-    // Champ de saisie "Desktop URL"
-    add_settings_field(
-        'slc_desktop_url',
-        __( 'Desktop URL', 'slc' ),
-        'slc_desktop_url_callback',
-        'slc_options_tab3',
-        'slc_tab3_section'
-    );
-
-    // Champ de saisie "Mobile URL"
-    add_settings_field(
-        'slc_mobile_url',
-        __( 'Mobile URL', 'slc' ),
-        'slc_mobile_url_callback',
-        'slc_options_tab3',
-        'slc_tab3_section'
-    );
-
-    // Champ de saisie "Button Color"
-    add_settings_field(
-        'slc_button_color',
-        __( 'Button Color', 'slc' ),
-        'slc_button_color_callback',
-        'slc_options_tab3',
-        'slc_tab3_section'
-    );
-
-    // Champ de saisie "Background Color"
-    add_settings_field(
-        'slc_background_color',
-        __( 'Background Color', 'slc' ),
-        'slc_background_color_callback',
-        'slc_options_tab3',
-        'slc_tab3_section'
-    );
-
-    // Champ de saisie "Text Color"
-    add_settings_field(
-        'slc_text_color',
-        __( 'Text Color', 'slc' ),
-        'slc_text_color_callback',
-        'slc_options_tab3',
-        'slc_tab3_section'
-    );
-
-    // Champ de saisie "Border Color"
-    add_settings_field(
-        'slc_border_color',
-        __( 'Border Color', 'slc' ),
-        'slc_border_color_callback',
-        'slc_options_tab3',
-        'slc_tab3_section'
-    );
-
-    // Champ de saisie "Transparency"
-    add_settings_field(
-        'slc_transparency',
-        __( 'Transparency', 'slc' ),
-        'slc_transparency_callback',
-        'slc_options_tab3',
-        'slc_tab3_section'
-    );
-}
-
-
-// Onglet 4
-function slc_tab4_settings_init() {
-    // Section 1
-    add_settings_section(
-        'slc_tab4_section',
-        __( 'QR Codes and Secrets', 'slc' ),
-        'slc_tab4_section_callback',
-        'slc_options_tab4'
-    );
-
-    // Champ de saisie "QR Code Page URL"
-    add_settings_field(
-        'slc_qr_code_page_url',
-        __( 'QR Code Page URL', 'slc' ),
-        'slc_qr_code_page_url_callback',
-        'slc_options_tab4',
-        'slc_tab4_section'
-    );
-
-    // Champ de saisie "Secrets Page URL"
-    add_settings_field(
-        'slc_secrets_page_url',
-        __( 'Secrets Page URL', 'slc' ),
-        'slc_secrets_page_url_callback',
-        'slc_options_tab4',
-        'slc_tab4_section'
-    );
-
-    // Champ de saisie "Disable Account Page URL"
-    add_settings_field(
-        'slc_disable_account_page_url',
-        __( 'Disable Account Page URL', 'slc' ),
-        'slc_disable_account_page_url_callback',
-        'slc_options_tab4',
-        'slc_tab4_section'
-    );
-}
-
-// Onglet 5
-function slc_tab5_settings_init() {
-    // Section 1
-    add_settings_section(
-        'slc_tab5_section',
-        __( 'Other Information', 'slc' ),
-        'slc_tab5_section_callback',
-        'slc_options_tab5'
-    );
-
-    // Champ de saisie "Text Area"
-    add_settings_field(
-        'slc_text_area',
-        __( 'Text Area', 'slc' ),
-        'slc_text_area_callback',
-        'slc_options_tab5',
-        'slc_tab5_section'
-    );
-}
-
 // Fonctions pour l'affichage des champs de saisie des onglets
 
-// Onglet 1
+/***  Onglet 1 ***/
+
 function slc_tab1_settings_init() {
     add_settings_field(
         'slc_enable_2fa',
@@ -411,6 +133,8 @@ function slc_tab1_settings_init() {
         'slc_tab1_section'
     );
 }
+
+
 // zone activation 2FA Saisie + validation
 
 function slc_enable_2fa_callback() {
@@ -476,14 +200,14 @@ function slc_security_groups_callback() {
 
 function slc_security_groups_validate( $input ) {
     $valid = array();
-    $user_roles = get_editable_roles();
-    foreach ( $user_roles as $role_name => $role_info ) {
-        $valid['security_groups'][ $role_name ] = isset( $input['security_groups'][ $role_name ] ) ? true : false;
+    if ( isset( $input['security_groups'] ) ) {
+        $security_groups = array_filter( $input['security_groups'], fn($role) => in_array( $role, array( 'administrator', 'shop_manager', 'editor', 'author', 'contributor', 'subscriber' ) ) );
+        $valid['security_groups'] = $security_groups;
     }
     return $valid;
 }
 
-/***  Onglet 2 ***/
+/***  Onglet 2  CHAMP  ***/
  
 function slc_tab2_settings_init() {
     add_settings_field(
@@ -541,9 +265,10 @@ function slc_tab2_settings_init() {
         'slc_options_group',
         'slc_tab2_section'
     );
+}
 
-  // Suite de l'onglet 2
-  
+
+/***  Onglet 2  SAISIE ET VALIDATION***/
   
   // Case à cocher "Activer Security Headers" Saisie + Validation
   
@@ -637,9 +362,8 @@ function slc_whitelist_validate( $input ) {
 // Zone de saisie "Nombre de tentatives de connexions avant désactivation"
 function slc_max_login_attempts_callback() {
     $options = get_option( 'slc_options' );
-    $value = isset( $options['max_login_attempts'] ) ? absint( $options['max_login_attempts'] ) : 0;
-    $html = '<input type="number" id="slc_max_login_attempts" name="slc_options[max_login_attempts]" min="0" max="20" value="' . $value . '" />';
-    echo $html;
+    $max_login_attempts = isset( $options['max_login_attempts'] ) ? esc_attr( $options['max_login_attempts'] ) : '';
+    echo '<input type="number" min="0" max="20" id="max_login_attempts" name="slc_options[max_login_attempts]" value="' . $max_login_attempts . '"/>';
 }
 
 function slc_max_login_attempts_validate( $input ) {
@@ -736,12 +460,10 @@ function slc_account_block_time_validate( $input ) {
  
 function slc_logo_url_callback() {
     $options = get_option( 'slc_options' );
-    $logo_url = isset( $options['logo_url'] ) ? esc_url( $options['logo_url'] ) : '';
-    ?>
-    <input type="text" name="slc_options[logo_url]" value="<?php echo $logo_url; ?>" class="regular-text" />
-    <p class="description"><?php _e( 'Enter the URL of your logo image.', 'slc' ); ?></p>
-    <?php
+    $logo_url = isset( $options['logo_url'] ) ? esc_url_raw( $options['logo_url'] ) : '';
+    echo '<input type="url" id="logo_url" name="slc_options[logo_url]" value="' . $logo_url . '"> ';
 }
+
 
 // Fonction de validation pour l'URL du logo
 function slc_logo_url_validate( $input ) {
@@ -760,11 +482,7 @@ function slc_logo_url_validate( $input ) {
     return $valid;
 }
 
-function slc_logo_url_validate( $input ) {
-    $valid = array();
-    $valid['logo_url'] = isset( $input['logo_url'] ) ? esc_url_raw( $input['logo_url'] ) : '';
-    return $valid;
-}
+ 
 
 // Zone de saisie "Url pour desktop"
 function slc_desktop_url_callback() {
