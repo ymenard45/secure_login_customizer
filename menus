@@ -11,6 +11,7 @@ Text Domain: mon-google-authentificator
 */
 
 // Protection
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
@@ -86,12 +87,13 @@ function slc_settings_init() {
 
 // Fonction générale pour l'affichage des options et des onglets 
 function slc_options_page() {
-    ?>
+    $active_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'slc_tab1_section';
+	?>
     <div class="wrap">
         <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
         <form action="options.php" method="post">
             <?php settings_fields( 'slc_options_group' ); ?>
-            <?php do_settings_sections( 'slc_options_group' ); ?>
+            <?php ddo_settings_sections( $active_tab ); ?>
             <?php submit_button( __( 'Save Changes', 'slc' ) ); ?>
         </form>
     </div>
@@ -99,24 +101,278 @@ function slc_options_page() {
 }
 
 // Fonctions spécifiques aux onglets:
+ 
+// Onglet 1
 function slc_tab1_settings_init() {
-    // Fonction pour initialiser les champs de l'onglet 1
+    // Section 1
+    add_settings_section(
+        'slc_tab1_section',
+        __( '2FA Authentication', 'slc' ),
+        'slc_tab1_section_callback',
+        'slc_options_tab1'
+    );
+
+    // Champ de saisie "Enable 2FA"
+    add_settings_field(
+        'slc_enable_2fa',
+        __( 'Enable 2FA Authentication', 'slc' ),
+        'slc_enable_2fa_callback',
+        'slc_options_tab1',
+        'slc_tab1_section'
+    );
+
+    // Champ de saisie "Enable Backup Code"
+    add_settings_field(
+        'slc_enable_backup_code',
+        __( 'Enable Backup Code', 'slc' ),
+        'slc_enable_backup_code_callback',
+        'slc_options_tab1',
+        'slc_tab1_section'
+    );
+
+    // Champ de saisie "Restrict 2FA Deactivation"
+    add_settings_field(
+        'slc_restrict_2fa_deactivation',
+        __( 'Restrict 2FA Deactivation', 'slc' ),
+        'slc_restrict_2fa_deactivation_callback',
+        'slc_options_tab1',
+        'slc_tab1_section'
+    );
+
+    // Champ de saisie "2FA Security Groups"
+    add_settings_field(
+        'slc_2fa_security_groups',
+        __( '2FA Security Groups', 'slc' ),
+        'slc_2fa_security_groups_callback',
+        'slc_options_tab1',
+        'slc_tab1_section'
+    );
 }
 
+
+// Onglet 2
 function slc_tab2_settings_init() {
-    // Fonction pour initialiser les champs de l'onglet 2
+    // Section 1
+    add_settings_section(
+        'slc_tab2_section',
+        __( 'Security Headers', 'slc' ),
+        'slc_tab2_section_callback',
+        'slc_options_tab2'
+    );
+
+    // Champ de saisie "Enable Security Headers"
+    add_settings_field(
+        'slc_enable_security_headers',
+        __( 'Enable Security Headers', 'slc' ),
+        'slc_enable_security_headers_callback',
+        'slc_options_tab2',
+        'slc_tab2_section'
+    );
+
+    // Champ de saisie "Anonymize Messages"
+    add_settings_field(
+        'slc_anonymize_messages',
+        __( 'Anonymize Messages', 'slc' ),
+        'slc_anonymize_messages_callback',
+        'slc_options_tab2',
+        'slc_tab2_section'
+    );
+
+    // Champ de saisie "Disallow Proxy Connections"
+    add_settings_field(
+        'slc_disallow_proxy_connections',
+        __( 'Disallow Proxy Connections', 'slc' ),
+        'slc_disallow_proxy_connections_callback',
+        'slc_options_tab2',
+        'slc_tab2_section'
+    );
+
+    // Champ de saisie "Disallow Weak Passwords"
+    add_settings_field(
+        'slc_disallow_weak_passwords',
+        __( 'Disallow Weak Passwords', 'slc' ),
+        'slc_disallow_weak_passwords_callback',
+        'slc_options_tab2',
+        'slc_tab2_section'
+    );
+
+    // Champ de saisie "Blacklist"
+    add_settings_field(
+        'slc_blacklist',
+        __( 'Blacklist', 'slc' ),
+        'slc_blacklist_callback',
+        'slc_options_tab2',
+        'slc_tab2_section'
+    );
+
+    // Champ de saisie "Whitelist"
+    add_settings_field(
+        'slc_whitelist',
+        __( 'Whitelist', 'slc' ),
+        'slc_whitelist_callback',
+        'slc_options_tab2',
+        'slc_tab2_section'
+    );
+
+    // Champ de saisie "Max Login Attempts"
+    add_settings_field(
+        'slc_max_login_attempts',
+        __( 'Max Login Attempts', 'slc' ),
+        'slc_max_login_attempts_callback',
+        'slc_options_tab2',
+        'slc_tab2_section'
+    );
+
+    // Champ de saisie "Account Block Time"
+    add_settings_field(
+        'slc_account_block_time',
+        __( 'Account Block Time', 'slc' ),
+        'slc_account_block_time_callback',
+        'slc_options_tab2',
+        'slc_tab2_section'
+    );
 }
 
+// Onglet 3
 function slc_tab3_settings_init() {
-    // Fonction pour initialiser les champs de l'onglet 3
+    // Section 1
+    add_settings_section(
+        'slc_tab3_section',
+        __( 'Login Screen Customization', 'slc' ),
+        'slc_tab3_section_callback',
+        'slc_options_tab3'
+    );
+
+    // Champ de saisie "Logo URL"
+    add_settings_field(
+        'slc_logo_url',
+        __( 'Logo URL', 'slc' ),
+        'slc_logo_url_callback',
+        'slc_options_tab3',
+        'slc_tab3_section'
+    );
+
+    // Champ de saisie "Desktop URL"
+    add_settings_field(
+        'slc_desktop_url',
+        __( 'Desktop URL', 'slc' ),
+        'slc_desktop_url_callback',
+        'slc_options_tab3',
+        'slc_tab3_section'
+    );
+
+    // Champ de saisie "Mobile URL"
+    add_settings_field(
+        'slc_mobile_url',
+        __( 'Mobile URL', 'slc' ),
+        'slc_mobile_url_callback',
+        'slc_options_tab3',
+        'slc_tab3_section'
+    );
+
+    // Champ de saisie "Button Color"
+    add_settings_field(
+        'slc_button_color',
+        __( 'Button Color', 'slc' ),
+        'slc_button_color_callback',
+        'slc_options_tab3',
+        'slc_tab3_section'
+    );
+
+    // Champ de saisie "Background Color"
+    add_settings_field(
+        'slc_background_color',
+        __( 'Background Color', 'slc' ),
+        'slc_background_color_callback',
+        'slc_options_tab3',
+        'slc_tab3_section'
+    );
+
+    // Champ de saisie "Text Color"
+    add_settings_field(
+        'slc_text_color',
+        __( 'Text Color', 'slc' ),
+        'slc_text_color_callback',
+        'slc_options_tab3',
+        'slc_tab3_section'
+    );
+
+    // Champ de saisie "Border Color"
+    add_settings_field(
+        'slc_border_color',
+        __( 'Border Color', 'slc' ),
+        'slc_border_color_callback',
+        'slc_options_tab3',
+        'slc_tab3_section'
+    );
+
+    // Champ de saisie "Transparency"
+    add_settings_field(
+        'slc_transparency',
+        __( 'Transparency', 'slc' ),
+        'slc_transparency_callback',
+        'slc_options_tab3',
+        'slc_tab3_section'
+    );
 }
 
+
+// Onglet 4
 function slc_tab4_settings_init() {
-    // Fonction pour initialiser les champs de l'onglet 4
+    // Section 1
+    add_settings_section(
+        'slc_tab4_section',
+        __( 'QR Codes and Secrets', 'slc' ),
+        'slc_tab4_section_callback',
+        'slc_options_tab4'
+    );
+
+    // Champ de saisie "QR Code Page URL"
+    add_settings_field(
+        'slc_qr_code_page_url',
+        __( 'QR Code Page URL', 'slc' ),
+        'slc_qr_code_page_url_callback',
+        'slc_options_tab4',
+        'slc_tab4_section'
+    );
+
+    // Champ de saisie "Secrets Page URL"
+    add_settings_field(
+        'slc_secrets_page_url',
+        __( 'Secrets Page URL', 'slc' ),
+        'slc_secrets_page_url_callback',
+        'slc_options_tab4',
+        'slc_tab4_section'
+    );
+
+    // Champ de saisie "Disable Account Page URL"
+    add_settings_field(
+        'slc_disable_account_page_url',
+        __( 'Disable Account Page URL', 'slc' ),
+        'slc_disable_account_page_url_callback',
+        'slc_options_tab4',
+        'slc_tab4_section'
+    );
 }
 
+// Onglet 5
 function slc_tab5_settings_init() {
-    // Fonction pour initialiser les champs de l'onglet 5
+    // Section 1
+    add_settings_section(
+        'slc_tab5_section',
+        __( 'Other Information', 'slc' ),
+        'slc_tab5_section_callback',
+        'slc_options_tab5'
+    );
+
+    // Champ de saisie "Text Area"
+    add_settings_field(
+        'slc_text_area',
+        __( 'Text Area', 'slc' ),
+        'slc_text_area_callback',
+        'slc_options_tab5',
+        'slc_tab5_section'
+    );
 }
 
 // Fonctions pour l'affichage des champs de saisie des onglets
@@ -155,25 +411,80 @@ function slc_tab1_settings_init() {
         'slc_tab1_section'
     );
 }
+// zone activation 2FA Saisie + validation
 
 function slc_enable_2fa_callback() {
-    // Fonction pour afficher la case à cocher "Enable 2FA Authentication"
+    $options = get_option( 'slc_options' );
+    $checked = isset( $options['enable_2fa'] ) ? checked( $options['enable_2fa'], true, false ) : '';
+    $html = '<input type="checkbox" id="slc_enable_2fa" name="slc_options[enable_2fa]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_enable_2fa">' . __( 'Enable 2FA Authentication', 'slc' ) . '</label>';
+    echo $html;
 }
+function slc_enable_2fa_validate( $input ) {
+    $valid = array();
+    $valid['enable_2fa'] = isset( $input['enable_2fa'] ) ? true : false;
+    return $valid;
+}
+
+
+// Case à cocher "Activer Backup Code"  Saisie + validation
 
 function slc_enable_backup_code_callback() {
-    // Fonction pour afficher la case à cocher "Enable Backup Code"
+    $options = get_option( 'slc_options' );
+    $checked = isset( $options['enable_backup_code'] ) ? checked( $options['enable_backup_code'], true, false ) : '';
+    $html = '<input type="checkbox" id="slc_enable_backup_code" name="slc_options[enable_backup_code]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_enable_backup_code">' . __( 'Enable Backup Code', 'slc' ) . '</label>';
+    echo $html;
 }
 
-function slc_restrict_2fa_deactivation_callback() {
-    // Fonction pour afficher la case à cocher "Restrict 2FA Deactivation"
+function slc_enable_backup_code_validate( $input ) {
+    $valid = array();
+    $valid['enable_backup_code'] = isset( $input['enable_backup_code'] ) ? true : false;
+    return $valid;
 }
 
-function slc_2fa_security_groups_callback() {
-    // Fonction pour afficher la zone de saisie "2FA Security Groups"
+
+// Case à cocher "Interdire la désactivation de 2FA Authentication"  Saisie + validation
+
+function slc_disable_2fa_deactivation_callback() {
+    $options = get_option( 'slc_options' );
+    $checked = isset( $options['disable_2fa_deactivation'] ) ? checked( $options['disable_2fa_deactivation'], true, false ) : '';
+    $html = '<input type="checkbox" id="slc_disable_2fa_deactivation" name="slc_options[disable_2fa_deactivation]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_disable_2fa_deactivation">' . __( 'Disable 2FA Authentication Deactivation', 'slc' ) . '</label>';
+    echo $html;
+}
+
+function slc_disable_2fa_deactivation_validate( $input ) {
+    $valid = array();
+    $valid['disable_2fa_deactivation'] = isset( $input['disable_2fa_deactivation'] ) ? true : false;
+    return $valid;
 }
 
 
-// Onglet 2
+// Case à cocher de sélection des groupes de sécurité ou 2FA sera activée   Saisie + validation
+function slc_security_groups_callback() {
+    $options = get_option( 'slc_options' );
+    $html = '';
+    $user_roles = get_editable_roles();
+    foreach ( $user_roles as $role_name => $role_info ) {
+        $checked = isset( $options['security_groups'][ $role_name ] ) ? checked( $options['security_groups'][ $role_name ], true, false ) : '';
+        $html .= '<input type="checkbox" id="slc_security_groups_' . $role_name . '" name="slc_options[security_groups][' . $role_name . ']" value="1" ' . $checked . '/>';
+        $html .= '<label for="slc_security_groups_' . $role_name . '">' . $role_info['name'] . '</label><br>';
+    }
+    echo $html;
+}
+
+function slc_security_groups_validate( $input ) {
+    $valid = array();
+    $user_roles = get_editable_roles();
+    foreach ( $user_roles as $role_name => $role_info ) {
+        $valid['security_groups'][ $role_name ] = isset( $input['security_groups'][ $role_name ] ) ? true : false;
+    }
+    return $valid;
+}
+
+/***  Onglet 2 ***/
+ 
 function slc_tab2_settings_init() {
     add_settings_field(
         'slc_enable_security_headers',
@@ -232,15 +543,128 @@ function slc_tab2_settings_init() {
     );
 
   // Suite de l'onglet 2
-	function slc_max_login_attempts_callback() {
-	// Fonction pour afficher la zone de saisie "Max Login Attempts"
-	}
+  
+  
+  // Case à cocher "Activer Security Headers" Saisie + Validation
+  
+function slc_enable_security_headers_callback() {
+    $options = get_option( 'slc_options' );
+    $checked = isset( $options['enable_security_headers'] ) ? checked( $options['enable_security_headers'], true, false ) : '';
+    $html = '<input type="checkbox" id="slc_enable_security_headers" name="slc_options[enable_security_headers]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_enable_security_headers">' . __( 'Enable Security Headers', 'slc' ) . '</label>';
+    echo $html;
+}
 
-	function slc_account_lockout_time_callback() {
-	// Fonction pour afficher la zone de saisie "Account Lockout Time"
-	}
+function slc_enable_security_headers_validate( $input ) {
+    $valid = array();
+    $valid['enable_security_headers'] = isset( $input['enable_security_headers'] ) ? true : false;
+    return $valid;
+}
 
-	// Onglet 3
+// Case à cocher "Activer l'anonymisation des messages"
+function slc_enable_message_anonymization_callback() {
+    $options = get_option( 'slc_options' );
+    $checked = isset( $options['enable_message_anonymization'] ) ? checked( $options['enable_message_anonymization'], true, false ) : '';
+    $html = '<input type="checkbox" id="slc_enable_message_anonymization" name="slc_options[enable_message_anonymization]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_enable_message_anonymization">' . __( 'Enable Message Anonymization', 'slc' ) . '</label>';
+    echo $html;
+}
+
+function slc_enable_message_anonymization_validate( $input ) {
+    $valid = array();
+    $valid['enable_message_anonymization'] = isset( $input['enable_message_anonymization'] ) ? true : false;
+    return $valid;
+}
+
+// Case à cocher "Refuser les connexions depuis un proxy"
+function slc_disable_proxy_connections_callback() {
+    $options = get_option( 'slc_options' );
+    $checked = isset( $options['disable_proxy_connections'] ) ? checked( $options['disable_proxy_connections'], true, false ) : '';
+    $html = '<input type="checkbox" id="slc_disable_proxy_connections" name="slc_options[disable_proxy_connections]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_disable_proxy_connections">' . __( 'Disable Proxy Connections', 'slc' ) . '</label>';
+    echo $html;
+}
+
+function slc_disable_proxy_connections_validate( $input ) {
+    $valid = array();
+    $valid['disable_proxy_connections'] = isset( $input['disable_proxy_connections'] ) ? true : false;
+    return $valid;
+}
+
+// Case à cocher "Interdire les Mots de passe à faible sécurité"
+function slc_disable_weak_passwords_callback() {
+    $options = get_option( 'slc_options' );
+    $checked = isset( $options['disable_weak_passwords'] ) ? checked( $options['disable_weak_passwords'], true, false ) : '';
+    $html = '<input type="checkbox" id="slc_disable_weak_passwords" name="slc_options[disable_weak_passwords]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_disable_weak_passwords">' . __( 'Disable Weak Passwords', 'slc' ) . '</label>';
+    echo $html;
+}
+
+function slc_disable_weak_passwords_validate( $input ) {
+    $valid = array();
+    $valid['disable_weak_passwords'] = isset( $input['disable_weak_passwords'] ) ? true : false;
+    return $valid;
+}
+
+// Zone de saisie "Blacklist"
+function slc_blacklist_callback() {
+    $options = get_option( 'slc_options' );
+    $value = isset( $options['blacklist'] ) ? sanitize_text_field( $options['blacklist'] ) : '';
+    $html = '<textarea id="slc_blacklist" name="slc_options[blacklist]" rows="5" cols="50">' . $value . '</textarea>';
+    echo $html;
+}
+
+function slc_blacklist_validate( $input ) {
+    $valid = array();
+    $valid['blacklist'] = isset( $input['blacklist'] ) ? sanitize_text_field( $input['blacklist'] ) : '';
+    return $valid;
+}
+
+// Zone de saisie "Whitelist"
+function slc_whitelist_callback() {
+    $options = get_option( 'slc_options' );
+    $value = isset( $options['whitelist'] ) ? sanitize_text_field( $options['whitelist'] ) : '';
+    $html = '<textarea id="slc_whitelist" name="slc_options[whitelist]" rows="5" cols="50">' . $value . '</textarea>';
+    echo $html;
+}
+
+function slc_whitelist_validate( $input ) {
+    $valid = array();
+    $valid['whitelist'] = isset( $input['whitelist'] ) ? sanitize_text_field( $input['whitelist'] ) : '';
+    return $valid;
+}
+
+// Zone de saisie "Nombre de tentatives de connexions avant désactivation"
+function slc_max_login_attempts_callback() {
+    $options = get_option( 'slc_options' );
+    $value = isset( $options['max_login_attempts'] ) ? absint( $options['max_login_attempts'] ) : 0;
+    $html = '<input type="number" id="slc_max_login_attempts" name="slc_options[max_login_attempts]" min="0" max="20" value="' . $value . '" />';
+    echo $html;
+}
+
+function slc_max_login_attempts_validate( $input ) {
+    $valid = array();
+    $valid['max_login_attempts'] = isset( $input['max_login_attempts'] ) ? absint( $input['max_login_attempts'] ) : 0;
+    return $valid;
+}
+
+// Zone de saisie "Temps de blocage du compte"
+function slc_account_block_time_callback() {
+    $options = get_option( 'slc_options' );
+    $value = isset( $options['account_block_time'] ) ? absint( $options['account_block_time'] ) : 0;
+    $html = '<input type="number" id="slc_account_block_time" name="slc_options[account_block_time]" min="0" max="300" value="' . $value . '" />';
+    echo $html;
+}
+
+function slc_account_block_time_validate( $input ) {
+    $valid = array();
+    $valid['account_block_time'] = isset( $input['account_block_time'] ) ? absint( $input['account_block_time'] ) : 0;
+    return $valid;
+}
+
+
+/***  Onglet 3 ***/
+	 
 	function slc_tab3_settings_init() {
 	add_settings_field(
 	'slc_login_logo_url',
@@ -307,40 +731,128 @@ function slc_tab2_settings_init() {
 		'slc_tab3_section'
 	);
 	}
+ 
+// Zone de saisie "Url du logo"  Saisie + Controle + validation
+ 
+function slc_logo_url_callback() {
+    $options = get_option( 'slc_options' );
+    $logo_url = isset( $options['logo_url'] ) ? esc_url( $options['logo_url'] ) : '';
+    ?>
+    <input type="text" name="slc_options[logo_url]" value="<?php echo $logo_url; ?>" class="regular-text" />
+    <p class="description"><?php _e( 'Enter the URL of your logo image.', 'slc' ); ?></p>
+    <?php
+}
 
-	function slc_login_logo_url_callback() {
-	// Fonction pour afficher la zone de saisie "Login Logo URL"
-	}
+// Fonction de validation pour l'URL du logo
+function slc_logo_url_validate( $input ) {
+    $valid = array();
+    if ( isset( $input['logo_url'] ) ) {
+        if ( ! filter_var( $input['logo_url'], FILTER_VALIDATE_URL ) ) {
+            add_settings_error(
+                'slc_logo_url',
+                'invalid_url',
+                __( 'Invalid URL. Please enter a valid URL.', 'slc' )
+            );
+        } else {
+            $valid['logo_url'] = esc_url_raw( $input['logo_url'] );
+        }
+    }
+    return $valid;
+}
 
-	function slc_desktop_logo_url_callback() {
-	// Fonction pour afficher la zone de saisie "Desktop Logo URL"
-	}
+function slc_logo_url_validate( $input ) {
+    $valid = array();
+    $valid['logo_url'] = isset( $input['logo_url'] ) ? esc_url_raw( $input['logo_url'] ) : '';
+    return $valid;
+}
 
-	function slc_mobile_logo_url_callback() {
-	// Fonction pour afficher la zone de saisie "Mobile Logo URL"
-	}
+// Zone de saisie "Url pour desktop"
+function slc_desktop_url_callback() {
+    $options = get_option( 'slc_options' );
+    $value = isset( $options['desktop_url'] ) ? esc_url_raw( $options['desktop_url'] ) : '';
+    $html = '<input type="text" id="slc_desktop_url" name="slc_options[desktop_url]" value="' . $value . '" />';
+    echo $html;
+}
 
-	function slc_button_color_callback() {
-	// Fonction pour afficher la zone de saisie "Button Color"
-	}
+function slc_desktop_url_validate( $input ) {
+    $valid = array();
+    $valid['desktop_url'] = isset( $input['desktop_url'] ) ? esc_url_raw( $input['desktop_url'] ) : '';
+    return $valid;
+}
 
-	function slc_background_color_callback() {
-	// Fonction pour afficher la zone de saisie "Background Color"
-	}
+// Zone de saisie "Url pour mobile"
+function slc_mobile_url_callback() {
+    $options = get_option( 'slc_options' );
+    $value = isset( $options['mobile_url'] ) ? esc_url_raw( $options['mobile_url'] ) : '';
+    $html = '<input type="text" id="slc_mobile_url" name="slc_options[mobile_url]" value="' . $value . '" />';
+    echo $html;
+}
 
-	function slc_text_color_callback() {
-	// Fonction pour afficher la zone de saisie "Text Color"
-	}
+function slc_mobile_url_validate( $input ) {
+    $valid = array();
+    $valid['mobile_url'] = isset( $input['mobile_url'] ) ? esc_url_raw( $input['mobile_url'] ) : '';
+    return $valid;
+}
 
-	function slc_border_color_callback() {
-	// Fonction pour afficher la zone de saisie "Border Color"
-	}
+// Zone de saisie "Couleur du bouton"
+function slc_button_color_callback() {
+    $options = get_option( 'slc_options' );
+    $value = isset( $options['button_color'] ) ? sanitize_hex_color( $options['button_color'] ) : '';
+    $html = '<input type="text" id="slc_button_color" name="slc_options[button_color]" value="' . $value . '" />';
+    echo $html;
+}
 
-	function slc_opacity_level_callback() {
-	// Fonction pour afficher la zone de saisie "Opacity Level"
-	}
+function slc_button_color_validate( $input ) {
+    $valid = array();
+    $valid['button_color'] = isset( $input['button_color'] ) ? sanitize_hex_color( $input['button_color'] ) : '';
+    return $valid;
+}
 
-	// Onglet 4
+// Zone de saisie "Couleur du texte"
+function slc_text_color_callback() {
+$options = get_option( 'slc_options' );
+$value = isset( $options['text_color'] ) ? sanitize_hex_color( $options['text_color'] ) : '';
+$html = '<input type="text" id="slc_text_color" name="slc_options[text_color]" value="' . $value . '" />';
+echo $html;
+}
+
+function slc_text_color_validate( $input ) {
+$valid = array();
+$valid['text_color'] = isset( $input['text_color'] ) ? sanitize_hex_color( $input['text_color'] ) : '';
+return $valid;
+}
+
+// Zone de saisie "Couleur des bords"
+function slc_border_color_callback() {
+$options = get_option( 'slc_options' );
+$value = isset( $options['border_color'] ) ? sanitize_hex_color( $options['border_color'] ) : '';
+$html = '<input type="text" id="slc_border_color" name="slc_options[border_color]" value="' . $value . '" />';
+echo $html;
+}
+
+function slc_border_color_validate( $input ) {
+$valid = array();
+$valid['border_color'] = isset( $input['border_color'] ) ? sanitize_hex_color( $input['border_color'] ) : '';
+return $valid;
+}
+
+// Zone de saisie "Niveau de transparence"
+function slc_transparency_level_callback() {
+$options = get_option( 'slc_options' );
+$value = isset( $options['transparency_level'] ) ? absint( $options['transparency_level'] ) : '';
+$html = '<input type="number" min="0" max="100" id="slc_transparency_level" name="slc_options[transparency_level]" value="' . $value . '" />';
+echo $html;
+}
+
+function slc_transparency_level_validate( $input ) {
+$valid = array();
+$valid['transparency_level'] = isset( $input['transparency_level'] ) ? absint( $input['transparency_level'] ) : '';
+return $valid;
+}
+
+
+
+/***  Onglet 4 ***/
 
 	function slc_tab4_settings_init() {
 	add_settings_field(
@@ -352,7 +864,105 @@ function slc_tab2_settings_init() {
 	);
 	}
 	
-	// Création du menu dans l'interface d'administration
+	
+/*** Focntion de validation des options ***/	
+	
+// Fonction de validation pour les options
+function slc_options_validate( $input ) {
+    $valid = array();
+    
+    // Validation pour l'onglet 1
+    if ( isset( $input['enable_2fa'] ) ) {
+        $valid['enable_2fa'] = 1;
+    }
+    if ( isset( $input['enable_backup_codes'] ) ) {
+        $valid['enable_backup_codes'] = 1;
+    }
+    if ( isset( $input['disable_2fa_deactivation'] ) ) {
+        $valid['disable_2fa_deactivation'] = 1;
+    }
+    if ( isset( $input['security_groups'] ) ) {
+        $valid['security_groups'] = sanitize_text_field( $input['security_groups'] );
+    }
+    
+    // Validation pour l'onglet 2
+    if ( isset( $input['enable_security_headers'] ) ) {
+        $valid['enable_security_headers'] = 1;
+    }
+    if ( isset( $input['anonymize_messages'] ) ) {
+        $valid['anonymize_messages'] = 1;
+    }
+    if ( isset( $input['block_proxy_connections'] ) ) {
+        $valid['block_proxy_connections'] = 1;
+    }
+    if ( isset( $input['enable_strong_passwords'] ) ) {
+        $valid['enable_strong_passwords'] = 1;
+    }
+    if ( isset( $input['blacklist'] ) ) {
+        $valid['blacklist'] = sanitize_text_field( $input['blacklist'] );
+    }
+    if ( isset( $input['whitelist'] ) ) {
+        $valid['whitelist'] = sanitize_text_field( $input['whitelist'] );
+    }
+    if ( isset( $input['max_login_attempts'] ) ) {
+        $valid['max_login_attempts'] = absint( $input['max_login_attempts'] );
+    }
+    if ( isset( $input['account_lock_time'] ) ) {
+        $valid['account_lock_time'] = absint( $input['account_lock_time'] );
+    }
+    
+        // Validation pour l'onglet 3
+    if ( isset( $input['logo_url'] ) ) {
+        if ( ! filter_var( $input['logo_url'], FILTER_VALIDATE_URL ) ) {
+            add_settings_error(
+                'slc_logo_url',
+                'invalid_url',
+                __( 'Invalid URL. Please enter a valid URL.', 'slc' )
+            );
+        } else {
+            $valid['logo_url'] = esc_url_raw( $input['logo_url'] );
+        }
+    }
+    if ( isset( $input['desktop_url'] ) ) {
+        $valid['desktop_url'] = esc_url_raw( $input['desktop_url'] );
+    }
+    if ( isset( $input['mobile_url'] ) ) {
+        $valid['mobile_url'] = esc_url_raw( $input['mobile_url'] );
+    }
+    if ( isset( $input['button_color'] ) ) {
+        $valid['button_color'] = sanitize_hex_color( $input['button_color'] );
+    }
+    if ( isset( $input['background_color'] ) ) {
+        $valid['background_color'] = sanitize_hex_color( $input['background_color'] );
+    }
+    if ( isset( $input['text_color'] ) ) {
+        $valid['text_color'] = sanitize_hex_color( $input['text_color'] );
+    }
+    if ( isset( $input['border_color'] ) ) {
+        $valid['border_color'] = sanitize_hex_color( $input['border_color'] );
+    }
+    if ( isset( $input['transparency'] ) ) {
+        $valid['transparency'] = absint( $input['transparency'] );
+    }
+    
+    // Validation pour l'onglet 4
+    if ( isset( $input['qr_code_page_url'] ) ) {
+        $valid['qr_code_page_url'] = esc_url_raw( $input['qr_code_page_url'] );
+    }
+    if ( isset( $input['secret_code_page_url'] ) ) {
+        $valid['secret_code_page_url'] = esc_url_raw( $input['secret_code_page_url'] );
+    }
+    if ( isset( $input['disable_account_page_url'] ) ) {
+        $valid['disable_account_page_url'] = esc_url_raw( $input['disable_account_page_url'] );
+    }
+    
+    // Retourne les options valides
+    return $valid;
+}
+
+
+	
+/*** Création du menu dans l'interface d'administration ***/
 add_submenu_page(
     'options-general.php',
     __( 'SecureLoginCustomizer Settings', 'slc' ),
