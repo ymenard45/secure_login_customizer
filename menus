@@ -1,34 +1,15 @@
 <?php
 /*
 Plugin Name: SecureLoginCustomizer
-Plugin URI: https://example.com/secure-login-customizer
+Plugin URI: https://sitewebprodesign.fr/secure-login-customizer
 Description: Un plugin pour sécuriser et personnaliser le processus de connexion à WordPress.
 Version: 1.0
-Author: Votre nom
-Author URI: https://example.com
+Author: YM
+Author URI: https://sitewebprodesign.fr
 Text Domain: secure-login-customizer
 Domain Path: /languages
 */
 
-// Chargement des fichiers de traduction
-function secure_login_customizer_load_textdomain() {
-    //load_plugin_textdomain('secure-login-customizer', false, basename(dirname(__FILE__)) . '/languages');
-}
-add_action('plugins_loaded', 'secure_login_customizer_load_textdomain');
-
-// Ajout du menu d'administration
-function secure_login_customizer_add_admin_menu() {
-    add_menu_page(
-        __('SecureLoginCustomizer', 'secure-login-customizer'),
-        __('SecureLoginCustomizer', 'secure-login-customizer'),
-        'manage_options',
-        'secure-login-customizer',
-        'secure_login_customizer_admin_page',
-        'dashicons-shield',
-        80
-    );
-}
-add_action('admin_menu', 'secure_login_customizer_add_admin_menu');
 
 // Génération de la page d'administration du plugin
 function secure_login_customizer_admin_page() {
@@ -109,6 +90,22 @@ function secure_login_customizer_admin_page() {
     <?php
 	
 }
+
+// Ajout du menu d'administration
+function secure_login_customizer_add_admin_menu() {
+    add_menu_page(
+        __('SecureLoginCustomizer', 'secure-login-customizer'),
+        __('SecureLoginCustomizer', 'secure-login-customizer'),
+        'manage_options',
+        'secure-login-customizer',
+        'secure_login_customizer_admin_page',
+        'dashicons-shield',
+        80
+    );
+}
+add_action('admin_menu', 'secure_login_customizer_add_admin_menu');
+
+
 
 function secure_login_customizer_tab_2fa() {
     ?>
@@ -387,45 +384,8 @@ function secure_login_customizer_tab_documentation() {
     <?php
 }
 
-function secure_login_customizer_admin_page() {
-    // ...
-    elseif ($active_tab == 'documentation') {
-        secure_login_customizer_tab_documentation();
-    }
-}	
+ 
 
-function secure_login_customizer_admin_page() {
-    ?>
-    <style>
-        .wrap .notice-warning {
-            display: none;
-        }
-    </style>
-    <?php
-    <form method="post" action="options.php">
-    <?php
-    settings_fields('secure_login_customizer_options_group');
-    if ($active_tab == '2fa') {
-        do_settings_sections('secure-login-customizer-2fa');
-        secure_login_customizer_tab_2fa();
-    } elseif ($active_tab == 'security') {
-        do_settings_sections('secure-login-customizer-security');
-        secure_login_customizer_tab_security();
-    } elseif ($active_tab == 'login_screen') {
-        do_settings_sections('secure-login-customizer-login_screen');
-        secure_login_customizer_tab_login_screen();
-    } elseif ($active_tab == 'messages') {
-        do_settings_sections('secure-login-customizer-messages');
-        secure_login_customizer_tab_messages();
-    } elseif ($active_tab == 'documentation') {
-        do_settings_sections('secure-login-customizer-documentation');
-        secure_login_customizer_tab_documentation();
-    }
-    submit_button();
-    ?>
-</form>
-
-}
 
 function secure_login_customizer_sanitize_options($input) {
     $new_options = array();
@@ -486,7 +446,7 @@ function secure_login_customizer_admin_init() {
     register_setting('secure_login_customizer_options_group', 'secure_login_customizer_options', 'secure_login_customizer_sanitize_options');
     // Ajouter ces lignes pour enregistrer les paramètres pour chaque onglet
     register_setting('secure_login_customizer_options_group', 'secure_login_customizer_2fa_options', 'secure_login_customizer_sanitize_2fa_options');
-    register_setting('secure_login_customizer_options_group', 'secure_login_customizer_security_options', 'secure_login_customizer_sanitize
+    register_setting('secure_login_customizer_options_group', 'secure_login_customizer_security_options', 'secure_login_customizer_sanitize');
 }
 
 function secure_login_customizer_settings_init() {
