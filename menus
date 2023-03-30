@@ -963,14 +963,8 @@ function slc_options_validate( $input ) {
 
 	
 /*** Création du menu dans l'interface d'administration ***/
-add_submenu_page(
-    'options-general.php',
-    __( 'SecureLoginCustomizer Settings', 'slc' ),
-    __( 'SecureLoginCustomizer', 'slc' ),
-    'manage_options',
-    'slc_options',
-    'slc_options_page'
-);
+add_submenu_page( 'options-general.php', __( 'Secure Login Customizer', 'slc' ), __( 'Secure Login Customizer', 'slc' ), 'manage_options', 'slc_options', 'slc_options_page' );
+
 
 // Ajout des onglets
 add_action( 'admin_init', 'slc_tab1_settings_init' );
