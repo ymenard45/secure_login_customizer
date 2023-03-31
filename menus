@@ -139,27 +139,14 @@ function slc_tab1_settings_init() {
 // zone activation 2FA Saisie + validation
 
 function secure_login_customizer_tab_2fa() {
-    echo '<h2>2FA</h2>';
-    echo '<p>Configurez ici les options de l\'authentification à deux facteurs (2FA).</p>';
+  
+    echo '<p class="slc-description">Configurez ici les options de l\'authentification à deux facteurs (2FA).</p>';
     slc_enable_2fa_callback();
     slc_enable_backup_code_callback();
     slc_disable_2fa_deactivation_callback();
     slc_security_groups_callback();
 }
-
-
-/*   function secure_login_customizer_tab_2fa() {
-	
-    // Insérez ici le code pour afficher le contenu de l'onglet "2FA"
-    echo "<h2>Authentification à deux facteurs avec un code 6 digits qui change toutes les 30 secondes</h2>";
-    echo '<p>Configurez ici les options de l\'authentification à deux facteurs (2FA).</p>';
-	echo '';
-	slc_enable_2fa_callback();
-	//slc_enable_2fa_validate($valid);
-	slc_enable_backup_code_callback();
-	slc_disable_2fa_deactivation_callback();
-	slc_security_groups_callback();
-} */  
+ 
 
 function slc_enable_2fa_callback() {
     $options = get_option( 'slc_options' );
@@ -872,7 +859,8 @@ function secure_login_customizer_menu() {
         'Secure Login Customizer',
         'manage_options',
         'secure-login-customizer',
-        'secure_login_customizer_admin_page'
+        'secure_login_customizer_admin_page',
+		'dashicons-shield'
     );
 }
 
@@ -1006,6 +994,15 @@ function secure_login_customizer_init() {
 
 add_action('admin_init', 'secure_login_customizer_init');
 
+/*** ajout lien settings  ***/
+function secure_login_customizer_add_plugin_settings_link( $links ) {
+    $settings_link = '<a href="admin.php?page=secure-login-customizer">' . __( 'Settings', 'slc' ) . '</a>';
+    array_unshift( $links, $settings_link );
+    return $links;
+}
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'secure_login_customizer_add_plugin_settings_link' );
+
+
 
 /*** secure_login_customizer_admin_page ***/
 
@@ -1014,8 +1011,26 @@ function secure_login_customizer_admin_page() {
     $active_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : '2fa';
 
     ?>
+	   <style>
+        h1  {
+            font-size: 3em;
+            color: #0073aa;
+        }
+        h2.nav-tab-wrapper .nav-tab {
+            font-size: 1em;
+            color: #0073aa;
+		}	
+
+		.slc-description {
+			font-size: 1.2em; /* Changez la taille de police */
+			color: #0073aa; /* Changez la couleur */
+			padding-bottom: 30px; 
+			padding-top: 20px; 
+		}
+
+    </style>
     <div class="wrap">
-        <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+        
         <p><?php _e( 'Customize your WordPress login page with Secure Login Customizer!', 'slc' ); ?></p>
         <h2 class="nav-tab-wrapper">
         <h2 class="nav-tab-wrapper">
@@ -1057,59 +1072,6 @@ function secure_login_customizer_admin_page() {
     </div>
     <?php
 }
-
-
-
-/* function secure_login_customizer_admin_page() {
-    $active_tab = isset($_GET['tab']) ? $_GET['tab'] : '2fa';
-
-    ?>
-    <div class="wrap">
-        <h1><?php _e('', 'slc'); ?></h1>
-
-        <h2 class="nav-tab-wrapper">
-            <a href="?page=secure-login-customizer&tab=2fa" class="nav-tab <?php echo $active_tab == '2fa' ? 'nav-tab-active' : ''; ?>"><?php _e('2FA', 'slc'); ?></a>
-            <a href="?page=secure-login-customizer&tab=security" class="nav-tab <?php echo $active_tab == 'security' ? 'nav-tab-active' : ''; ?>"><?php _e('Security', 'slc'); ?></a>
-            <a href="?page=secure-login-customizer&tab=customization" class="nav-tab <?php echo $active_tab == 'customization' ? 'nav-tab-active' : ''; ?>"><?php _e('Customization', 'slc'); ?></a>
-            <a href="?page=secure-login-customizer&tab=logging" class="nav-tab <?php echo $active_tab == 'logging' ? 'nav-tab-active' : ''; ?>"><?php _e('Logging', 'slc'); ?></a>
-            <a href="?page=secure-login-customizer&tab=advanced" class="nav-tab <?php echo $active_tab == 'advanced' ? 'nav-tab-active' : ''; ?>"><?php _e('Advanced', 'slc'); ?></a>
-        </h2>
-
-        <form method="post" action="options.php">
-            <?php
-            if ($active_tab == '2fa') {
-                settings_fields('secure_login_customizer_2fa_options_group');
-                do_settings_sections('secure_login_customizer_2fa_options_group');
-                secure_login_customizer_tab_2fa();
-            } elseif ($active_tab == 'security') {
-				secure_login_customizer_tab_security();
-                settings_fields('secure_login_customizer_security_options_group');
-                do_settings_sections('secure_login_customizer_security_options_group');
-                
-            } elseif ($active_tab == 'customization') {
-                secure_login_customizer_tab_customization();
-				settings_fields('secure_login_customizer_customization_options_group');
-                do_settings_sections('secure_login_customizer_customization_options_group');
-                
-            } elseif ($active_tab == 'logging') {
-                secure_login_customizer_tab_logging();
-				settings_fields('secure_login_customizer_logging_options_group');
-                do_settings_sections('secure_login_customizer_logging_options_group');
-                
-            } elseif ($active_tab == 'advanced') {
-                secure_login_customizer_tab_advanced();
-				settings_fields('secure_login_customizer_advanced_options_group');
-                do_settings_sections('secure_login_customizer_advanced_options_group');
-                
-            }
-
-            submit_button();
-            ?>
-        </form>
-    </div>
-    <?php
-}
- */
 
 
 function slc_load_textdomain() {
