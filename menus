@@ -101,16 +101,15 @@ function slc_options_page() {
 
 /***  Onglet 1 ***/
 
+// Ajout des fonctions de rappel pour l'onglet 1
 function slc_tab1_settings_init() {
-error_log('slc_tab1_settings_init est bien appelé');	
-	add_settings_field(
-    'slc_disable_2fa_deactivation',
-    __( 'Disable 2FA Deactivation', 'slc' ),
-    'slc_disable_2fa_deactivation_callback',
-    'slc_options_group',
-    'slc_tab1_section'
-	);
-	
+    add_settings_section(
+        'slc_tab1_section',
+        __( 'Secure Login Customizer Settings', 'slc' ),
+        '',
+        'slc_options_group'
+    );
+
     add_settings_field(
         'slc_enable_2fa',
         __( 'Enable 2FA Authentication', 'slc' ),
@@ -123,6 +122,14 @@ error_log('slc_tab1_settings_init est bien appelé');
         'slc_enable_backup_code',
         __( 'Enable Backup Code', 'slc' ),
         'slc_enable_backup_code_callback',
+        'slc_options_group',
+        'slc_tab1_section'
+    );
+
+    add_settings_field(
+        'slc_disable_2fa_deactivation',
+        __( 'Disable 2FA Deactivation', 'slc' ),
+        'slc_disable_2fa_deactivation_callback',
         'slc_options_group',
         'slc_tab1_section'
     );
@@ -142,6 +149,22 @@ error_log('slc_tab1_settings_init est bien appelé');
         'slc_options_group',
         'slc_tab1_section'
     );
+
+/*     register_setting( 'slc_options_group', 'slc_options' );
+
+    // Ajout de la fonction de rappel pour l'enregistrement des options
+    add_action( 'admin_init', 'slc_tab1_settings_save' );
+}
+ */
+
+
+    // Enregistrement des paramètres
+    add_action( 'admin_init', 'slc_tab1_settings_save' );
+}
+
+ // Ajout de la fonction de rappel pour l'enregistrement des options de l'onglet 1
+function slc_tab1_settings_save() {
+    register_setting( 'slc_options_group', 'slc_options', 'slc_validate_options' );
 }
 
 
@@ -206,15 +229,42 @@ function slc_enable_backup_code_validate( $input ) {
 // Case à cocher "Interdire la désactivation de 2FA Authentication"  Saisie + validation
 
 function slc_disable_2fa_deactivation_callback() {
-	$options = get_option( 'slc_options' );
-	$checked = isset( $options['disable_2fa_deactivation'] ) && $options['disable_2fa_deactivation'] ? 'checked="checked"' : '';
-	?>
-	<div>
-		<input type="checkbox" name="slc_options[disable_2fa_deactivation]" value="1" <?php echo $checked; ?>>
-		<label for="slc_disable_2fa_deactivation"><?php _e( 'Disable 2FA deactivation', 'slc' ); ?></label>
-	</div>
-	<?php
+    $options = get_option( 'slc_options' );
+    $checked = isset( $options['disable_2fa_deactivation'] ) && $options['disable_2fa_deactivation'] ? 'checked="checked"' : '';
+    ?>
+    <div>
+        <input type="checkbox" name="slc_options[disable_2fa_deactivation]" value="1" <?php echo $checked; ?>>
+        <label for="slc_disable_2fa_deactivation"><?php _e( 'Disable 2FA Deactivation', 'slc' ); ?></label>
+    </div>
+    <?php
 }
+
+// Fonction de rappel pour l'enregistrement des options de l'onglet 1
+ 
+ 
+// Enregistrer les options
+function slc_register_settings() {
+    register_setting( 'slc_options_group', 'slc_options' );
+}
+add_action( 'admin_init', 'slc_register_settings' );
+
+// Ajouter les champs au formulaire de paramètres
+function slc_add_settings_fields() {
+    add_settings_section(
+        'slc_tab1_section',
+        __( '2FA Settings', 'slc' ),
+        'slc_tab1_section_callback',
+        'slc_options_page'
+    );
+    add_settings_field(
+        'slc_disable_2fa_deactivation',
+        __( 'Disable 2FA Deactivation', 'slc' ),
+        'slc_disable_2fa_deactivation_callback',
+        'slc_options_page',
+        'slc_tab1_section'
+    );
+}
+add_action( 'admin_init', 'slc_add_settings_fields' );
 
 
 
