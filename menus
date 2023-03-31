@@ -148,6 +148,14 @@ function secure_login_customizer_tab_2fa() {
 }
  
 
+/* function slc_enable_2fa_callback() {
+    $options = get_option( 'slc_options' );
+    $checked = isset( $options['enable_2fa'] ) ? checked( $options['enable_2fa'], true, false ) : '';
+    $html = '<div><input type="checkbox" id="slc_enable_2fa" name="slc_options[enable_2fa]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_enable_2fa">' . __( 'Enable 2FA Authentication', 'slc' ) . '</label></div>';
+    echo $html;
+}
+ */
 function slc_enable_2fa_callback() {
     $options = get_option( 'slc_options' );
     $checked = isset( $options['enable_2fa'] ) ? checked( $options['enable_2fa'], true, false ) : '';
@@ -157,17 +165,10 @@ function slc_enable_2fa_callback() {
 }
 
 
-/*  function slc_enable_2fa_callback() {
-    $options = get_option( 'slc_options' );
-    $checked = isset( $options['enable_2fa'] ) ? checked( $options['enable_2fa'], true, false ) : '';
-    $html = '<div><input type="checkbox" id="slc_enable_2fa" name="slc_options[enable_2fa]" value="1" ' . $checked . '/>';
-    $html .= '<label for="slc_enable_2fa">' . __( 'Enable 2FA Authentication', 'slc' ) . '</label></div>';
-    echo $html;
-} 
- */
 function slc_enable_2fa_validate( $input ) {
     $valid = array();
-    $valid['enable_2fa'] = isset( $input['enable_2fa'] ) ? true : false;
+    $valid['enable_2fa'] = isset( $valid['enable_2fa'] ) ? true : false;
+    error_log('2FA options: ' . print_r($input, true));
     return $valid;
 }
 
@@ -720,21 +721,27 @@ function ddo_settings_sections( $page ) {
 	
 // Fonction de validation pour les options
 function slc_options_validate( $input ) {
-    $valid = array();
     
-    // Validation pour l'onglet 1
-    if ( isset( $input['enable_2fa'] ) ) {
-        $valid['enable_2fa'] = 1;
+    // Création d'un fichier de log personnalisé
+    $log_file = fopen( plugin_dir_path( __FILE__ ) . 'slc_log.txt', 'a' );
+    if ( $log_file ) {
+        fwrite( $log_file, "slc_options_validate() called.\n" );
+        fwrite( $log_file, "Input: " . print_r( $input, true ) . "\n" );
+        fclose( $log_file );
     }
-    if ( isset( $input['enable_backup_codes'] ) ) {
-        $valid['enable_backup_codes'] = 1;
-    }
-    if ( isset( $input['disable_2fa_deactivation'] ) ) {
-        $valid['disable_2fa_deactivation'] = 1;
-    }
-    if ( isset( $input['security_groups'] ) ) {
-        $valid['security_groups'] = sanitize_text_field( $input['security_groups'] );
-    }
+
+	
+	$valid = array();
+	
+	// Validation pour l'onglet 1
+    $valid['enable_2fa'] = isset( $input['enable_2fa'] ) ? 1 : 0;
+    $valid['enable_backup_codes'] = isset( $input['enable_backup_codes'] ) ? 1 : 0;
+    $valid['disable_2fa_deactivation'] = isset( $input['disable_2fa_deactivation'] ) ? 1 : 0;
+    $valid['security_groups'] = isset( $input['security_groups'] ) ? sanitize_text_field( $input['security_groups'] ) : '';
+
+     write_log('Input: ' . print_r($input, true));
+	 write_log('Valid: ' . print_r($valid, true));
+	
     
     // Validation pour l'onglet 2
     if ( isset( $input['enable_security_headers'] ) ) {
@@ -806,9 +813,9 @@ function slc_options_validate( $input ) {
     if ( isset( $input['disable_account_page_url'] ) ) {
         $valid['disable_account_page_url'] = esc_url_raw( $input['disable_account_page_url'] );
     }
-    
-    // Retourne les options valides
-    return $valid;
+     // Retourne les options valides
+     return $valid;
+
 }
 
 
@@ -859,10 +866,10 @@ function secure_login_customizer_menu() {
         'Secure Login Customizer',
         'manage_options',
         'secure-login-customizer',
-        'secure_login_customizer_admin_page',
-		'dashicons-shield'
+        'secure_login_customizer_admin_page'
     );
 }
+
 
 
 // Ajout du menu
@@ -994,6 +1001,20 @@ function secure_login_customizer_init() {
 
 add_action('admin_init', 'secure_login_customizer_init');
 
+function slc_security_options_validate( $input ) {
+    write_log('slc_security_options_validate() called.');
+    write_log('Input: ' . print_r($input, true));
+
+    $valid = array();
+    // Ici, ajoutez votre logique de validation et de nettoyage pour les options de sécurité
+
+    write_log('Valid: ' . print_r($valid, true));
+
+    return $valid;
+}
+
+
+
 /*** ajout lien settings  ***/
 function secure_login_customizer_add_plugin_settings_link( $links ) {
     $settings_link = '<a href="admin.php?page=secure-login-customizer">' . __( 'Settings', 'slc' ) . '</a>';
@@ -1003,6 +1024,12 @@ function secure_login_customizer_add_plugin_settings_link( $links ) {
 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'secure_login_customizer_add_plugin_settings_link' );
 
 
+/* ecrture des logs  */
+
+function write_log($message) {
+    $log_file = plugin_dir_path(__FILE__) . 'log.txt';
+    file_put_contents($log_file, date('Y-m-d H:i:s') . ": " . $message . "\n", FILE_APPEND);
+}
 
 /*** secure_login_customizer_admin_page ***/
 
@@ -1077,6 +1104,7 @@ function secure_login_customizer_admin_page() {
 function slc_load_textdomain() {
     load_plugin_textdomain( 'slc', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 }
+
 
 // Chargement du fichier de traduction
 add_action( 'plugins_loaded', 'slc_load_textdomain' );
