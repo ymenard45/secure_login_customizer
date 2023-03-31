@@ -102,6 +102,15 @@ function slc_options_page() {
 /***  Onglet 1 ***/
 
 function slc_tab1_settings_init() {
+error_log('slc_tab1_settings_init est bien appelé');	
+	add_settings_field(
+    'slc_disable_2fa_deactivation',
+    __( 'Disable 2FA Deactivation', 'slc' ),
+    'slc_disable_2fa_deactivation_callback',
+    'slc_options_group',
+    'slc_tab1_section'
+	);
+	
     add_settings_field(
         'slc_enable_2fa',
         __( 'Enable 2FA Authentication', 'slc' ),
@@ -157,8 +166,9 @@ function secure_login_customizer_tab_2fa() {
 }
  */
 function slc_enable_2fa_callback() {
-    $options = get_option( 'slc_options' );
-    $checked = isset( $options['enable_2fa'] ) ? checked( $options['enable_2fa'], true, false ) : '';
+    $slc_options = get_option('secure_login_customizer_2fa_options');
+	$checked = isset($slc_options['enable_2fa']) && $slc_options['enable_2fa'] == 1 ? 'checked' : '';
+
     $html = '<div><input type="checkbox" id="slc_enable_2fa" name="slc_options[enable_2fa]" value="1" ' . $checked . '/>';
     $html .= '<label for="slc_enable_2fa">' . __( 'Enable 2FA Authentication', 'slc' ) . '</label></div>';
     echo $html;
@@ -169,6 +179,9 @@ function slc_enable_2fa_validate( $input ) {
     $valid = array();
     $valid['enable_2fa'] = isset( $valid['enable_2fa'] ) ? true : false;
     error_log('2FA options: ' . print_r($input, true));
+	    // Save the option value
+    update_option('secure_login_customizer_2fa_options', $valid);
+	
     return $valid;
 }
 
@@ -193,12 +206,17 @@ function slc_enable_backup_code_validate( $input ) {
 // Case à cocher "Interdire la désactivation de 2FA Authentication"  Saisie + validation
 
 function slc_disable_2fa_deactivation_callback() {
-    $options = get_option( 'slc_options' );
-    $checked = isset( $options['disable_2fa_deactivation'] ) ? checked( $options['disable_2fa_deactivation'], true, false ) : '';
-    $html = '<div></br><input type="checkbox" id="slc_disable_2fa_deactivation" name="slc_options[disable_2fa_deactivation]" value="1" ' . $checked . '/>';
-    $html .= '<label for="slc_disable_2fa_deactivation">' . __( 'Activer / désactiver 2FA pour les groupes suivants', 'slc' ) . '</label></br></div>';
-    echo $html;
+	$options = get_option( 'slc_options' );
+	$checked = isset( $options['disable_2fa_deactivation'] ) && $options['disable_2fa_deactivation'] ? 'checked="checked"' : '';
+	?>
+	<div>
+		<input type="checkbox" name="slc_options[disable_2fa_deactivation]" value="1" <?php echo $checked; ?>>
+		<label for="slc_disable_2fa_deactivation"><?php _e( 'Disable 2FA deactivation', 'slc' ); ?></label>
+	</div>
+	<?php
 }
+
+
 
 function slc_disable_2fa_deactivation_validate( $input ) {
     $valid = array();
@@ -717,6 +735,31 @@ function ddo_settings_sections( $page ) {
 
 
 
+/** focntion de sauvegarde **/
+
+function slc_save_options() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    check_admin_referer( 'slc_options_page' );
+
+    $options = get_option( 'slc_options' );
+
+    $options['enable_2fa'] = isset( $_POST['secure_login_customizer_2fa_options']['enable_2fa'] ) ? true : false;
+    $options['enable_backup_code'] = isset( $_POST['secure_login_customizer_2fa_options']['enable_backup_code'] ) ? true : false;
+    $options['restrict_2fa_deactivation'] = isset( $_POST['secure_login_customizer_2fa_options']['restrict_2fa_deactivation'] ) ? true : false;
+    $options['2fa_security_groups'] = isset( $_POST['secure_login_customizer_2fa_options']['2fa_security_groups'] ) ? sanitize_text_field( $_POST['secure_login_customizer_2fa_options']['2fa_security_groups'] ) : '';
+
+    $options['disable_2fa_deactivation'] = isset( $_POST['slc_options']['disable_2fa_deactivation'] ) ? true : false;
+
+    update_option( 'slc_options', $options );
+
+    wp_redirect( add_query_arg( array( 'page' => 'slc_options_page', 'updated' => 'true' ), admin_url( 'admin.php' ) ) );
+    exit;
+}
+
+
 /*** Fonction de validation des options ***/	
 	
 // Fonction de validation pour les options
@@ -817,8 +860,6 @@ function slc_options_validate( $input ) {
      return $valid;
 
 }
-
-
 
 	
 /*** Création du menu dans l'interface d'administration ***/
@@ -1158,3 +1199,4 @@ function slc_activate_plugin() {
 // Activation du plugin
 register_activation_hook( __FILE__, 'slc_activate_plugin' );
 
+ 
