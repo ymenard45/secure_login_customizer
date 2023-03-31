@@ -27,7 +27,7 @@ add_action( 'admin_init', 'slc_settings_init' );
 
 function slc_add_admin_menu() {
     add_options_page(
-        'SecureLoginCustomizer Settings',
+        'Secure Login Customizer Settings',
         'SecureLoginCustomizer',
         'manage_options',
         'secure-login-customizer',
@@ -91,7 +91,7 @@ function slc_options_page() {
         <form action="options.php" method="post">
             <?php settings_fields( 'slc_options_group' ); ?>
             <?php ddo_settings_sections( $active_tab ); ?>
-            <?php submit_button( __( 'Save Changes', 'slc' ) ); ?>
+             
         </form>
     </div>
     <?php
@@ -156,7 +156,7 @@ function slc_enable_2fa_callback() {
     $options = get_option( 'slc_options' );
     $checked = isset( $options['enable_2fa'] ) ? checked( $options['enable_2fa'], true, false ) : '';
     $html = '<div><input type="checkbox" id="slc_enable_2fa" name="slc_options[enable_2fa]" value="1" ' . $checked . '/>';
-    $html .= '<label for="slc_enable_2fa">' . __( 'Enable 2FA Authentication', 'slc' ) . '</label></div>';
+    $html .= '<label for="slc_enable_2fa">' . __( 'Enable 2FA Authentication ***', 'slc' ) . '</label></div>';
     echo $html;
 }
 function slc_enable_2fa_validate( $input ) {
@@ -290,17 +290,7 @@ function slc_tab2_settings_init() {
   
   
      // Insérez ici le code pour afficher le contenu de l'onglet SECURITY
-    echo "<h2>Autres options de sécurité</h2>";
-    echo '<p>Configurez ici les options de sécurité supplémentaires.</p>';
-	echo '';
-	slc_enable_security_headers_callback();
-	slc_enable_message_anonymization_callback();
-	slc_disable_proxy_connections_callback()();
-	slc_disable_weak_passwords_callback();
-	slc_blacklist_callback();
-	slc_whitelist_callback();
-	lc_max_login_attempts_callback();
-	slc_account_block_time_callback();
+ 
   
   
 function slc_enable_security_headers_callback() {
@@ -416,6 +406,14 @@ function slc_account_block_time_validate( $input ) {
     $valid['account_block_time'] = isset( $input['account_block_time'] ) ? absint( $input['account_block_time'] ) : 0;
     return $valid;
 }
+
+function secure_login_customizer_tab_security() {
+    // Insérez ici le code pour afficher le contenu de l'onglet "Security"
+    echo '<h2>Autres options de sécurité</h2>';
+    echo '<p>Configurez ici les options de sécurité supplémentaires.</p>';
+ 
+}
+
 
 
 /***  Onglet 3 ***/
@@ -873,58 +871,175 @@ function secure_login_customizer_tab_messages() {
     echo '<p>Personnalisez ici les messages affichés sur la page de connexion.</p>';
 }
 
+/*
+La fonction secure_login_customizer_init utilise register_setting(), 
+add_settings_section() et add_settings_field() pour définir les groupes
+d'options, sections et champs pour chaque onglet. 
+*/
 
+function secure_login_customizer_init() {
+    // Onglet 2FA
+    register_setting(
+        'secure_login_customizer_2fa_options_group',
+        'secure_login_customizer_2fa_options',
+        'slc_enable_2fa_validate'
+    );
+
+    add_settings_section(
+        'slc_2fa_options_section',
+        '',
+        '',
+        'secure_login_customizer_2fa_options_group'
+    );
+
+    add_settings_field(
+        'slc_enable_2fa',
+        __('Enable 2FA Authentication', 'slc'),
+        'slc_enable_2fa_callback',
+        'secure_login_customizer_2fa_options_group',
+        'slc_2fa_options_section'
+    );
+
+    // Onglet Security
+    register_setting(
+        'secure_login_customizer_security_options_group',
+        'secure_login_customizer_security_options',
+        'slc_security_options_validate'
+    );
+
+    add_settings_section(
+        'slc_security_options_section',
+        '',
+        '',
+        'secure_login_customizer_security_options_group'
+    );
+
+    add_settings_field(
+        'slc_enable_security_headers',
+        __('Enable Security Headers', 'slc'),
+        'slc_enable_security_headers_callback',
+        'secure_login_customizer_security_options_group',
+        'slc_security_options_section'
+    );
+    // Onglet Customization
+    register_setting(
+        'secure_login_customizer_customization_options_group',
+        'secure_login_customizer_customization_options',
+        'slc_customization_options_validate'
+    );
+
+    add_settings_section(
+        'slc_customization_options_section',
+        '',
+        '',
+        'secure_login_customizer_customization_options_group'
+    );
+
+    add_settings_field(
+        'slc_custom_login_logo',
+        __('Custom Login Logo', 'slc'),
+        'slc_custom_login_logo_callback',
+        'secure_login_customizer_customization_options_group',
+        'slc_customization_options_section'
+    );
+
+    // Onglet Logging
+    register_setting(
+        'secure_login_customizer_logging_options_group',
+        'secure_login_customizer_logging_options',
+        'slc_logging_options_validate'
+    );
+
+    add_settings_section(
+        'slc_logging_options_section',
+        '',
+        '',
+        'secure_login_customizer_logging_options_group'
+    );
+
+    add_settings_field(
+        'slc_enable_logging',
+        __('Enable Logging', 'slc'),
+        'slc_enable_logging_callback',
+        'secure_login_customizer_logging_options_group',
+        'slc_logging_options_section'
+    );
+    // Onglet Advanced
+    register_setting(
+        'secure_login_customizer_advanced_options_group',
+        'secure_login_customizer_advanced_options',
+        'slc_advanced_options_validate'
+    );
+
+    add_settings_section(
+        'slc_advanced_options_section',
+        '',
+        '',
+        'secure_login_customizer_advanced_options_group'
+    );
+
+    add_settings_field(
+        'slc_custom_captcha_site_key',
+        __('Custom Captcha Site Key', 'slc'),
+        'slc_custom_captcha_site_key_callback',
+        'secure_login_customizer_advanced_options_group',
+        'slc_advanced_options_section'
+    );
+}
+
+add_action('admin_init', 'secure_login_customizer_init');
+
+
+/*** secure_login_customizer_admin_page ***/
 function secure_login_customizer_admin_page() {
-?>
-    <style>
-        .wrap .notice-warning {
-            display: none;
-        }
-    </style>
-<?php
-
     $active_tab = isset($_GET['tab']) ? $_GET['tab'] : '2fa';
-?>
+
+    ?>
     <div class="wrap">
-        <h1><?php _e('Secure Login Customizer', 'secure-login-customizer'); ?></h1>
+        <h1><?php _e('', 'slc'); ?></h1>
+
         <h2 class="nav-tab-wrapper">
-            <a href="?page=secure-login-customizer&tab=2fa" class="nav-tab <?php echo $active_tab == '2fa' ? 'nav-tab-active' : ''; ?>"><?php _e('2FA', 'secure-login-customizer'); ?></a>
-            <a href="?page=secure-login-customizer&tab=security" class="nav-tab <?php echo $active_tab == 'security' ? 'nav-tab-active' : ''; ?>"><?php _e('Sécurité', 'secure-login-customizer'); ?></a>
-            <a href="?page=secure-login-customizer&tab=login_screen" class="nav-tab <?php echo $active_tab == 'login_screen' ? 'nav-tab-active' : ''; ?>"><?php _e('Customisation Login Screen', 'secure-login-customizer'); ?></a>
-            <a href="?page=secure-login-customizer&tab=messages" class="nav-tab <?php echo $active_tab == 'messages' ? 'nav-tab-active' : ''; ?>"><?php _e('Customisation Messages', 'secure-login-customizer'); ?></a>
-            <a href="?page=secure-login-customizer&tab=documentation" class="nav-tab <?php echo $active_tab == 'documentation' ? 'nav-tab-active' : ''; ?>"><?php _e('Documentation', 'secure-login-customizer'); ?></a>
+            <a href="?page=secure-login-customizer&tab=2fa" class="nav-tab <?php echo $active_tab == '2fa' ? 'nav-tab-active' : ''; ?>"><?php _e('2FA', 'slc'); ?></a>
+            <a href="?page=secure-login-customizer&tab=security" class="nav-tab <?php echo $active_tab == 'security' ? 'nav-tab-active' : ''; ?>"><?php _e('Security', 'slc'); ?></a>
+            <a href="?page=secure-login-customizer&tab=customization" class="nav-tab <?php echo $active_tab == 'customization' ? 'nav-tab-active' : ''; ?>"><?php _e('Customization', 'slc'); ?></a>
+            <a href="?page=secure-login-customizer&tab=logging" class="nav-tab <?php echo $active_tab == 'logging' ? 'nav-tab-active' : ''; ?>"><?php _e('Logging', 'slc'); ?></a>
+            <a href="?page=secure-login-customizer&tab=advanced" class="nav-tab <?php echo $active_tab == 'advanced' ? 'nav-tab-active' : ''; ?>"><?php _e('Advanced', 'slc'); ?></a>
         </h2>
 
-        <form action="options.php" method="post">
+        <form method="post" action="options.php">
             <?php
             if ($active_tab == '2fa') {
                 settings_fields('secure_login_customizer_2fa_options_group');
-                do_settings_sections('secure_login_customizer_2fa');
+                do_settings_sections('secure_login_customizer_2fa_options_group');
                 secure_login_customizer_tab_2fa();
             } elseif ($active_tab == 'security') {
+				secure_login_customizer_tab_security();
                 settings_fields('secure_login_customizer_security_options_group');
-                do_settings_sections('secure_login_customizer_security');
-                secure_login_customizer_tab_security();
-            } elseif ($active_tab == 'login_screen') {
-                settings_fields('secure_login_customizer_login_screen_options_group');
-                do_settings_sections('secure_login_customizer_login_screen');
-                secure_login_customizer_tab_login_screen();
-            } elseif ($active_tab == 'messages') {
-                settings_fields('secure_login_customizer_messages_options_group');
-                do_settings_sections('secure_login_customizer_messages');
-                secure_login_customizer_tab_messages();
-            } elseif ($active_tab == 'documentation') {
-                settings_fields('secure_login_customizer_documentation_options_group');
-                do_settings_sections('secure_login_customizer_documentation');
-                secure_login_customizer_tab_documentation();
+                do_settings_sections('secure_login_customizer_security_options_group');
+                
+            } elseif ($active_tab == 'customization') {
+                secure_login_customizer_tab_customization();
+				settings_fields('secure_login_customizer_customization_options_group');
+                do_settings_sections('secure_login_customizer_customization_options_group');
+                
+            } elseif ($active_tab == 'logging') {
+                secure_login_customizer_tab_logging();
+				settings_fields('secure_login_customizer_logging_options_group');
+                do_settings_sections('secure_login_customizer_logging_options_group');
+                
+            } elseif ($active_tab == 'advanced') {
+                secure_login_customizer_tab_advanced();
+				settings_fields('secure_login_customizer_advanced_options_group');
+                do_settings_sections('secure_login_customizer_advanced_options_group');
+                
             }
-            //submit_button();
+
+            submit_button();
             ?>
         </form>
     </div>
-<?php
+    <?php
 }
-
 
 
 
