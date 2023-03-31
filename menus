@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Mon Google Authentificator
+Plugin Name: Secure Login Customiser
 Plugin URI: https://sitewebprodesign.fr
 Description: Un plugin d'authentification à deux facteurs pour WordPress en utilisant Google Authenticator
-Version: 1.0
+Version: 1.2
 Author: Y.MENARD
 Author URI: https://sitewebprodesign.fr
 License: GPLv2 or later
@@ -82,6 +82,7 @@ function slc_settings_init() {
 }
 
 // Fonction générale pour l'affichage des options et des onglets 
+
 function slc_options_page() {
     $active_tab = $_GET['tab'] ?? 'slc_tab1_section';
 	?>
@@ -137,11 +138,25 @@ function slc_tab1_settings_init() {
 
 // zone activation 2FA Saisie + validation
 
+function secure_login_customizer_tab_2fa() {
+	
+    // Insérez ici le code pour afficher le contenu de l'onglet "2FA"
+    echo "<h2>Authentification à deux facteurs avec un code 6 digits qui change toutes les 30 secondes</h2>";
+    echo '<p>Configurez ici les options de l\'authentification à deux facteurs (2FA).</p>';
+	echo '';
+	slc_enable_2fa_callback();
+	//slc_enable_2fa_validate($valid);
+	slc_enable_backup_code_callback();
+	slc_disable_2fa_deactivation_callback();
+	slc_security_groups_callback();
+}
+
+
 function slc_enable_2fa_callback() {
     $options = get_option( 'slc_options' );
     $checked = isset( $options['enable_2fa'] ) ? checked( $options['enable_2fa'], true, false ) : '';
-    $html = '<input type="checkbox" id="slc_enable_2fa" name="slc_options[enable_2fa]" value="1" ' . $checked . '/>';
-    $html .= '<label for="slc_enable_2fa">' . __( 'Enable 2FA Authentication', 'slc' ) . '</label>';
+    $html = '<div><input type="checkbox" id="slc_enable_2fa" name="slc_options[enable_2fa]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_enable_2fa">' . __( 'Enable 2FA Authentication', 'slc' ) . '</label></div>';
     echo $html;
 }
 function slc_enable_2fa_validate( $input ) {
@@ -156,8 +171,8 @@ function slc_enable_2fa_validate( $input ) {
 function slc_enable_backup_code_callback() {
     $options = get_option( 'slc_options' );
     $checked = isset( $options['enable_backup_code'] ) ? checked( $options['enable_backup_code'], true, false ) : '';
-    $html = '<input type="checkbox" id="slc_enable_backup_code" name="slc_options[enable_backup_code]" value="1" ' . $checked . '/>';
-    $html .= '<label for="slc_enable_backup_code">' . __( 'Enable Backup Code', 'slc' ) . '</label>';
+    $html = '<div></br><input type="checkbox" id="slc_enable_backup_code" name="slc_options[enable_backup_code]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_enable_backup_code">' . __( 'Enable Backup Code', 'slc' ) . '</label></div>';
     echo $html;
 }
 
@@ -173,8 +188,8 @@ function slc_enable_backup_code_validate( $input ) {
 function slc_disable_2fa_deactivation_callback() {
     $options = get_option( 'slc_options' );
     $checked = isset( $options['disable_2fa_deactivation'] ) ? checked( $options['disable_2fa_deactivation'], true, false ) : '';
-    $html = '<input type="checkbox" id="slc_disable_2fa_deactivation" name="slc_options[disable_2fa_deactivation]" value="1" ' . $checked . '/>';
-    $html .= '<label for="slc_disable_2fa_deactivation">' . __( 'Disable 2FA Authentication Deactivation', 'slc' ) . '</label>';
+    $html = '<div></br><input type="checkbox" id="slc_disable_2fa_deactivation" name="slc_options[disable_2fa_deactivation]" value="1" ' . $checked . '/>';
+    $html .= '<label for="slc_disable_2fa_deactivation">' . __( 'Activer / désactiver 2FA pour les groupes suivants', 'slc' ) . '</label></br></div>';
     echo $html;
 }
 
@@ -188,12 +203,12 @@ function slc_disable_2fa_deactivation_validate( $input ) {
 // Case à cocher de sélection des groupes de sécurité ou 2FA sera activée   Saisie + validation
 function slc_security_groups_callback() {
     $options = get_option( 'slc_options' );
-    $html = '';
+    $html = '<div></br>Sélection des groupes de sécurité</br></br>';
     $user_roles = get_editable_roles();
     foreach ( $user_roles as $role_name => $role_info ) {
         $checked = isset( $options['security_groups'][ $role_name ] ) ? checked( $options['security_groups'][ $role_name ], true, false ) : '';
-        $html .= '<input type="checkbox" id="slc_security_groups_' . $role_name . '" name="slc_options[security_groups][' . $role_name . ']" value="1" ' . $checked . '/>';
-        $html .= '<label for="slc_security_groups_' . $role_name . '">' . $role_info['name'] . '</label><br>';
+        $html .= '<div><input type="checkbox" id="slc_security_groups_' . $role_name . '" name="slc_options[security_groups][' . $role_name . ']" value="1" ' . $checked . '/>';
+        $html .= '<label for="slc_security_groups_' . $role_name . '">' . $role_info['name'] . '</label><br></div>';
     }
     echo $html;
 }
@@ -204,8 +219,9 @@ function slc_security_groups_validate( $input ) {
         $security_groups = array_filter( $input['security_groups'], fn($role) => in_array( $role, array( 'administrator', 'shop_manager', 'editor', 'author', 'contributor', 'subscriber' ) ) );
         $valid['security_groups'] = $security_groups;
     }
-    return $valid;
-}
+    return $valid; 
+}	
+	
 
 /***  Onglet 2  CHAMP  ***/
  
@@ -271,6 +287,21 @@ function slc_tab2_settings_init() {
 /***  Onglet 2  SAISIE ET VALIDATION***/
   
   // Case à cocher "Activer Security Headers" Saisie + Validation
+  
+  
+     // Insérez ici le code pour afficher le contenu de l'onglet SECURITY
+    echo "<h2>Autres options de sécurité</h2>";
+    echo '<p>Configurez ici les options de sécurité supplémentaires.</p>';
+	echo '';
+	slc_enable_security_headers_callback();
+	slc_enable_message_anonymization_callback();
+	slc_disable_proxy_connections_callback()();
+	slc_disable_weak_passwords_callback();
+	slc_blacklist_callback();
+	slc_whitelist_callback();
+	lc_max_login_attempts_callback();
+	slc_account_block_time_callback();
+  
   
 function slc_enable_security_headers_callback() {
     $options = get_option( 'slc_options' );
@@ -820,8 +851,82 @@ function slc_add_menu() {
     );
 }
 
+function secure_login_customizer_menu() {
+    add_options_page(
+        'Secure Login Customizer',
+        'Secure Login Customizer',
+        'manage_options',
+        'secure-login-customizer',
+        'secure_login_customizer_admin_page'
+    );
+}
+
+
 // Ajout du menu
-add_action( 'admin_menu', 'slc_add_menu' );
+//add_action( 'admin_menu', 'slc_add_menu' );
+// Add the admin menu
+add_action('admin_menu', 'secure_login_customizer_menu');
+
+function secure_login_customizer_tab_messages() {
+    // Insérez ici le code pour afficher le contenu de l'onglet "Customisation Messages"
+    echo '<h2>Customisation Messages</h2>';
+    echo '<p>Personnalisez ici les messages affichés sur la page de connexion.</p>';
+}
+
+
+function secure_login_customizer_admin_page() {
+?>
+    <style>
+        .wrap .notice-warning {
+            display: none;
+        }
+    </style>
+<?php
+
+    $active_tab = isset($_GET['tab']) ? $_GET['tab'] : '2fa';
+?>
+    <div class="wrap">
+        <h1><?php _e('Secure Login Customizer', 'secure-login-customizer'); ?></h1>
+        <h2 class="nav-tab-wrapper">
+            <a href="?page=secure-login-customizer&tab=2fa" class="nav-tab <?php echo $active_tab == '2fa' ? 'nav-tab-active' : ''; ?>"><?php _e('2FA', 'secure-login-customizer'); ?></a>
+            <a href="?page=secure-login-customizer&tab=security" class="nav-tab <?php echo $active_tab == 'security' ? 'nav-tab-active' : ''; ?>"><?php _e('Sécurité', 'secure-login-customizer'); ?></a>
+            <a href="?page=secure-login-customizer&tab=login_screen" class="nav-tab <?php echo $active_tab == 'login_screen' ? 'nav-tab-active' : ''; ?>"><?php _e('Customisation Login Screen', 'secure-login-customizer'); ?></a>
+            <a href="?page=secure-login-customizer&tab=messages" class="nav-tab <?php echo $active_tab == 'messages' ? 'nav-tab-active' : ''; ?>"><?php _e('Customisation Messages', 'secure-login-customizer'); ?></a>
+            <a href="?page=secure-login-customizer&tab=documentation" class="nav-tab <?php echo $active_tab == 'documentation' ? 'nav-tab-active' : ''; ?>"><?php _e('Documentation', 'secure-login-customizer'); ?></a>
+        </h2>
+
+        <form action="options.php" method="post">
+            <?php
+            if ($active_tab == '2fa') {
+                settings_fields('secure_login_customizer_2fa_options_group');
+                do_settings_sections('secure_login_customizer_2fa');
+                secure_login_customizer_tab_2fa();
+            } elseif ($active_tab == 'security') {
+                settings_fields('secure_login_customizer_security_options_group');
+                do_settings_sections('secure_login_customizer_security');
+                secure_login_customizer_tab_security();
+            } elseif ($active_tab == 'login_screen') {
+                settings_fields('secure_login_customizer_login_screen_options_group');
+                do_settings_sections('secure_login_customizer_login_screen');
+                secure_login_customizer_tab_login_screen();
+            } elseif ($active_tab == 'messages') {
+                settings_fields('secure_login_customizer_messages_options_group');
+                do_settings_sections('secure_login_customizer_messages');
+                secure_login_customizer_tab_messages();
+            } elseif ($active_tab == 'documentation') {
+                settings_fields('secure_login_customizer_documentation_options_group');
+                do_settings_sections('secure_login_customizer_documentation');
+                secure_login_customizer_tab_documentation();
+            }
+            //submit_button();
+            ?>
+        </form>
+    </div>
+<?php
+}
+
+
+
 
 function slc_load_textdomain() {
     load_plugin_textdomain( 'slc', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
