@@ -1134,12 +1134,12 @@ function slc_add_security_plus_page() {
         __( 'Sécurité Plus', 'slc' ),
         'manage_options',
         'slc_security_plus_options_page',
-        'slc_security_plus_options_page_callback',
-		99
+        'slc_security_plus_options_page_callback' 
+		 
 		
     );
 }
-add_action( 'admin_menu', 'slc_add_security_plus_page' );
+//add_action( 'admin_menu', 'slc_add_security_plus_page' );
 
 // Fonction pour afficher le contenu de la page "Sécurité Plus"
 function slc_security_plus_options_page_callback() {
