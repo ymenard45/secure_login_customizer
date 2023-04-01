@@ -35,6 +35,12 @@ function slc_add_admin_menu() {
     );
 }
 
+// Supprime le code existant pour afficher les messages
+remove_action( 'admin_notices', 'slc_display_message' );
+
+
+
+
 function slc_settings_init() {
     register_setting( 'slc_options_group', 'slc_settings' );
 
@@ -93,6 +99,7 @@ function slc_options_page() {
             <?php ddo_settings_sections( $active_tab ); ?>
              
         </form>
+
     </div>
     <?php
 }
@@ -711,8 +718,10 @@ function ddo_settings_sections( $page ) {
         echo '</table>';
     }
 
-    submit_button();
-    echo '</form></div>';
+    
+    echo '</form>
+	submit_button();
+	</div>';
 }
 
 
@@ -1002,15 +1011,18 @@ function secure_login_customizer_admin_page() {
             color: #0073aa;
 		}	
 
-		.slc-description {
-			font-size: 1.2em; /* Changez la taille de police */
-			color: #0073aa; /* Changez la couleur */
-			padding-bottom: 30px; 
-			padding-top: 20px; 
-		}
-
+			#setting-error-settings_updated {
+				position: fixed;
+				bottom: 0;
+				width: 100%;
+				margin-bottom: 60px;
+				font-size: 1.5em;
+				color: #0073aa;				
+			}
     </style>
     <div class="wrap">
+	
+	
         
         <p><?php _e( 'Customize your WordPress login page with Secure Login Customizer!', 'slc' ); ?></p>
         <h2 class="nav-tab-wrapper">
@@ -1047,8 +1059,9 @@ function secure_login_customizer_admin_page() {
                     break;
             }
 
-            submit_button();
+            submit_button(); 
             ?>
+			
         </form>
     </div>
     <?php
