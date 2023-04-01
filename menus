@@ -812,12 +812,6 @@ function slc_options_validate( $input ) {
 }
 
 
-
-	
-/*** Création du menu dans l'interface d'administration ***/
-//add_submenu_page( 'options-general.php', __( 'Secure Login Customizer', 'slc' ), __( 'Secure Login Customizer', 'slc' ), 'manage_options', 'slc_options', 'slc_options_page' );
-
-
 // Ajout des onglets
 add_action( 'admin_init', 'slc_tab1_settings_init' );
 add_action( 'admin_init', 'slc_tab2_settings_init' );
@@ -834,24 +828,6 @@ add_action( 'slc_options_tabs', 'slc_options_tab5' );
 // Initialisation du plugin
 add_action( 'admin_init', 'slc_plugin_init' );
 
-function slc_add_menu() {
-    add_submenu_page(
-        'plugins.php',
-        __( 'SecureLoginCustomizer', 'slc' ),
-        __( 'SecureLoginCustomizer', 'slc' ),
-        'manage_options',
-        'slc_options',
-        'slc_options_page'
-    );
-
-    add_dashboard_page(
-        __( 'SecureLoginCustomizer', 'slc' ),
-        __( 'SecureLoginCustomizer', 'slc' ),
-        'manage_options',
-        'slc_options',
-        'slc_options_page'
-    );
-}
 
 function secure_login_customizer_menu() {
     add_options_page(
@@ -865,10 +841,10 @@ function secure_login_customizer_menu() {
 }
 
 
-// Ajout du menu
-//add_action( 'admin_menu', 'slc_add_menu' );
+
 // Add the admin menu
 add_action('admin_menu', 'secure_login_customizer_menu');
+
 
 function secure_login_customizer_tab_messages() {
     // Insérez ici le code pour afficher le contenu de l'onglet "Customisation Messages"
@@ -993,6 +969,9 @@ function secure_login_customizer_init() {
 }
 
 add_action('admin_init', 'secure_login_customizer_init');
+
+
+
 
 /*** ajout lien settings  ***/
 function secure_login_customizer_add_plugin_settings_link( $links ) {
