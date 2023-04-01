@@ -281,28 +281,17 @@ function secure_login_customizer_tab_2fa() {
 }
  
 
-/* function slc_enable_2fa_callback() {
-    $options = get_option( 'slc_options' );
-    $checked = isset( $options['enable_2fa'] ) ? checked( $options['enable_2fa'], true, false ) : '';
-    $html = '<div><input type="checkbox" id="slc_enable_2fa" name="slc_options[enable_2fa]" value="1" ' . $checked . '/>';
-    $html .= '<label for="slc_enable_2fa">' . __( 'Enable 2FA Authentication', 'slc' ) . '</label></div>';
-    echo $html;
-}
- */
-/* function slc_enable_2fa_callback() {
-    $options = get_option('slc_options');
-    ?>
-      <input type="checkbox" name="secure_login_customizer_2fa_options[enable_2fa]" id="enable_2fa" value="1" <?php checked( $enable_2fa, 1 ); ?> />
-      <label for="enable_2fa"><?php _e( 'Enable 2FA Authentication', 'slc' ); ?></label>
-   <?php
-}
- */
  
- function slc_enable_2fa_callback() {
+/**
+ * Fonction de rappel pour l'affichage de la case à cocher "Enable 2FA Authentication".
+ */
+function slc_enable_2fa_callback() {
     $options = get_option('secure_login_customizer_2fa_options');
-    $checked = isset($options['enable_2fa']) ? 'checked="checked"' : '';
-    echo '<input type="checkbox" id="slc_enable_2fa" name="secure_login_customizer_2fa_options[enable_2fa]" value="1" '.$checked.' />';
+    $enable_2fa = isset($options['enable_2fa']) ? $options['enable_2fa'] : '';
+
+    echo '<input type="checkbox" id="slc_enable_2fa" name="secure_login_customizer_2fa_options[enable_2fa]" value="1" ' . checked(1, $enable_2fa, false) . '/>';
 }
+
 
 // Fonction de validation des options de l'onglet 2 
 function slc_enable_2fa_validate($input) {
@@ -657,6 +646,14 @@ function secure_login_customizer_tab_security() {
     echo '<h2>Security</h2>';
     echo '<p>Configurez ici les options de sécurité de votre site.</p>';
 }
+
+/**
+ * Fonction de rappel pour l'affichage de l'onglet 2.
+ */
+function slc_tab2_settings_section_callback() {
+    echo __('Configure Two-Factor Authentication', 'slc');
+}
+
 
 
 
