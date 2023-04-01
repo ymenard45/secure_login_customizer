@@ -146,6 +146,7 @@ function secure_login_customizer_tab_2fa() {
     slc_disable_2fa_deactivation_callback();
     slc_security_groups_callback();
 }
+
  
 
 function slc_enable_2fa_callback() {
@@ -218,6 +219,7 @@ function slc_security_groups_callback() {
     }
     echo $html;
 }
+
 
 function slc_security_groups_validate( $input ) {
     $valid = array();
@@ -1093,7 +1095,7 @@ function slc_activate_plugin() {
 
     // Création de la table de la liste noire (blacklist) si elle n'existe pas
     global $wpdb;
-    $table_name = $wpdb->prefix . 'slc_blacklist';
+    $table_name = esc_sql( $wpdb->prefix . 'slc_blacklist' );
     $charset_collate = $wpdb->get_charset_collate();
 
     $sql = "CREATE TABLE IF NOT EXISTS $table_name (
