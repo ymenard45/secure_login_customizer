@@ -1120,8 +1120,9 @@ function slc_security_page_callback() {
       <form method="post" action="options.php">
         <?php settings_fields('slc_security_options'); ?>
         <?php do_settings_sections('slc_security'); ?>
-        <?php submit_button(); ?>
+        
       </form>
+	  <?php submit_button(); ?>
     </div>
   <?php
 }
@@ -1287,65 +1288,122 @@ add_action( 'admin_post_save_proxy_state', 'save_proxy_state' );
 } */
 add_action( 'admin_post_save_password_security_state', 'save_password_security_state' );
 
- function save_blacklist_ips() {
-    $value = isset( $_POST['secure_login_customizer_blacklist_ips'] ) ? sanitize_text_field( $_POST['secure_login_customizer_blacklist_ips'] ) : '';
-    update_option( 'secure_login_customizer_blacklist_ips', $value );
-}
-add_action( 'admin_post_save_blacklist_ips', 'save_blacklist_ips' );
-
-function save_whitelist_ips() {
-    $value = isset( $_POST['secure_login_customizer_whitelist_ips'] ) ? sanitize_text_field( $_POST['secure_login_customizer_whitelist_ips'] ) : '';
-    update_option( 'secure_login_customizer_whitelist_ips', $value );
-}
-add_action( 'admin_post_save_whitelist_ips', 'save_whitelist_ips' );
-
-// Action: Enregistrer le nombre de tentatives de connexion avant blocage
-// Fonction: save_max_login_attempts()
-function save_max_login_attempts() {
-    $value = isset( $_POST['secure_login_customizer_max_login_attempts'] ) ? intval( $_POST['secure_login_customizer_max_login_attempts'] ) : 0;
-    update_option( 'secure_login_customizer_max_login_attempts', $value );
-}
-add_action( 'admin_post_save_max_login_attempts', 'save_max_login_attempts' );
-
-// Action: Enregistrer la durée de blocage du compte
-// Fonction: save_login_lockout_duration()
-function save_login_lockout_duration() {
-    $value = isset( $_POST['secure_login_customizer_login_lockout_duration'] ) ? intval( $_POST['secure_login_customizer_login_lockout_duration'] ) : 0;
-    update_option( 'secure_login_customizer_login_lockout_duration', $value );
-}
-add_action( 'admin_post_save_login_lockout_duration', 'save_login_lockout_duration' );
- 
 function secure_login_customizer_tab_security() {
     ?>
-    <div class="tab-content" id="tab-security">
+    <form method="post" action="options.php">
+        <?php settings_fields( 'secure_login_customizer_security_options' ); ?>
+        <?php do_settings_sections( 'secure_login_customizer_security' ); ?>
         <table class="form-table">
-            <tr valign="top">
-                <th scope="row"><?php _e( 'Activer Security headers', 'secure-login-customizer' ); ?></th>
-                <td>
-                    <input type="checkbox" name="secure_login_customizer_security_headers" value="1" <?php checked( 1, get_option( 'secure_login_customizer_security_headers' ), true ); ?>>
-                </td>
-            </tr>
-            <tr valign="top">
-                <th scope="row"><?php _e( 'Activer l\'anonymisation des messages', 'secure-login-customizer' ); ?></th>
-                <td>
-                    <input type="checkbox" name="secure_login_customizer_anonymize_messages" value="1" <?php checked( 1, get_option( 'secure_login_customizer_anonymize_messages' ), true ); ?>>
-                </td>
-            </tr>
-            <tr valign="top">
-                <th scope="row"><?php _e( 'Refuser les connexions depuis un proxy', 'secure-login-customizer' ); ?></th>
-                <td>
-                    <input type="checkbox" name="secure_login_customizer_proxy" value="1" <?php checked( 1, get_option( 'secure_login_customizer_proxy' ), true ); ?>>
-                </td>
-            </tr>
-            <tr valign="top">
-                <th scope="row"><?php _e( 'Interdire les Mots de passe à faible sécurité', 'secure-login-customizer' ); ?></th>
-                <td>
-                    <input type="checkbox" name="secure_login_customizer_password_security" value="1" <?php checked( 1, get_option( 'secure_login_customizer_password_security' ), true ); ?>>
-                </td>
-            </tr>
-            <?php
-}
+            <tbody>
+			<tr>
+				<th scope="row"><?php _e('Activer Security headers', 'slc'); ?></th>
+				<td>
+					<?php $security_headers_state = get_option( 'secure_login_customizer_security_headers' ); ?>
+					<label for="secure_login_customizer_security_headers">
+						<input type="checkbox" id="secure_login_customizer_security_headers" name="secure_login_customizer_security_headers" <?php checked( $security_headers_state, 1 ); ?>>
+						<?php _e('Activer les Security Headers', 'slc'); ?>
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php _e('Activer l\'anonymisation des messages', 'slc'); ?></th>
+				<td>
+					<?php $anonymize_messages_state = get_option( 'secure_login_customizer_anonymize_messages' ); ?>
+					<label for="secure_login_customizer_anonymize_messages">
+						<input type="checkbox" id="secure_login_customizer_anonymize_messages" name="secure_login_customizer_anonymize_messages" <?php checked( $anonymize_messages_state, 1 ); ?>>
+						<?php _e('Activer l\'anonymisation des messages', 'slc'); ?>
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php _e('Refuser les connexions depuis un proxy', 'slc'); ?></th>
+				<td>
+					<?php $proxy_state = get_option( 'secure_login_customizer_proxy' ); ?>
+					<label for="secure_login_customizer_proxy">
+						<input type="checkbox" id="secure_login_customizer_proxy" name="secure_login_customizer_proxy" <?php checked( $proxy_state, 1 ); ?>>
+						<?php _e('Refuser les connexions depuis un proxy', 'slc'); ?>
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php _e('Interdire les mots de passe à faible sécurité', 'slc'); ?></th>
+				<td>
+					<?php $password_security_state = get_option( 'secure_login_customizer_password_security' ); ?>
+					<label for="secure_login_customizer_password_security">
+						<input type="checkbox" id="secure_login_customizer_password_security" name="secure_login_customizer_password_security" <?php checked( $password_security_state, 1 ); ?>>
+						<?php _e('Interdire les mots de passe à faible sécurité', 'slc'); ?>
+					</label>
+				</td>
+			</tr>
+<?php if ( $password_security_state ) : ?>
+    <tr>
+        <th scope="row"><?php _e('Configuration des règles de sécurité des mots de passe', 'slc'); ?></th>
+        <td>
+            <label for="secure_login_customizer_password_length"><?php _e('Nombre de caractères minimum', 'slc'); ?></label>
+            <input type="number" id="secure_login_customizer_password_length" name="secure_login_customizer_password_length" value="<?php echo esc_attr( get_option( 'secure_login_customizer_password_length', 8 ) ); ?>" min="8" max="64" step="1" required>
 
+            <br><br>
+
+            <input type="checkbox" id="secure_login_customizer_password_uppercase" name="secure_login_customizer_password_uppercase" <?php checked( get_option( 'secure_login_customizer_password_uppercase', true ) ); ?>>
+            <label for="secure_login_customizer_password_uppercase"><?php _e('Doit contenir des majuscules', 'slc'); ?></label>
+
+            <br>
+
+            <input type="checkbox" id="secure_login_customizer_password_lowercase" name="secure_login_customizer_password_lowercase" <?php checked( get_option( 'secure_login_customizer_password_lowercase', true ) ); ?>>
+            <label for="secure_login_customizer_password_lowercase"><?php _e('Doit contenir des minuscules', 'slc'); ?></label>
+
+            <br>
+
+            <input type="checkbox" id="secure_login_customizer_password_numbers" name="secure_login_customizer_password_numbers" <?php checked( get_option( 'secure_login_customizer_password_numbers', true ) ); ?>>
+            <label for="secure_login_customizer_password_numbers"><?php _e('Doit contenir des chiffres', 'slc'); ?></label>
+
+            <br>
+
+            <input type="checkbox" id="secure_login_customizer_password_special_chars" name="secure_login_customizer_password_special_chars" <?php checked( get_option( 'secure_login_customizer_password_special_chars', true ) ); ?>>
+            <label for="secure_login_customizer_password_special_chars"><?php _e('Doit contenir des caractères spéciaux', 'slc'); ?></label>
+        </td>
+    </tr>
+	<?php endif; ?>
+    <tr>
+        <th scope="row"><?php _e('Liste noire d\'IP', 'slc'); ?></th>
+        <td>
+            <label for="secure_login_customizer_blacklist">
+            <input type="text" id="secure_login_customizer_blacklist" name="secure_login_customizer_blacklist" value="<?php echo esc_attr( get_option( 'secure_login_customizer_blacklist', '' ) ); ?>">
+			<?php _e(' Liste d\'IP à bloquer séparées par des virgules', 'slc'); ?></label>	       
+
+	   </td>
+    </tr>
+    <tr>
+        <th scope="row"><?php _e('Whitelist d\'IP', 'slc'); ?></th>
+        <td>
+            <label for="secure_login_customizer_whitelist">
+            <input type="text" id="secure_login_customizer_whitelist" name="secure_login_customizer_whitelist" value="<?php echo esc_attr( get_option( 'secure_login_customizer_whitelist', '' ) ); ?>">
+            <?php _e(' Liste d\'IP à ne jamais bloquer séparées par des virgules', 'slc'); ?></label>
+		</td>
+    </tr>
+    <tr>
+        <th scope="row">
+		<?php _e(' Nombre de tentatives de connexion avant désactivation', 'slc'); ?></th>
+        <td>
+            <label for="secure_login_customizer_max_login_attempts">
+            <input type="number" id="secure_login_customizer_max_login_attempts" name="secure_login_customizer_max_login_attempts" value="<?php echo esc_attr( get_option( 'secure_login_customizer_max_login_attempts', 0 ) ); ?>" min="0" max="20" step="1" required>
+			<?php _e('Nombre de tentatives entre 0 et 20 mn  ... 0 = Jamais', 'slc'); ?></label>
+        </td>
+    </tr>
+    <tr>
+        <th scope="row"><?php _e('Temps de blocage du compte (en minutes)', 'slc'); ?></th>
+        <td>
+            <label for="secure_login_customizer_login_lockout_duration">
+            <input type="number" id="secure_login_customizer_login_lockout_duration" name="secure_login_customizer_login_lockout_duration" value="<?php echo esc_attr( get_option( 'secure_login_customizer_login_lockout_duration', 0 ) ); ?>" min="0" max="300" step="1" required>
+			<?php _e('Durée de blocage de 0 à 240 minutes', 'slc'); ?></label>
+		</td>
+    </tr>
+<?php submit_button(); ?>
+</table>
+</form>
+<?php
+}
+ 
 // Si la case à cocher 'Interdire les Mots de passe à faible sécurité' est cochée, afficher les options de configuration
 function secure_login_customizer_password_security_options() {
 if ( get_option( 'secure_login_customizer_password_security' ) ) {
@@ -1447,6 +1505,38 @@ function custom_password_check($pass, $user_id, $old_pass, $user) {
     }
 
     return $pass;
+}
+
+// Enregistrer la liste des IPs en blacklist
+function save_blacklist_ips() {
+if ( isset( $_POST['secure_login_customizer_blacklist_ips'] ) ) {
+$ips = sanitize_textarea_field( $_POST['secure_login_customizer_blacklist_ips'] );
+update_option( 'secure_login_customizer_blacklist_ips', $ips );
+}
+}
+
+// Enregistrer la liste des IPs en whitelist
+function save_whitelist_ips() {
+if ( isset( $_POST['secure_login_customizer_whitelist_ips'] ) ) {
+$ips = sanitize_textarea_field( $_POST['secure_login_customizer_whitelist_ips'] );
+update_option( 'secure_login_customizer_whitelist_ips', $ips );
+}
+} 
+
+// Enregistrer le nombre de tentatives de connexion avant blocage
+function save_max_login_attempts() {
+if ( isset( $_POST['secure_login_customizer_max_login_attempts'] ) ) {
+$attempts = intval( $_POST['secure_login_customizer_max_login_attempts'] );
+update_option( 'secure_login_customizer_max_login_attempts', $attempts );
+}
+}
+
+// Enregistrer la durée de blocage du compte
+function save_login_lockout_duration() {
+if ( isset( $_POST['secure_login_customizer_login_lockout_duration'] ) ) {
+$duration = intval( $_POST['secure_login_customizer_login_lockout_duration'] );
+update_option( 'secure_login_customizer_login_lockout_duration', $duration );
+}
 }
 
 
