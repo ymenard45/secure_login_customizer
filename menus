@@ -854,8 +854,8 @@ function secure_login_customizer_menu() {
 
 
 // Add the admin menu
-add_action('admin_menu', 'secure_login_customizer_menu');
 
+add_action('admin_menu', 'secure_login_customizer_menu');
 
 function secure_login_customizer_tab_messages() {
     // Insérez ici le code pour afficher le contenu de l'onglet "Customisation Messages"
@@ -980,8 +980,6 @@ function secure_login_customizer_init() {
 }
 
 add_action('admin_init', 'secure_login_customizer_init');
-
-
 
 
 /*** ajout lien settings  ***/
@@ -1127,32 +1125,67 @@ register_activation_hook( __FILE__, 'slc_activate_plugin' );
 
 /***  Gestion de l'onglet 2 ***/
  
-/**
- * Crée les pages de menu et les onglets.
- */
-function slc_add_menu_pages() {
-	// Créer la page d'options des en-têtes de sécurité.
-	add_menu_page(
-		__( 'En-têtes de sécurité', 'slc' ),
-		__( 'Sécurité', 'slc' ),
-		'manage_options',
-		'slc_security_headers_options_page',
-		'slc_security_headers_options_page_callback',
-		'dashicons-shield-alt',
-		30
-	);
+ 
+function slc_add_security_headers_submenu() {
+    add_menu_page(
+        __( 'Secure Login Customizer', 'slc' ),
+        __( 'Secure Login Customizer', 'slc' ),
+        'manage_options',
+        'slc_security_headers_options_page',
+        'slc_security_headers_options_page_callback',
+        '',
+        6 // Position du menu principal
+    );
 
-	// Créer la page d'options de sécurité supplémentaires.
-	add_menu_page(
-		__( 'Sécurité Plus', 'slc' ),
-		__( 'Sécurité Plus', 'slc' ),
-		'manage_options',
-		'slc_security_plus_options_page',
-		'slc_security_headers_options_page_callback',
-		'dashicons-lock',
-		31
-	);
+    // Ajouter les sous-onglets en utilisant add_settings_section et add_settings_field
+    add_settings_section(
+        'slc_security_headers_options_section',
+        __( 'Sécurité des en-têtes', 'slc' ),
+        'slc_security_headers_options_section_callback',
+        'slc_security_headers_options_page'
+    );
+
+    add_settings_field(
+        'slc_enable_security_headers_field',
+        __( 'Activer la sécurité des en-têtes', 'slc' ),
+        'slc_enable_security_headers_field_callback',
+        'slc_security_headers_options_page',
+        'slc_security_headers_options_section'
+    );
+
+    add_settings_field(
+        'slc_x_content_type_options_field',
+        __( 'Options de sécurité X-Content-Type', 'slc' ),
+        'slc_x_content_type_options_field_callback',
+        'slc_security_headers_options_page',
+        'slc_security_headers_options_section'
+    );
+
+    add_settings_field(
+        'slc_x_frame_options_field',
+        __( 'Options de sécurité X-Frame', 'slc' ),
+        'slc_x_frame_options_field_callback',
+        'slc_security_headers_options_page',
+        'slc_security_headers_options_section'
+    );
+
+    add_settings_field(
+        'slc_x_xss_protection_field',
+        __( 'Options de sécurité X-XSS-Protection', 'slc' ),
+        'slc_x_xss_protection_field_callback',
+        'slc_security_headers_options_page',
+        'slc_security_headers_options_section'
+    );
+
+    add_settings_field(
+        'slc_referrer_policy_field',
+        __( 'Options de sécurité Referrer-Policy', 'slc' ),
+        'slc_referrer_policy_field_callback',
+        'slc_security_headers_options_page',
+        'slc_security_headers_options_section'
+    );
 }
+
 
 /**
  * Fonction pour afficher le contenu de la page "En-têtes de sécurité" et "Sécurité Plus".
