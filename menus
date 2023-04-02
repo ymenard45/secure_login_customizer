@@ -422,11 +422,6 @@ function slc_account_block_time_validate( $input ) {
     return $valid;
 }
 
-function secure_login_customizer_tab_security() {
-    echo '<h2>Security</h2>';
-    echo '<p>Configurez ici les options de sécurité de votre site.</p>';
-}
-
 
 
 /***  Onglet 3 ***/
@@ -995,75 +990,69 @@ add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'secure_login_
 /*** secure_login_customizer_admin_page ***/
 
 function secure_login_customizer_admin_page() {
-    // Set active tab
-    $active_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : '2fa';
-
-    ?>
-	   <style>
-        h1  {
-            font-size: 3em;
-            color: #0073aa;
-        }
-        h2.nav-tab-wrapper .nav-tab {
-            font-size: 1em;
-            color: #0073aa;
+	// Set active tab
+	$active_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : '2fa';
+	?>
+	<style>
+		h1  {
+			font-size: 3em;
+			color: #0073aa;
+		}
+		h2.nav-tab-wrapper .nav-tab {
+			font-size: 1em;
+			color: #0073aa;
 		}	
+		#setting-error-settings_updated {
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+			margin-bottom: 60px;
+			font-size: 1.5em;
+			color: #0073aa;				
+		}
+	</style>
+	<div class="wrap">
+		<p><?php _e( 'Customize your WordPress login page with Secure Login Customizer!', 'slc' ); ?></p>
+		<h2 class="nav-tab-wrapper">
+			<a href="?page=secure-login-customizer&tab=2fa" class="nav-tab <?php echo $active_tab == '2fa' ? 'nav-tab-active' : ''; ?>"><?php _e('2FA', 'slc'); ?></a>
+			<a href="?page=secure-login-customizer&tab=security" class="nav-tab <?php echo $active_tab == 'security' ? 'nav-tab-active' : ''; ?>"><?php _e('Security', 'slc'); ?></a>
+			<a href="?page=secure-login-customizer&tab=customization" class="nav-tab <?php echo $active_tab == 'customization' ? 'nav-tab-active' : ''; ?>"><?php _e('Customization', 'slc'); ?></a>
+			<a href="?page=secure-login-customizer&tab=logging" class="nav-tab <?php echo $active_tab == 'logging' ? 'nav-tab-active' : ''; ?>"><?php _e('Logging', 'slc'); ?></a>
+			<a href="?page=secure-login-customizer&tab=advanced" class="nav-tab <?php echo $active_tab == 'advanced' ? 'nav-tab-active' : ''; ?>"><?php _e('Advanced', 'slc'); ?></a>
+		</h2>
+		<form method="post" action="options.php">
+			<?php
+			settings_fields( 'slc_options_group' );
+			do_settings_sections( 'secure-login-customizer' );
 
-			#setting-error-settings_updated {
-				position: fixed;
-				bottom: 0;
-				width: 100%;
-				margin-bottom: 60px;
-				font-size: 1.5em;
-				color: #0073aa;				
+			switch ( $active_tab ) {
+				case '2fa':
+					secure_login_customizer_tab_2fa();
+					break;
+				case 'security':
+					secure_login_customizer_tab_security();
+					break;
+				case 'customization':
+					echo '<p>Contenu de l\'onglet Customization</p>';
+					break;
+				case 'advanced':
+					echo '<p>Contenu de l\'onglet Advanced</p>';
+					break;
+				case 'logging':
+					echo '<p>Contenu de l\'onglet Logging</p>';
+					break;
+				default:
+					secure_login_customizer_tab_2fa();
+					break;
 			}
-    </style>
-    <div class="wrap">
-	
-	
-        
-        <p><?php _e( 'Customize your WordPress login page with Secure Login Customizer!', 'slc' ); ?></p>
-        <h2 class="nav-tab-wrapper">
-        <h2 class="nav-tab-wrapper">
-            <a href="?page=secure-login-customizer&tab=2fa" class="nav-tab <?php echo $active_tab == '2fa' ? 'nav-tab-active' : ''; ?>"><?php _e('2FA', 'slc'); ?></a>
-            <a href="?page=secure-login-customizer&tab=security" class="nav-tab <?php echo $active_tab == 'security' ? 'nav-tab-active' : ''; ?>"><?php _e('Security', 'slc'); ?></a>
-            <a href="?page=secure-login-customizer&tab=customization" class="nav-tab <?php echo $active_tab == 'customization' ? 'nav-tab-active' : ''; ?>"><?php _e('Customization', 'slc'); ?></a>
-            <a href="?page=secure-login-customizer&tab=logging" class="nav-tab <?php echo $active_tab == 'logging' ? 'nav-tab-active' : ''; ?>"><?php _e('Logging', 'slc'); ?></a>
-            <a href="?page=secure-login-customizer&tab=advanced" class="nav-tab <?php echo $active_tab == 'advanced' ? 'nav-tab-active' : ''; ?>"><?php _e('Advanced', 'slc'); ?></a>
-          </h2>
-        <form method="post" action="options.php">
-            <?php
-            settings_fields( 'slc_options_group' );
-            do_settings_sections( 'secure-login-customizer' );
 
-            switch ( $active_tab ) {
-                case '2fa':
-                    secure_login_customizer_tab_2fa();
-                    break;
-                case 'security':
-                    secure_login_customizer_tab_security();
-                    break;
-                case 'customization':
-                    echo '<p>Contenu de l\'onglet Customization</p>';
-                    break;
-                case 'advanced':
-                    echo '<p>Contenu de l\'onglet Advanced</p>';
-                    break;
-				case 'Logging':
-                    echo '<p>Contenu de l\'onglet Advanced</p>';
-                    break;
-                default:
-                    secure_login_customizer_tab_2fa();
-                    break;
-            }
-
-            submit_button(); 
-            ?>
-			
-        </form>
-    </div>
-    <?php
+			submit_button(); 
+			?>
+		</form>
+	</div>
+	<?php
 }
+
 
 
 function slc_load_textdomain() {
@@ -1262,39 +1251,203 @@ function slc_account_lockout_input_changed() {
 /*********************************************/
 
 // Action: Enregistrer la valeur de la case à cocher 'Activer Security headers'
-// Fonction: save_security_headers_state()
 
 function save_security_headers_state() {
-  ?>
-  <script>
-  var security_headers_checkbox = document.getElementById("slc-security-headers-checkbox");
-  var security_headers_state = security_headers_checkbox.checked;
-  localStorage.setItem("slc-security-headers-state", security_headers_state);
-  </script>
-  <?php
+    $value = isset( $_POST['secure_login_customizer_security_headers'] ) ? 1 : 0;
+    update_option( 'secure_login_customizer_security_headers', $value );
 }
+add_action( 'admin_post_save_security_headers_state', 'save_security_headers_state' );
 
 // Action: Vérifier et activer/désactiver les Security Headers selon l'état de la case à cocher 'Activer Security headers'
 // Fonction: check_and_apply_security_headers()
 
 function check_and_apply_security_headers() {
-   ?>
-  <script>
-  var security_headers_state = localStorage.getItem("slc-security-headers-state");
-  var security_headers_checkbox = document.getElementById("slc-security-headers-checkbox");
-  security_headers_checkbox.checked = (security_headers_state === "true");
-  </script>
-  <?php
-  if (security_headers_checkbox.checked) {
-    // Apply the security headers
-    // ...
-  } else {
-    // Revert to the original state of the security headers
-    // ...
-  }
+    $value = get_option( 'secure_login_customizer_security_headers' );
+    if ( $value ) {
+        // Activer les Security Headers
+        // ...
+    } else {
+        // Désactiver les Security Headers
+        // ...
+    }
+}
+add_action( 'wp_loaded', 'check_and_apply_security_headers' );
 
+
+
+ function save_proxy_state() {
+    $value = isset( $_POST['secure_login_customizer_proxy'] ) ? 1 : 0;
+    update_option( 'secure_login_customizer_proxy', $value );
+}
+add_action( 'admin_post_save_proxy_state', 'save_proxy_state' );
+
+/* function save_password_security_state() {
+    $value = isset( $_POST['secure_login_customizer_password_security'] ) ? 1 : 0;
+    update_option( 'secure_login_customizer_password_security', $value );
+} */
+add_action( 'admin_post_save_password_security_state', 'save_password_security_state' );
+
+ function save_blacklist_ips() {
+    $value = isset( $_POST['secure_login_customizer_blacklist_ips'] ) ? sanitize_text_field( $_POST['secure_login_customizer_blacklist_ips'] ) : '';
+    update_option( 'secure_login_customizer_blacklist_ips', $value );
+}
+add_action( 'admin_post_save_blacklist_ips', 'save_blacklist_ips' );
+
+function save_whitelist_ips() {
+    $value = isset( $_POST['secure_login_customizer_whitelist_ips'] ) ? sanitize_text_field( $_POST['secure_login_customizer_whitelist_ips'] ) : '';
+    update_option( 'secure_login_customizer_whitelist_ips', $value );
+}
+add_action( 'admin_post_save_whitelist_ips', 'save_whitelist_ips' );
+
+// Action: Enregistrer le nombre de tentatives de connexion avant blocage
+// Fonction: save_max_login_attempts()
+function save_max_login_attempts() {
+    $value = isset( $_POST['secure_login_customizer_max_login_attempts'] ) ? intval( $_POST['secure_login_customizer_max_login_attempts'] ) : 0;
+    update_option( 'secure_login_customizer_max_login_attempts', $value );
+}
+add_action( 'admin_post_save_max_login_attempts', 'save_max_login_attempts' );
+
+// Action: Enregistrer la durée de blocage du compte
+// Fonction: save_login_lockout_duration()
+function save_login_lockout_duration() {
+    $value = isset( $_POST['secure_login_customizer_login_lockout_duration'] ) ? intval( $_POST['secure_login_customizer_login_lockout_duration'] ) : 0;
+    update_option( 'secure_login_customizer_login_lockout_duration', $value );
+}
+add_action( 'admin_post_save_login_lockout_duration', 'save_login_lockout_duration' );
+ 
+function secure_login_customizer_tab_security() {
+    ?>
+    <div class="tab-content" id="tab-security">
+        <table class="form-table">
+            <tr valign="top">
+                <th scope="row"><?php _e( 'Activer Security headers', 'secure-login-customizer' ); ?></th>
+                <td>
+                    <input type="checkbox" name="secure_login_customizer_security_headers" value="1" <?php checked( 1, get_option( 'secure_login_customizer_security_headers' ), true ); ?>>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row"><?php _e( 'Activer l\'anonymisation des messages', 'secure-login-customizer' ); ?></th>
+                <td>
+                    <input type="checkbox" name="secure_login_customizer_anonymize_messages" value="1" <?php checked( 1, get_option( 'secure_login_customizer_anonymize_messages' ), true ); ?>>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row"><?php _e( 'Refuser les connexions depuis un proxy', 'secure-login-customizer' ); ?></th>
+                <td>
+                    <input type="checkbox" name="secure_login_customizer_proxy" value="1" <?php checked( 1, get_option( 'secure_login_customizer_proxy' ), true ); ?>>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row"><?php _e( 'Interdire les Mots de passe à faible sécurité', 'secure-login-customizer' ); ?></th>
+                <td>
+                    <input type="checkbox" name="secure_login_customizer_password_security" value="1" <?php checked( 1, get_option( 'secure_login_customizer_password_security' ), true ); ?>>
+                </td>
+            </tr>
+            <?php
 }
 
+// Si la case à cocher 'Interdire les Mots de passe à faible sécurité' est cochée, afficher les options de configuration
+function secure_login_customizer_password_security_options() {
+if ( get_option( 'secure_login_customizer_password_security' ) ) {
+?>
+<table class="form-table">
+<tr>
+<th scope="row"><?php _e( 'Nombre de caractères minimum', 'slc' ); ?></th>
+<td>
+<input type="number" name="secure_login_customizer_password_min_length" min="1" max="50" value="<?php echo esc_attr( get_option( 'secure_login_customizer_password_min_length', 8 ) ); ?>">
+</td>
+</tr>
+<tr>
+<th scope="row"><?php _e( 'Doit contenir des majuscules', 'slc' ); ?></th>
+<td>
+<input type="checkbox" name="secure_login_customizer_password_require_uppercase" value="1" <?php checked( 1, get_option( 'secure_login_customizer_password_require_uppercase', 0 ) ); ?>>
+</td>
+</tr>
+<tr>
+<th scope="row"><?php _e( 'Doit contenir des minuscules', 'slc' ); ?></th>
+<td>
+<input type="checkbox" name="secure_login_customizer_password_require_lowercase" value="1" <?php checked( 1, get_option( 'secure_login_customizer_password_require_lowercase', 0 ) ); ?>>
+</td>
+</tr>
+<tr>
+<th scope="row"><?php _e( 'Doit contenir des chiffres', 'slc' ); ?></th>
+<td>
+<input type="checkbox" name="secure_login_customizer_password_require_numbers" value="1" <?php checked( 1, get_option( 'secure_login_customizer_password_require_numbers', 0 ) ); ?>>
+</td>
+</tr>
+<tr>
+<th scope="row"><?php _e( 'Doit contenir des caractères spéciaux', 'slc' ); ?></th>
+<td>
+<input type="checkbox" name="secure_login_customizer_password_require_special_chars" value="1" <?php checked( 1, get_option( 'secure_login_customizer_password_require_special_chars', 0 ) ); ?>>
+</td>
+</tr>
+</table>
+<?php
+}
+}
+
+// Action: Enregistrer la valeur de la case à cocher 'Interdire les Mots de passe à faible sécurité'
+function save_password_security_state() {
+$value = isset( $_POST['secure_login_customizer_password_security'] ) ? 1 : 0;
+update_option( 'secure_login_customizer_password_security', $value );
+}
+add_action( 'admin_post_save_password_security_state', 'save_password_security_state' );
+
+ 
+function check_and_apply_password_security() {
+    $value = get_option('secure_login_customizer_password_security');
+    if ($value) {
+        // Activer les règles de sécurité des mots de passe
+        add_filter('wp_check_password', 'custom_password_check', 10, 4);
+    } else {
+        // Désactiver les règles de sécurité des mots de passe
+        remove_filter('wp_check_password', 'custom_password_check');
+    }
+}
+
+add_action('wp_loaded', 'check_and_apply_password_security');
+
+// Fonction de vérification des mots de passe
+function custom_password_check($pass, $user_id, $old_pass, $user) {
+    $min_length = isset($_POST['secure_login_customizer_password_min_length']) ? intval($_POST['secure_login_customizer_password_min_length']) : 8;
+    $require_uppercase = isset($_POST['secure_login_customizer_password_require_uppercase']);
+    $require_lowercase = isset($_POST['secure_login_customizer_password_require_lowercase']);
+    $require_numbers = isset($_POST['secure_login_customizer_password_require_numbers']);
+    $require_special_chars = isset($_POST['secure_login_customizer_password_require_special_chars']);
+
+    $errors = new WP_Error();
+
+    // Vérifier la longueur minimale
+    if (strlen($pass) < $min_length) {
+        $errors->add('password_too_short', sprintf(__('Le mot de passe doit contenir au moins %d caractères.', 'secure-login-customizer'), $min_length));
+    }
+
+    // Vérifier s'il doit contenir des majuscules
+    if ($require_uppercase && !preg_match('/[A-Z]/', $pass)) {
+        $errors->add('password_missing_uppercase', __('Le mot de passe doit contenir des majuscules.', 'secure-login-customizer'));
+    }
+
+    // Vérifier s'il doit contenir des minuscules
+    if ($require_lowercase && !preg_match('/[a-z]/', $pass)) {
+        $errors->add('password_missing_lowercase', __('Le mot de passe doit contenir des minuscules.', 'secure-login-customizer'));
+    }
+
+    // Vérifier s'il doit contenir des chiffres
+    if ($require_numbers && !preg_match('/[0-9]/', $pass)) {
+        $errors->add('password_missing_numbers', __('Le mot de passe doit contenir des chiffres.', 'secure-login-customizer'));
+    }
+
+    // Vérifier s'il doit contenir des caractères spéciaux
+    if ($require_special_chars && !preg_match('/[^a-zA-Z0-9]/', $pass)) {
+        $errors->add('password_missing_special_chars', __('Le mot de passe doit contenir des caractères spéciaux.', 'secure-login-customizer'));
+    }
+
+    if (is_wp_error($errors)) {
+        return $errors;
+    }
+
+    return $pass;
+}
 
 
 
