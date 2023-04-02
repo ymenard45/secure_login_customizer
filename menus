@@ -1197,29 +1197,23 @@ function slc_security_plus_initialize_options() {
    <?php
 }
 
-function slc_security_headers_checkbox_changed( ) {
-  if (checked) {
+function slc_security_headers_checkbox_changed() {
+	   ?>
+   <script>
+  var security_headers_checkbox = document.getElementById("slc-security-headers-checkbox");
+
+  if (security_headers_checkbox.checked) {
     console.log("Security headers enabled");
+
+    // Set the "X-Content-Type-Options" header to "nosniff".
+    document.headers.set("X-Content-Type-Options", "nosniff");
   } else {
     console.log("Security headers disabled");
   }
-}
-  
-function slc_anonymize_messages_checkbox_changed( ) {
-  if (checked) {
-    console.log("Anonymize messages enabled");
-  } else {
-    console.log("Anonymize messages disabled");
-  }
+     </script>
+   <?php
 }
 
- function slc_security_headers_checkbox_changed( ) {
-  if (checked) {
-    console.log("Security headers enabled");
-  } else {
-    console.log("Security headers disabled");
-  }
-}
 
 function slc_anonymize_messages_checkbox_changed( ) {
   if (checked) {
@@ -1238,21 +1232,37 @@ function slc_password_security_checkbox_changed( ) {
 }
 
 function slc_blacklist_input_changed() {
+		   ?>
+   <script>
   var blacklist_input = document.getElementById("slc-blacklist-input");
   console.log("Blacklist changed to: " + blacklist_input.value);
+       </script>
+   <?php
 }
 
 function slc_whitelist_input_changed() {
+		   ?>
+   <script>
   var whitelist_input = document.getElementById("slc-whitelist-input");
   console.log("Whitelist changed to: " + whitelist_input.value);
+       </script>
+   <?php
 }
-
+ 
 function slc_login_attempts_input_changed() {
+		   ?>
+   <script>
   var login_attempts_input = document.getElementById("slc-login-attempts-input");
   console.log("Login attempts changed to: " + login_attempts_input.value);
+       </script>
+   <?php
 }
 
 function slc_account_lockout_input_changed() {
+	?>
+   <script>
   var account_lockout_input = document.getElementById("slc-account-lockout-input");
   console.log("Account lockout time changed to: " + account_lockout_input.value);
+       </script>
+   <?php
 }
