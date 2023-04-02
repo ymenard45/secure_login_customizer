@@ -1126,20 +1126,72 @@ register_activation_hook( __FILE__, 'slc_activate_plugin' );
 
 
 /***  Gestion de l'onglet 2 ***/
-// Fonction pour ajouter la page "Sécurité Plus" dans le menu "Réglages"
-function slc_add_security_plus_page() {
-    add_submenu_page(
-        'slc_security_headers_options_page',
-        __( 'Sécurité Plus', 'slc' ),
-        __( 'Sécurité Plus', 'slc' ),
-        'manage_options',
-        'slc_security_plus_options_page',
-        'slc_security_plus_options_page_callback' 
-		 
-		
-    );
+ 
+/**
+ * Crée les pages de menu et les onglets.
+ */
+function slc_add_menu_pages() {
+	// Créer la page d'options des en-têtes de sécurité.
+	add_menu_page(
+		__( 'En-têtes de sécurité', 'slc' ),
+		__( 'Sécurité', 'slc' ),
+		'manage_options',
+		'slc_security_headers_options_page',
+		'slc_security_headers_options_page_callback',
+		'dashicons-shield-alt',
+		30
+	);
+
+	// Créer la page d'options de sécurité supplémentaires.
+	add_menu_page(
+		__( 'Sécurité Plus', 'slc' ),
+		__( 'Sécurité Plus', 'slc' ),
+		'manage_options',
+		'slc_security_plus_options_page',
+		'slc_security_headers_options_page_callback',
+		'dashicons-lock',
+		31
+	);
 }
-//add_action( 'admin_menu', 'slc_add_security_plus_page' );
+
+/**
+ * Fonction pour afficher le contenu de la page "En-têtes de sécurité" et "Sécurité Plus".
+ */
+function slc_security_headers_options_page_callback() {
+	// Vérifier quel onglet est sélectionné et charger le contenu approprié.
+	if ( isset( $_GET['page'] ) && $_GET['page'] === 'slc_security_plus_options_page' ) {
+		// Afficher le contenu de l'onglet "Sécurité Plus".
+?>
+		<div class="wrap">
+			<h1><?php _e( 'Sécurité Plus', 'slc' ); ?></h1>
+			<form method="post" action="options.php">
+				<?php
+					settings_fields( 'slc_security_plus_options_group' );
+					do_settings_sections( 'slc_security_plus_options_page' );
+					submit_button();
+				?>
+			</form>
+		</div>
+<?php
+	} else {
+		// Afficher le contenu de l'onglet "En-têtes de sécurité".
+?>
+		<div class="wrap">
+			<h1><?php _e( 'En-têtes de sécurité', 'slc' ); ?></h1>
+			<form method="post" action="options.php">
+				<?php
+					settings_fields( 'slc_security_headers_options_group' );
+					do_settings_sections( 'slc_security_headers_options_page' );
+					submit_button();
+				?>
+			</form>
+		</div>
+<?php
+	}
+}
+
+
+
 
 // Fonction pour afficher le contenu de la page "Sécurité Plus"
 function slc_security_plus_options_page_callback() {
