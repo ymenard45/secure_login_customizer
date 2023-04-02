@@ -1261,215 +1261,36 @@ function slc_account_lockout_input_changed() {
 
 /*********************************************/
 
-function slc_add_security_fields() {
-			   ?>
-   <script>
-	
-    var security_settings_section = document.getElementById("slc-security-settings-section");
-  
-    // Create the "Security Headers" checkbox.
-    var security_headers_div = document.createElement("div");
-    security_headers_div.classList.add("slc-setting");
-  
-    var security_headers_label = document.createElement("label");
-    security_headers_label.setAttribute("for", "slc-security-headers-checkbox");
-    security_headers_label.innerText = "Enable Security Headers";
-  
-    var security_headers_checkbox = document.createElement("input");
-    security_headers_checkbox.setAttribute("type", "checkbox");
-    security_headers_checkbox.setAttribute("id", "slc-security-headers-checkbox");
-    security_headers_checkbox.addEventListener("change", function() {
-      slc_security_headers_checkbox_changed(security_headers_checkbox.checked);
-    });
-  
-    security_headers_label.appendChild(security_headers_checkbox);
-    security_headers_div.appendChild(security_headers_label);
-  
-    // Create the "Anonymize Messages" checkbox.
-    var anonymize_messages_div = document.createElement("div");
-    anonymize_messages_div.classList.add("slc-setting");
-  
-    var anonymize_messages_label = document.createElement("label");
-    anonymize_messages_label.setAttribute("for", "slc-anonymize-messages-checkbox");
-    anonymize_messages_label.innerText = "Enable Anonymize Messages";
-  
-    var anonymize_messages_checkbox = document.createElement("input");
-    anonymize_messages_checkbox.setAttribute("type", "checkbox");
-    anonymize_messages_checkbox.setAttribute("id", "slc-anonymize-messages-checkbox");
-    anonymize_messages_checkbox.addEventListener("change", function() {
-      slc_anonymize_messages_checkbox_changed(anonymize_messages_checkbox.checked);
-    });
-  
-    anonymize_messages_label.appendChild(anonymize_messages_checkbox);
-    anonymize_messages_div.appendChild(anonymize_messages_label);
-  
-    // Create the "Refuse Proxy" checkbox.
-    var refuse_proxy_div = document.createElement("div");
-    refuse_proxy_div.classList.add("slc-setting");
-  
-    var refuse_proxy_label = document.createElement("label");
-    refuse_proxy_label.setAttribute("for", "slc-refuse-proxy-checkbox");
-    refuse_proxy_label.innerText = "Refuse Proxy Connections";
-  
-    var refuse_proxy_checkbox = document.createElement("input");
-    refuse_proxy_checkbox.setAttribute("type", "checkbox");
-    refuse_proxy_checkbox.setAttribute("id", "slc-refuse-proxy-checkbox");
-    refuse_proxy_checkbox.addEventListener("change", function() {
-      slc_refuse_proxy_checkbox_changed(refuse_proxy_checkbox.checked);
-    });
-  
-    refuse_proxy_label.appendChild(refuse_proxy_checkbox);
-    refuse_proxy_div.appendChild(refuse_proxy_label);
-  
-    // Create the "Password Security" checkbox.
-    var password_security_div = document.createElement("div");
-    password_security_div.classList.add("slc-setting");
-  
-    var password_security_label = document.createElement("label");
-    password_security_label.setAttribute("for", "slc-password-security-checkbox");
-    password_security_label.innerText = "Enable Password Security";
-  
-    var password_security_checkbox = document.createElement("input");
-    password_security_checkbox.setAttribute("type", "checkbox");
-    password_security_checkbox.setAttribute("id", "slc-password-security-checkbox");
-    password_security_checkbox.addEventListener("change", function() {
-      slc_password_security_checkbox_changed(password_security_checkbox.checked);
-    });
-  
-    password_security_label.appendChild(password_security_checkbox);
-    password_security_div.appendChild(password_security_label);
-  
-    // Create the "Blacklist" input.
-    var blacklist_div = document.createElement("div");
-    blacklist_div.classList.add("slc-setting");
-  
-  // Create the "Blacklist" field.
-  var blacklist_label = document.createElement("label");
-  blacklist_label.innerHTML = "Blacklist:";
-  blacklist_label.setAttribute("for", "slc-blacklist-input");
-  security_settings_section.appendChild(blacklist_label);
+// Action: Enregistrer la valeur de la case à cocher 'Activer Security headers'
+// Fonction: save_security_headers_state()
 
-  security_settings_section.appendChild(document.createElement("br"));
-  security_settings_section.appendChild(blacklist_input);
-
-  // Create the "Whitelist" field.
-  var whitelist_label = document.createElement("label");
-  whitelist_label.innerHTML = "Whitelist:";
-  whitelist_label.setAttribute("for", "slc-whitelist-input");
-  security_settings_section.appendChild(document.createElement("br"));
-  security_settings_section.appendChild(whitelist_label);
-
-  var whitelist_input = document.createElement("input");
-  whitelist_input.type = "text";
-  whitelist_input.id = "slc-whitelist-input";
-  whitelist_input.name = "slc-whitelist-input";
-  security_settings_section.appendChild(document.createElement("br"));
-  security_settings_section.appendChild(whitelist_input);
-
-  // Create the "Login Attempts" field.
-  var login_attempts_label = document.createElement("label");
-  login_attempts_label.innerHTML = "Login Attempts:";
-  login_attempts_label.setAttribute("for", "slc-login-attempts-input");
-  security_settings_section.appendChild(document.createElement("br"));
-  security_settings_section.appendChild(login_attempts_label);
-
-  var login_attempts_input = document.createElement("input");
-  login_attempts_input.type = "number";
-  login_attempts_input.min = "0";
-  login_attempts_input.max = "20";
-  login_attempts_input.id = "slc-login-attempts-input";
-  login_attempts_input.name = "slc-login-attempts-input";
-  security_settings_section.appendChild(document.createElement("br"));
-  security_settings_section.appendChild(login_attempts_input);
-
-  // Create the "Account Lockout" field.
-  var account_lockout_label = document.createElement("label");
-  account_lockout_label.innerHTML = "Account Lockout:";
-  account_lockout_label.setAttribute("for", "slc-account-lockout-input");
-  security_settings_section.appendChild(document.createElement("br"));
-  security_settings_section.appendChild(account_lockout_label);
-
-  var account_lockout_input = document.createElement("input");
-  account_lockout_input.type = "number";
-  account_lockout_input.min = "0";
-  account_lockout_input.max = "300";
-  account_lockout_input.id = "slc-account-lockout-input";
-  account_lockout_input.name = "slc-account-lockout-input";
-  security_settings_section.appendChild(document.createElement("br"));
-  security_settings_section.appendChild(account_lockout_input);
-
-  // Add the event listeners to the fields.
-  security_headers_checkbox.addEventListener("change", function() {
-    slc_security_headers_checkbox_changed(security_headers_checkbox.checked);
-  });
-
-  anonymize_messages_checkbox.addEventListener("change", function() {
-    slc_anonymize_messages_checkbox_changed(anonymize_messages_checkbox.checked);
-  });
-
-  refuse_proxy_checkbox.addEventListener("change", function() {
-    slc_refuse_proxy_checkbox_changed(refuse_proxy_checkbox.checked);
-  });
-
-  password_security_checkbox.addEventListener("change", function() {
-    slc_password_security_checkbox_changed(password_security_checkbox.checked);
-  });
-
-  blacklist_input.addEventListener("input", function() {
-    slc_blacklist_input_changed();
-  });
-
-  whitelist_input.addEventListener("input", function() {
-    slc_whitelist_input_changed();
-  });
-
-  login_attempts_input.addEventListener("input", function() {
-    slc_login_attempts_input_changed();
-  });
-
-  account_lockout_input.addEventListener("input", function() {
-    slc_account_lockout_input_changed();
-  });
-
-  // Add the event listener to the "Security Headers" checkbox.
-  security_headers_checkbox.addEventListener("change", function() {
-    slc_security_headers_checkbox_changed();
-  });
-
-  // Add the event listener to the "Anonymize Messages" checkbox.
-  anonymize_messages_checkbox.addEventListener("change", function() {
-    slc_anonymize_messages_checkbox_changed();
-  });
-
-  // Add the event listener to the "Refuse Proxy" checkbox.
-  refuse_proxy_checkbox.addEventListener("change", function() {
-    slc_refuse_proxy_checkbox_changed();
-  });
-
-  // Add the event listener to the "Password Security" checkbox.
-  password_security_checkbox.addEventListener("change", function() {
-    slc_password_security_checkbox_changed();
-  });
-
-  // Add the event listener to the "Blacklist" input.
-  blacklist_input.addEventListener("input", function() {
-    slc_blacklist_input_changed();
-  });
-
-  // Add the event listener to the "Whitelist" input.
-  whitelist_input.addEventListener("input", function() {
-    slc_whitelist_input_changed();
-  });
-
-  // Add the event listener to the "Login Attempts" input.
-  login_attempts_input.addEventListener("input", function() {
-    slc_login_attempts_input_changed();
-  });
-
-  // Add the event listener to the "Account Lockout" input.
-  account_lockout_input.addEventListener("input", function() {
-    slc_account_lockout_input_changed();
-  });
-      </script>
-   <?php
+function save_security_headers_state() {
+	<script>
+  var security_headers_checkbox = document.getElementById("slc-security-headers-checkbox");
+  var security_headers_state = security_headers_checkbox.checked;
+  localStorage.setItem("slc-security-headers-state", security_headers_state);
+  </script>
 }
+
+// Action: Vérifier et activer/désactiver les Security Headers selon l'état de la case à cocher 'Activer Security headers'
+// Fonction: check_and_apply_security_headers()
+
+function check_and_apply_security_headers() {
+		<script>
+  var security_headers_state = localStorage.getItem("slc-security-headers-state");
+  var security_headers_checkbox = document.getElementById("slc-security-headers-checkbox");
+  security_headers_checkbox.checked = (security_headers_state === "true");
+	  </script>
+  if (security_headers_checkbox.checked) {
+    // Apply the security headers
+    // ...
+  } else {
+    // Revert to the original state of the security headers
+    // ...
+  }
+
+}
+
+
+
+
