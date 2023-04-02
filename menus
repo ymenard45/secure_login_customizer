@@ -1265,22 +1265,26 @@ function slc_account_lockout_input_changed() {
 // Fonction: save_security_headers_state()
 
 function save_security_headers_state() {
-	<script>
+  ?>
+  <script>
   var security_headers_checkbox = document.getElementById("slc-security-headers-checkbox");
   var security_headers_state = security_headers_checkbox.checked;
   localStorage.setItem("slc-security-headers-state", security_headers_state);
   </script>
+  <?php
 }
 
 // Action: Vérifier et activer/désactiver les Security Headers selon l'état de la case à cocher 'Activer Security headers'
 // Fonction: check_and_apply_security_headers()
 
 function check_and_apply_security_headers() {
-		<script>
+   ?>
+  <script>
   var security_headers_state = localStorage.getItem("slc-security-headers-state");
   var security_headers_checkbox = document.getElementById("slc-security-headers-checkbox");
   security_headers_checkbox.checked = (security_headers_state === "true");
-	  </script>
+  </script>
+  <?php
   if (security_headers_checkbox.checked) {
     // Apply the security headers
     // ...
