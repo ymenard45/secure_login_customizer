@@ -1122,10 +1122,8 @@ function slc_activate_plugin() {
 // Activation du plugin
 register_activation_hook( __FILE__, 'slc_activate_plugin' );
 
+/*** Management of Tab 2 ***/
 
-/***  Gestion de l'onglet 2 ***/
- 
- 
 function slc_add_security_headers_submenu() {
     add_menu_page(
         __( 'Secure Login Customizer', 'slc' ),
@@ -1134,20 +1132,20 @@ function slc_add_security_headers_submenu() {
         'slc_security_headers_options_page',
         'slc_security_headers_options_page_callback',
         '',
-        6 // Position du menu principal
+        6 // Position of main menu
     );
 
-    // Ajouter les sous-onglets en utilisant add_settings_section et add_settings_field
+    // Add sub-tabs using add_settings_section and add_settings_field
     add_settings_section(
         'slc_security_headers_options_section',
-        __( 'Sécurité des en-têtes', 'slc' ),
+        __( 'Security Headers', 'slc' ),
         'slc_security_headers_options_section_callback',
         'slc_security_headers_options_page'
     );
 
     add_settings_field(
         'slc_enable_security_headers_field',
-        __( 'Activer la sécurité des en-têtes', 'slc' ),
+        __( 'Enable Security Headers', 'slc' ),
         'slc_enable_security_headers_field_callback',
         'slc_security_headers_options_page',
         'slc_security_headers_options_section'
@@ -1155,7 +1153,7 @@ function slc_add_security_headers_submenu() {
 
     add_settings_field(
         'slc_x_content_type_options_field',
-        __( 'Options de sécurité X-Content-Type', 'slc' ),
+        __( 'X-Content-Type Security Options', 'slc' ),
         'slc_x_content_type_options_field_callback',
         'slc_security_headers_options_page',
         'slc_security_headers_options_section'
@@ -1163,7 +1161,7 @@ function slc_add_security_headers_submenu() {
 
     add_settings_field(
         'slc_x_frame_options_field',
-        __( 'Options de sécurité X-Frame', 'slc' ),
+        __( 'X-Frame Security Options', 'slc' ),
         'slc_x_frame_options_field_callback',
         'slc_security_headers_options_page',
         'slc_security_headers_options_section'
@@ -1171,7 +1169,7 @@ function slc_add_security_headers_submenu() {
 
     add_settings_field(
         'slc_x_xss_protection_field',
-        __( 'Options de sécurité X-XSS-Protection', 'slc' ),
+        __( 'X-XSS-Protection Security Options', 'slc' ),
         'slc_x_xss_protection_field_callback',
         'slc_security_headers_options_page',
         'slc_security_headers_options_section'
@@ -1179,328 +1177,151 @@ function slc_add_security_headers_submenu() {
 
     add_settings_field(
         'slc_referrer_policy_field',
-        __( 'Options de sécurité Referrer-Policy', 'slc' ),
+        __( 'Referrer-Policy Security Options', 'slc' ),
         'slc_referrer_policy_field_callback',
         'slc_security_headers_options_page',
         'slc_security_headers_options_section'
     );
 }
 
-
 /**
- * Fonction pour afficher le contenu de la page "En-têtes de sécurité" et "Sécurité Plus".
+ * Function to display the contents of the "Security Headers" and "Security Plus" pages.
  */
 function slc_security_headers_options_page_callback() {
-	// Vérifier quel onglet est sélectionné et charger le contenu approprié.
-	if ( isset( $_GET['page'] ) && $_GET['page'] === 'slc_security_plus_options_page' ) {
-		// Afficher le contenu de l'onglet "Sécurité Plus".
-?>
-		<div class="wrap">
-			<h1><?php _e( 'Sécurité Plus', 'slc' ); ?></h1>
-			<form method="post" action="options.php">
-				<?php
-					settings_fields( 'slc_security_plus_options_group' );
-					do_settings_sections( 'slc_security_plus_options_page' );
-					submit_button();
-				?>
-			</form>
-		</div>
-<?php
-	} else {
-		// Afficher le contenu de l'onglet "En-têtes de sécurité".
-?>
-		<div class="wrap">
-			<h1><?php _e( 'En-têtes de sécurité', 'slc' ); ?></h1>
-			<form method="post" action="options.php">
-				<?php
-					settings_fields( 'slc_security_headers_options_group' );
-					do_settings_sections( 'slc_security_headers_options_page' );
-					submit_button();
-				?>
-			</form>
-		</div>
-<?php
-	}
-}
-
-
-
-
-// Fonction pour afficher le contenu de la page "Sécurité Plus"
-function slc_security_plus_options_page_callback() {
-?>
-    <div class="wrap">
-        <h1><?php _e( 'Sécurité Plus', 'slc' ); ?></h1>
-        <form method="post" action="options.php">
-            <?php
-                settings_fields( 'slc_security_plus_options_group' );
-                do_settings_sections( 'slc_security_plus_options_page' );
-                submit_button();
-            ?>
-        </form>
-    </div>
-<?php
-}
-
-// Fonction pour initialiser les sections et les champs de la page "Sécurité Plus"
-function slc_security_plus_initialize_options() {
-    // Section "Refuser les connexions depuis un proxy"
-    add_settings_section(
-        'slc_block_proxy_section',
-        __( 'Refuser les connexions depuis un proxy', 'slc' ),
-        'slc_block_proxy_section_description',
-        'slc_security_plus_options_page'
-    );
-    add_settings_field(
-        'slc_block_proxy',
-        __( 'Activer le blocage des connexions depuis un proxy', 'slc' ),
-        'slc_block_proxy_field_callback',
-        'slc_security_plus_options_page',
-        'slc_block_proxy_section'
-    );
-    register_setting(
-        'slc_security_plus_options_group',
-        'slc_block_proxy',
-        array(
-            'type' => 'boolean',
-            'sanitize_callback' => 'slc_sanitize_boolean',
-            'default' => false,
-        )
-    );
-    
-    // Section "Interdire les Mots de passe à faible sécurité"
-    add_settings_section(
-        'slc_strong_passwords_section',
-        __( 'Interdire les Mots de passe à faible sécurité', 'slc' ),
-        'slc_strong_passwords_section_description',
-        'slc_security_plus_options_page'
-    );
-    add_settings_field(
-        'slc_strong_passwords',
-        __( 'Activer l\'interdiction des Mots de passe à faible sécurité', 'slc' ),
-        'slc_strong_passwords_field_callback',
-        'slc_security_plus_options_page',
-        'slc_strong_passwords_section'
-    );
-    register_setting(
-        'slc_security_plus_options_group',
-        'slc_strong_passwords',
-        array(
-            'type' => 'boolean',
-            'sanitize_callback' => 'slc_sanitize_boolean',
-            'default' => false,
-        )
-    );
-    add_settings_field(
-        'slc_password_length',
-        __( 'Longueur minimale du mot de passe', 'slc' ),
-        'slc_password_length_field_callback',
-        'slc_security_plus_options_page',
-        'slc_strong_passwords_section',
-        array(
-            'label_for' => 'slc_password_length',
-        )
-    );
-   
-
-        // Register settings for "Two-factor authentication" section.
-        add_settings_section(
-            'slc_two_factor_auth_section',
-            __( 'Authentification à deux facteurs', 'slc' ),
-            'slc_two_factor_auth_section_description',
-            'slc_security_plus_options_page'
-        );
-
-        register_setting(
-            'slc_security_plus_options_group',
-            'slc_2fa_enabled',
-            array(
-                'type' => 'boolean',
-                'description' => __( 'Activer l\'authentification à deux facteurs.', 'slc' ),
-                'sanitize_callback' => 'boolval',
-                'show_in_rest' => true,
-                'default' => false,
-            )
-        );
-
-        add_settings_field(
-            'slc_2fa_enabled',
-            __( 'Activer l\'authentification à deux facteurs', 'slc' ),
-            'slc_2fa_enabled_field_callback',
-            'slc_security_plus_options_page',
-            'slc_two_factor_auth_section',
-            array(
-                'label_for' => 'slc_2fa_enabled',
-            )
-        );
-    }
-
-    add_action( 'admin_init', 'slc_register_security_plus_settings' );
-
- 
-
-    /*
-     * Callback for the Password Complexity field
-     */
-    function slc_password_complexity_field_callback( $args ) {
-        $options = get_option( 'slc_security_plus_options' );
+    // Check which tab is selected and load the appropriate content.
+    if ( isset( $_GET['page'] ) && $_GET['page'] === 'slc_security_plus_options_page' ) {
+        // Display content for the "Security Plus" tab.
         ?>
-        <select name="slc_security_plus_options[<?php echo esc_attr( $args['label_for'] ); ?>]" id="<?php echo esc_attr( $args['label_for'] ); ?>">
-            <option value="0" <?php selected( isset( $options[ $args['label_for'] ] ) && $options[ $args['label_for'] ] === '0' ); ?>><?php esc_html_e( 'Aucun', 'slc' ); ?></option>
-            <option value="1" <?php selected( isset( $options[ $args['label_for'] ] ) && $options[ $args['label_for'] ] === '1' ); ?>><?php esc_html_e( 'Faible', 'slc' ); ?></option>
-            <option value="2" <?php selected( isset( $options[ $args['label_for'] ] ) && $options[ $args['label_for'] ] === '2' ); ?>><?php esc_html_e( 'Moyen', 'slc' ); ?></option>
-            <option value="3" <?php selected( isset( $options[ $args['label_for'] ] ) && $options[ $args['label_for'] ] === '3' ); ?>><?php esc_html_e( 'Fort', 'slc' ); ?></option>
-        </select>
+        <div class="wrap">
+            <h1><?php _e( 'Security Plus', 'slc' ); ?></h1>
+            <form method="post" action="options.php">
+                <?php
+                    settings_fields( 'slc_security_plus_options_group' );
+                    do_settings_sections( 'slc_security_plus_options_page' );
+                    submit_button();
+                ?>
+            </form>
+        </div>
+        <?php
+    } else {
+        // Display content for the "Security Headers" tab.
+        ?>
+        <div class="wrap">
+            <h1><?php _e( 'Security Headers', 'slc' ); ?></h1>
+            <form method="post" action="options.php">
+                <?php
+                    settings_fields( 'slc_security_headers_options_group' );
+                    do_settings_sections( 'slc_security_headers_options_page' );
+                    submit_button();
+                ?>
+            </form>
+        </div>
         <?php
     }
+}
 
+// Function to add a new settings section.
+function slc_add_settings_section( $id, $title, $callback, $page ) {
+  add_settings_section(
+    $id,
+    $title,
+    $callback,
+    $page
+  );
+}
+
+// Function to add a new settings field.
+function slc_add_settings_field( $id, $title, $callback, $page, $section ) {
+  add_settings_field(
+    $id,
+    $title,
+    $callback,
+    $page,
+    $section
+  );
+}
+
+// Callback function for the "Security Plus" section.
+function slc_security_plus_section_callback() {
+  echo '<p>' . __( 'Configure Security Plus settings below.', 'slc-security-plus' ) . '</p>';
+}
+
+// Callback function for the "Enable Security Plus" field.
+function slc_security_plus_enable_callback() {
+  $option_name = 'slc_security_plus_enable';
+  $checkbox_label = __( 'Enable Security Plus', 'slc-security-plus' );
+  $option_value = get_option( $option_name );
+  echo '<input type="checkbox" name="' . $option_name . '" id="' . $option_name . '" value="1"' . checked( 1, $option_value, false ) . '/>';
+  echo '<label for="' . $option_name . '">' . $checkbox_label . '</label>';
+}
+
+/*** fonctions de gestion des cases onglet 2  ***/
+// Function to initialize the sections and fields of the "Security Plus" page.
+// Function to initialize the sections and fields of the "Security Plus" page.
+function slc_security_plus_initialize_options() {
+  ?>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize the "Security Settings" section.
+      var security_settings_section = document.getElementById("slc-security-settings-section");
+      var enable_logging_checkbox = document.getElementById("slc-enable-logging-checkbox");
+      var enable_security_checkbox = document.getElementById("slc-enable-security-checkbox");
+
+      // Add the event listener to the "Enable Logging" checkbox.
+      enable_logging_checkbox.addEventListener("change", function() {
+        if (enable_logging_checkbox.checked) {
+          console.log("Logging enabled");
+        } else {
+          console.log("Logging disabled");
+        }
+      });
+    });
+  </script>
+  <?php
+}
+
+
+// Récupère la case à cocher "Enable Security"
+var enable_security_checkbox = document.getElementById("enable-security-checkbox");
+
+// Ajoute l'écouteur d'événements pour la case à cocher
+enable_security_checkbox.addEventListener("change", function() {
+  if (enable_security_checkbox.checked) {
+    console.log("Security enabled");
+  } else {
+    console.log("Security disabled");
+  }
+});
 
  
-/*
- * Fonction de rappel pour l'affichage du champ "Lettres majuscules requises"
+
+// Function to initialize the sections and fields of the "Password" page.
+/* function slc_password_initialize_options() {
+  // Initialize the "Password Settings" section.
+  var password_settings_section = document.getElementById("slc-password-settings-section");
+  var password_length_slider = document.getElementById("slc-password-length-slider");
+  var password_length_output = document.getElementById("slc-password-length-output");
+
+  // Set the initial password length value.
+  password_length_output.innerHTML = password_length_slider.value;
+
+  // Add the event listener to the password length slider.
+  password_length_slider.addEventListener("input", function() {
+    password_length_output.innerHTML = this.value;
+  });
+}
  */
-function slc_password_uppercase_field_callback( $args ) {
-    $option_name = 'slc_security_options';
-    $options = get_option( $option_name );
-    $checked = isset( $options['slc_password_uppercase'] ) ? $options['slc_password_uppercase'] : '';
 
-    $html = '<input type="checkbox" id="slc_password_uppercase" name="' . $option_name . '[slc_password_uppercase]" value="1"' . checked( 1, $checked, false ) . '/>';
-    $html .= '<label for="slc_password_uppercase">&nbsp;'  . $args['label_for'] . '</label>';
+// Function to initialize the options page.
+function slc_initialize_options() {
+  // Initialize the "Security Plus" page.
+  slc_security_plus_initialize_options();
 
-    echo $html;
+  // Initialize the "Security" page.
+  slc_security_initialize_options();
 }
 
-/*
- * Fonction de rappel pour l'affichage du champ "Lettres minuscules requises"
- */
-function slc_password_lowercase_field_callback( $args ) {
-    $option_name = 'slc_security_options';
-    $options = get_option( $option_name );
-    $checked = isset( $options['slc_password_lowercase'] ) ? $options['slc_password_lowercase'] : '';
-
-    $html = '<input type="checkbox" id="slc_password_lowercase" name="' . $option_name . '[slc_password_lowercase]" value="1"' . checked( 1, $checked, false ) . '/>';
-    $html .= '<label for="slc_password_lowercase">&nbsp;' . $args['label_for'] . '</label>';
-
-    echo $html;
-}
-
-/*
- * Fonction de rappel pour l'affichage du champ "Chiffres requis"
- */
-function slc_password_numbers_field_callback( $args ) {
-    $option_name = 'slc_security_options';
-    $options = get_option( $option_name );
-    $checked = isset( $options['slc_password_numbers'] ) ? $options['slc_password_numbers'] : '';
-
-    $html = '<input type="checkbox" id="slc_password_numbers" name="' . $option_name . '[slc_password_numbers]" value="1"' . checked( 1, $checked, false ) . '/>';
-    $html .= '<label for="slc_password_numbers">&nbsp;' . $args['label_for'] . '</label>';
-
-    echo $html;
-}
-
-/*
- * Fonction de rappel pour l'affichage du champ "Symboles requis"
- */
-function slc_password_symbols_field_callback( $args ) {
-    $option_name = 'slc_security_options';
-    $options = get_option( $option_name );
-    $checked = isset( $options['slc_password_symbols'] ) ? $options['slc_password_symbols'] : '';
-
-    $html = '<input type="checkbox" id="slc_password_symbols" name="' . $option_name . '[slc_password_symbols]" value="1"' . checked( 1, $checked, false ) . '/>';
-    $html .= '<label for="slc_password_symbols">&nbsp;' . $args['label_for'] . '</label>';
-
-    echo $html;
-}
-
-/**
- * Fonction pour ajouter la section "Mots de passe forts" à la page des options de sécurité plus
- */
-function slc_add_strong_passwords_section() {
-    add_settings_section(
-        'slc_strong_passwords_section',
-        __( 'Mots de passe forts', 'slc' ),
-        'slc_strong_passwords_section_description',
-        'slc_security_plus_options_page'
-    );
-    add_settings_field(
-        'slc_password_length',
-        __( 'Longueur minimale du mot de passe', 'slc' ),
-        'slc_password_length_field_callback',
-        'slc_security_plus_options_page',
-        'slc_strong_passwords_section',
-        array(
-            'label_for' => 'slc_password_length',
-        )
-    );
-    add_settings_field(
-        'slc_password_uppercase',
-        __( 'Nécessite une lettre majuscule', 'slc' ),
-        'slc_password_uppercase_field_callback',
-        'slc_security_plus_options_page',
-        'slc_strong_passwords_section',
-        array(
-            'label_for' => 'slc_password_uppercase',
-        )
-    );
-    add_settings_field(
-        'slc_password_lowercase',
-        __( 'Nécessite une lettre minuscule', 'slc' ),
-        'slc_password_lowercase_field_callback',
-        'slc_security_plus_options_page',
-        'slc_strong_passwords_section',
-        array(
-            'label_for' => 'slc_password_lowercase',
-        )
-    );
-    add_settings_field(
-        'slc_password_number',
-        __( 'Nécessite un chiffre', 'slc' ),
-        'slc_password_number_field_callback',
-        'slc_security_plus_options_page',
-        'slc_strong_passwords_section',
-        array(
-            'label_for' => 'slc_password_number',
-        )
-    );
-    add_settings_field(
-        'slc_password_special',
-        __( 'Nécessite un caractère spécial', 'slc' ),
-        'slc_password_special_field_callback',
-        'slc_security_plus_options_page',
-        'slc_strong_passwords_section',
-        array(
-            'label_for' => 'slc_password_special',
-        )
-    );
-}
-add_action( 'admin_init', 'slc_add_strong_passwords_section' );
-
-/**
- * Fonction pour afficher la description de la section "Mots de passe forts"
- */
-function slc_strong_passwords_section_description() {
-    echo '<p>' . __( 'Configurez les paramètres pour les mots de passe forts.', 'slc' ) . '</p>';
-}
-
-/**
- * Fonction de rappel pour afficher le champ de saisie de la longueur minimale du mot de passe
- */
-function slc_password_length_field_callback( $args ) {
-    $options = get_option( 'slc_security_options' );
-    $length = isset( $options['password_length'] ) ? $options['password_length'] : '';
-    ?>
-    <input type="number" min="0" step="1" id="<?php echo esc_attr( $args['label_for'] ); ?>"
-           name="slc_security_options[password_length]" value="<?php echo esc_attr( $length ); ?>">
-    <p class="description">
-        <?php esc_html_e( 'Entrez la longueur minimale souhaitée pour les mots de passe.', 'slc' ); ?>
-    </p>
-    <?php
-}
-
-/**
- * Fonction de rappel pour afficher le champ
-*/
-
-
-
-add_action( 'admin_init', 'slc_add_strong_passwords_section' );
+// Call the initialization function when the DOM is ready.
+document.addEventListener("DOMContentLoaded", function() {
+  slc_initialize_options();
+});
