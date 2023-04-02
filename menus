@@ -1124,13 +1124,135 @@ register_activation_hook( __FILE__, 'slc_activate_plugin' );
 
 /*** Management of Tab 2 ***/
 
-fucntion slc_security_page_callback()fucntion{}
-fucntion slc_security_plus_initialize_options(){}
-fucntion slc_security_headers_checkbox_changed(){}
-fucntion slc_anonymize_messages_checkbox_changed(){}
-fucntion slc_refuse_proxy_checkbox_changed(){}
-fucntion slc_password_security_checkbox_changed(){}
-fucntion slc_blacklist_input_changed(){}
-fucntion slc_whitelist_input_changed(){}
-fucntion slc_login_attempts_input_changed(){}
-fucntion slc_account_lockout_input_changed(){}
+function slc_security_page_callback() {
+  ?>
+    <div class="wrap">
+      <h2><?php _e('Secure Login Customizer - Security', 'slc'); ?></h2>
+      <form method="post" action="options.php">
+        <?php settings_fields('slc_security_options'); ?>
+        <?php do_settings_sections('slc_security'); ?>
+        <?php submit_button(); ?>
+      </form>
+    </div>
+  <?php
+}
+
+// Function to initialize the sections and fields of the "Security Plus" page.
+function slc_security_plus_initialize_options() {
+  // Initialize the "Security Settings" section.
+    ?>
+   <script>
+  var security_settings_section = document.getElementById("slc-security-settings-section");
+  var security_headers_checkbox = document.getElementById("slc-security-headers-checkbox");
+  var anonymize_messages_checkbox = document.getElementById("slc-anonymize-messages-checkbox");
+  var refuse_proxy_checkbox = document.getElementById("slc-refuse-proxy-checkbox");
+  var password_security_checkbox = document.getElementById("slc-password-security-checkbox");
+  var blacklist_input = document.getElementById("slc-blacklist-input");
+  var whitelist_input = document.getElementById("slc-whitelist-input");
+  var login_attempts_input = document.getElementById("slc-login-attempts-input");
+  var account_lockout_input = document.getElementById("slc-account-lockout-input");
+
+  // Add the event listener to the "Security Headers" checkbox.
+  security_headers_checkbox.addEventListener("change", function() {
+    slc_security_headers_checkbox_changed(security_headers_checkbox.checked);
+  });
+};
+
+
+  // Add the event listener to the "Anonymize Messages" checkbox.
+  anonymize_messages_checkbox.addEventListener("change", function() {
+    slc_anonymize_messages_checkbox_changed(anonymize_messages_checkbox.checked);
+  });
+
+  // Add the event listener to the "Refuse Proxy" checkbox.
+  refuse_proxy_checkbox.addEventListener("change", function() {
+    slc_refuse_proxy_checkbox_changed(refuse_proxy_checkbox.checked);
+  });
+
+  // Add the event listener to the "Password Security" checkbox.
+  password_security_checkbox.addEventListener("change", function() {
+    slc_password_security_checkbox_changed(password_security_checkbox.checked);
+  });
+
+  // Add the event listener to the "Blacklist" input.
+  blacklist_input.addEventListener("input", function() {
+    slc_blacklist_input_changed(blacklist_input.value);
+  });
+
+  // Add the event listener to the "Whitelist" input.
+  whitelist_input.addEventListener("input", function() {
+    slc_whitelist_input_changed(whitelist_input.value);
+  });
+
+  // Add the event listener to the "Login Attempts" input.
+  login_attempts_input.addEventListener("input", function() {
+    slc_login_attempts_input_changed(login_attempts_input.value);
+  });
+
+  // Add the event listener to the "Account Lockout" input.
+  account_lockout_input.addEventListener("input", function() {
+    slc_account_lockout_input_changed(account_lockout_input.value);
+  });
+   </script>
+   <?php
+}
+
+function slc_security_headers_checkbox_changed( ) {
+  if (checked) {
+    console.log("Security headers enabled");
+  } else {
+    console.log("Security headers disabled");
+  }
+}
+  
+function slc_anonymize_messages_checkbox_changed( ) {
+  if (checked) {
+    console.log("Anonymize messages enabled");
+  } else {
+    console.log("Anonymize messages disabled");
+  }
+}
+
+ function slc_security_headers_checkbox_changed( ) {
+  if (checked) {
+    console.log("Security headers enabled");
+  } else {
+    console.log("Security headers disabled");
+  }
+}
+
+function slc_anonymize_messages_checkbox_changed( ) {
+  if (checked) {
+    console.log("Anonymize messages enabled");
+  } else {
+    console.log("Anonymize messages disabled");
+  }
+}
+
+function slc_password_security_checkbox_changed( ) {
+  if (checked) {
+    console.log("Password security enabled");
+  } else {
+    console.log("Password security disabled");
+  }
+}
+
+function slc_blacklist_input_changed() {
+  var blacklist_input = document.getElementById("slc-blacklist-input");
+  console.log("Blacklist changed to: " + blacklist_input.value);
+}
+
+function slc_whitelist_input_changed() {
+  var whitelist_input = document.getElementById("slc-whitelist-input");
+  console.log("Whitelist changed to: " + whitelist_input.value);
+}
+
+function slc_login_attempts_input_changed() {
+  var login_attempts_input = document.getElementById("slc-login-attempts-input");
+  console.log("Login attempts changed to: " + login_attempts_input.value);
+}
+
+function slc_account_lockout_input_changed() {
+  var account_lockout_input = document.getElementById("slc-account-lockout-input");
+  console.log("Account lockout time changed to: " + account_lockout_input.value);
+}
