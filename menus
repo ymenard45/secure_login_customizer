@@ -240,8 +240,30 @@ function slc_security_groups_validate( $input ) {
 
 /***  Onglet 2  CHAMP  ***/
  
+ 
+ 
+ 
+ 
 function slc_tab2_settings_init() {
+
+    // Enregistrez la section de réglages pour l'onglet 2
+    add_settings_section(
+        'slc_tab2_section', // Identifiant unique de la section
+        __('Sécurité', 'secure-login-customizer'), // Titre de la section
+        null, // Pas de fonction de rappel pour cette section
+        'slc_tab2' // Identifiant de la page (onglet) sur laquelle la section doit être affichée
+    );
+
+    // Ajoutez les champs de réglages pour l'onglet 2
     add_settings_field(
+        'password_length', // Identifiant unique du champ
+        __('Longueur du mot de passe', 'secure-login-customizer'), // Titre du champ
+        'slc_password_length_render', // Fonction de rappel pour afficher le champ
+        'slc_tab2', // Identifiant de la page (onglet) sur laquelle le champ doit être affiché
+        'slc_tab2_section' // Identifiant de la section à laquelle le champ appartient
+    );
+
+    	add_settings_field(
         'slc_enable_security_headers',
         __( 'Enable Security Headers', 'slc' ),
         'slc_enable_security_headers_callback',
@@ -296,11 +318,65 @@ function slc_tab2_settings_init() {
         'slc_options_group',
         'slc_tab2_section'
     );
+
+    // Enregistrez les réglages de l'onglet 2
+    register_setting(
+        'slc_tab2', // Identifiant de la page (onglet) sur laquelle les réglages doivent être enregistrés
+        'slc_tab2_settings', // Identifiant unique des réglages
+        'slc_tab2_settings_validate_and_sanitize' // Fonction de rappel pour valider et assainir les données de réglages
+    );
+
+
+
+
+
+    add_settings_section(
+    'slc_tab2_section', // Identifiant unique de la section
+    __('Sécurité', 'secure-login-customizer'), // Titre de la section
+    'slc_tab2_content', // Fonction de rappel pour cette section
+    'slc_tab2' // Identifiant de la page (onglet) sur laquelle la section doit être affichée
+);
+
 }
 
 
 /***  Onglet 2  SAISIE ET VALIDATION***/
-  
+ 
+function slc_tab2_content() {
+    ?>
+    <style>
+        #security_options_container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .left_column, .right_column {
+            flex-basis: calc(50% - 10px);
+            box-sizing: border-box;
+            padding: 10px;
+        }
+        .right_column {
+            margin-left: 10px;
+        }
+    </style>
+    <div id="security_options_container">
+        <div class="left_column">
+            <!-- Insérez ici les champs existants de l'onglet 2 -->
+        </div>
+        <div class="right_column">
+            <h3>Options de mots de passe</h3>
+            <label for="password_length">Longueur du mot de passe: <span id="password_length_display">6</span></label>
+            <input type="range" id="password_length" name="password_length" min="6" max="24" value="6">
+            <h4>Contraintes de mot de passe :</h4>
+            <label for="require_uppercase"><input type="checkbox" id="require_uppercase" name="require_uppercase"> Exiger la présence de majuscules</label>
+            <label for="require_lowercase"><input type="checkbox" id="require_lowercase" name="require_lowercase"> Exiger la présence de minuscules</label>
+            <label for="require_digits"><input type="checkbox" id="require_digits" name="require_digits"> Exiger la présence de chiffres</label>
+            <label for="require_special_characters"><input type="checkbox" id="require_special_characters" name="require_special_characters"> Exiger la présence de caractères spéciaux (#*/-+\$ !?;)</label>
+        </div>
+    </div>
+    <?php
+}
+
+ add_action('admin_init', 'slc_tab2_settings_init');
   // Case à cocher "Activer Security Headers" Saisie + Validation
   
   
