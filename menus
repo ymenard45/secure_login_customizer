@@ -165,14 +165,6 @@ function slc_enable_2fa_callback() {
 }
 
 
-/*  function slc_enable_2fa_callback() {
-    $options = get_option( 'slc_options' );
-    $checked = isset( $options['enable_2fa'] ) ? checked( $options['enable_2fa'], true, false ) : '';
-    $html = '<div><input type="checkbox" id="slc_enable_2fa" name="slc_options[enable_2fa]" value="1" ' . $checked . '/>';
-    $html .= '<label for="slc_enable_2fa">' . __( 'Enable 2FA Authentication', 'slc' ) . '</label></div>';
-    echo $html;
-} 
- */
 function slc_enable_2fa_validate( $input ) {
     $valid = array();
     $valid['enable_2fa'] = isset( $input['enable_2fa'] ) ? true : false;
@@ -298,16 +290,7 @@ function slc_tab2_settings_init() {
     );
 }
 
-
-/***  Onglet 2  SAISIE ET VALIDATION***/
-  
-  // Case à cocher "Activer Security Headers" Saisie + Validation
-  
-  
-     // Insérez ici le code pour afficher le contenu de l'onglet SECURITY
  
-  
-  
 function slc_enable_security_headers_callback() {
     $options = get_option( 'slc_options' );
     $checked = isset( $options['enable_security_headers'] ) ? checked( $options['enable_security_headers'], true, false ) : '';
@@ -688,8 +671,6 @@ function slc_plugin_init() {
 add_action( 'admin_init', 'slc_plugin_init' );	
 
 
-/***                       ***/
-
 function ddo_settings_sections( $page ) {
     global $wp_settings_sections, $wp_settings_fields;
 
@@ -718,9 +699,6 @@ function ddo_settings_sections( $page ) {
 	submit_button();
 	</div>';
 }
-
-
-
 
 /*** Fonction de validation des options ***/	
 	
@@ -817,7 +795,6 @@ function slc_options_validate( $input ) {
     return $valid;
 }
 
-
 // Ajout des onglets
 add_action( 'admin_init', 'slc_tab1_settings_init' );
 add_action( 'admin_init', 'slc_tab2_settings_init' );
@@ -847,8 +824,6 @@ function secure_login_customizer_menu() {
     );
 }
 
-
-
 // Add the admin menu
 
 add_action('admin_menu', 'secure_login_customizer_menu');
@@ -860,9 +835,8 @@ function secure_login_customizer_tab_messages() {
 }
 
 /*
-La fonction secure_login_customizer_init utilise register_setting(), 
-add_settings_section() et add_settings_field() pour définir les groupes
-d'options, sections et champs pour chaque onglet. 
+La fonction secure_login_customizer_init utilise register_setting(), add_settings_section() et add_settings_field() pour définir
+les groupes d'options, sections et champs pour chaque onglet. 
 */
 
 function secure_login_customizer_init() {
@@ -977,7 +951,6 @@ function secure_login_customizer_init() {
 
 add_action('admin_init', 'secure_login_customizer_init');
 
-
 /*** ajout lien settings  ***/
 function secure_login_customizer_add_plugin_settings_link( $links ) {
     $settings_link = '<a href="admin.php?page=secure-login-customizer">' . __( 'Settings', 'slc' ) . '</a>';
@@ -985,8 +958,6 @@ function secure_login_customizer_add_plugin_settings_link( $links ) {
     return $links;
 }
 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'secure_login_customizer_add_plugin_settings_link' );
-
-
 
 /*** secure_login_customizer_admin_page ***/
 
@@ -1053,8 +1024,6 @@ function secure_login_customizer_admin_page() {
 	</div>
 	<?php
 }
-
-
 
 function slc_load_textdomain() {
     load_plugin_textdomain( 'slc', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
@@ -1146,11 +1115,7 @@ function register_security_options() {
   'security_options_callback',
   'secure_login_customizer_security_options'
 );
-
 }
-
-
-
 
 // Function to initialize the sections and fields of the "Security Plus" page.
 function slc_security_plus_initialize_options() {
@@ -1300,13 +1265,11 @@ function check_and_apply_security_headers() {
 add_action( 'wp_loaded', 'check_and_apply_security_headers' );
 
 
-
  function save_proxy_state() {
     $value = isset( $_POST['secure_login_customizer_proxy'] ) ? 1 : 0;
     update_option( 'secure_login_customizer_proxy', $value );
 }
 add_action( 'admin_post_save_proxy_state', 'save_proxy_state' );
-
 
 // Ajouter le bouton pour afficher le pop-up
 // Include popup.php file
@@ -1318,35 +1281,7 @@ function add_password_popup_button() {
 }
 add_action('admin_enqueue_scripts', 'add_password_popup_button');
 
-// Ajouter le fichier JavaScript pour le pop-up
-/* function add_password_popup_script() {
-  wp_enqueue_script('password-popup-script', plugin_dir_url(__FILE__) . 'password-popup.js', array('jquery', 'jquery-ui-dialog'));
-}
-add_action('admin_enqueue_scripts', 'add_password_popup_script');  */
-
-// Enregistrer les options de complexité de mot de passe
-/* function password_popup_save_options() {
-  if ( ! current_user_can( 'manage_options' ) ) {
-    wp_die( 'Vous n\'êtes pas autorisé à accéder à cette page.' );
-  }
-
-  $options = array(
-    'length' => sanitize_text_field($_POST['length']),
-    'uppercase' => isset($_POST['uppercase']) ? true : false,
-    'lowercase' => isset($_POST['lowercase']) ? true : false,
-    'digit' => isset($_POST['digit']) ? true : false,
-    'symbol' => isset($_POST['symbol']) ? true : false
-  );
-
-  update_option('password_complexity_options', $options);
-
-  wp_die();
-}
-add_action('wp_ajax_password_popup_save_options', 'password_popup_save_options');
-add_action('wp_ajax_nopriv_password_popup_save_options', 'password_popup_save_options');
- */
-
-/**  Focntions pour les optiosn de sécurité  **/
+/**  Fonctions pour les optiosn de sécurité  **/
 function password_length_callback() {
   $options = get_option( 'secure_login_customizer_security_options' );
   $length = isset( $options['password_length'] ) ? $options['password_length'] : '';
@@ -1355,14 +1290,6 @@ function password_length_callback() {
 
 function security_options_callback() {
   echo '<p>Choisissez les options de sécurité pour votre site :</p>';
-}
-
-function security_options_sanitize( $input ) {
-  $sanitized_input = array();
-  if ( isset( $input['password_length'] ) ) {
-    $sanitized_input['password_length'] = intval( $input['password_length'] );
-  }
-  return $sanitized_input;
 }
 
 function password_complexity_callback() {
@@ -1504,7 +1431,6 @@ function save_password_popup_options() {
 add_action('wp_ajax_password_popup_save_options', 'save_password_popup_options');
 add_action('wp_ajax_nopriv_password_popup_save_options', 'save_password_popup_options');
 
- 
  /***  Fin des  fonctions pour sauvegarder les options des mots de passe  ***/  
  
 // Si la case à cocher 'Interdire les Mots de passe à faible sécurité' est cochée, afficher les options de configuration
@@ -1645,54 +1571,9 @@ update_option( 'secure_login_customizer_login_lockout_duration', $duration );
 }
 }
 
-/*** Fonctions pour gérer les options de mots de passe ***/
-
-function password_complexity_options_callback() {
-  echo '<button id="password-complexity-btn" class="button button-secondary">Modifier les options de complexité de mot de passe</button>';
-}
-
-function password_complexity_popup_callback() {
-  ?>
-  <div id="password-complexity-popup" class="popup">
-    <form id="password-complexity-popup-form">
-      <label for="password-length">Longueur du mot de passe (entre 7 et 34 caractères) :</label>
-      <input type="number" id="password-length" name="password-length" min="7" max="34" required>
-      <br>
-      <label for="password-uppercase">Présence de majuscules :</label>
-      <input type="checkbox" id="password-uppercase" name="password-uppercase">
-      <br>
-      <label for="password-lowercase">Présence de minuscules :</label>
-      <input type="checkbox" id="password-lowercase" name="password-lowercase">
-      <br>
-      <label for="password-digit">Présence de chiffres :</label>
-      <input type="checkbox" id="password-digit" name="password-digit">
-      <br>
-      <label for="password-symbol">Présence de symboles :</label>
-      <input type="checkbox" id="password-symbol" name="password-symbol">
-      <br>
-      <input type="submit" value="Enregistrer les options">
-    </form>
-  </div>
-  <?php
-}
-
-function register_security_options() {
-  // Code pour enregistrer les options de sécurité et ajouter la section et les champs de saisie
-}
-
 function secure_login_customizer_add_menu() {
   // Code pour ajouter le menu et la page des options de sécurité
 }
-
-function register_security_options() {
-  // Code pour enregistrer les options de sécurité et ajouter la section et les champs de saisie
-}
-
-// Ajouter un bouton dans la section des options de sécurité pour ouvrir la pop-up des options de définition de mot de passe
-function password_complexity_options_callback() {
-  echo '<button id="password-complexity-btn" class="button button-secondary">Modifier les options de complexité de mot de passe</button>';
-}
-
 
 // Afficher la pop-up des options de définition de mot de passe
 function password_complexity_popup_callback() {
@@ -1731,72 +1612,6 @@ function password_complexity_save_options_callback() {
   wp_die();
 }
 
-function add_password_complexity_popup_css() {
-  echo '<style>';
-  echo '.popup {display: none; position: fixed; z-index: 1; left: 0; top: 0;}';
-  echo '</style>';
-}
-
-function add_password_complexity_popup() {
-?>
-  <div id="password-popup" style="display:none;">
-    <h2>Options de complexité de mot de passe</h2>
-    <p>Saisir les options de complexité de mot de passe :</p>
-    <form id="password-popup-form">
-      <label for="password-length">Longueur du mot de passe (entre 7 et 34 caractères) :</label>
-      <input type="number" id="password-length" name="password-length" min="7" max="34" required>
-      <br>
-      <label for="password-uppercase">Présence de majuscules :</label>
-      <input type="checkbox" id="password-uppercase" name="password-uppercase">
-      <br>
-      <label for="password-lowercase">Présence de minuscules :</label>
-      <input type="checkbox" id="password-lowercase" name="password-lowercase">
-      <br>
-      <label for="password-digit">Présence de chiffres :</label>
-      <input type="checkbox" id="password-digit" name="password-digit">
-      <br>
-      <label for="password-symbol">Présence de symboles :</label>
-      <input type="checkbox" id="password-symbol" name="password-symbol">
-      <br>
-      <input type="submit" value="Enregistrer les options">
-    </form>
-  </div>
-<?php
-}
-
-function add_password_complexity_popup_js() {
-?>
-  <script>
-    jQuery(document).ready(function($) {
-      $('#password-popup-form').submit(function(event) {
-        event.preventDefault();
-        var length = $('#password-length').val();
-        var uppercase = $('#password-uppercase').is(":checked");
-        var lowercase = $('#password-lowercase').is(":checked");
-        var digit = $('#password-digit').is(":checked");
-        var symbol = $('#password-symbol').is(":checked");
-        
-        var data = {
-          'action': 'password_popup_save_options',
-          'length': length,
-          'uppercase': uppercase,
-          'lowercase': lowercase,
-          'digit': digit,
-          'symbol': symbol
-        };
-        
-        jQuery.post(ajaxurl, data, function(response) {
-          alert('Options enregistrées avec succès');
-        });
-        
-        $('#password-popup').hide();
-      });
-    });
-  </script>
-<?php
-}
-
-
 function add_password_complexity_popup_html() {
   echo '<div id="password-complexity-popup" class="popup">';
   echo '<form id="password-complexity-popup-form">';
@@ -1820,32 +1635,31 @@ function add_password_complexity_popup_html() {
   echo '</div>';
 }
 
-function add_password_complexity_popup_css() {
-  echo '<style>';
-  echo '.popup {display: none; position: fixed; z-index: 1; left: 0; top: 0
 function add_password_complexity_popup() {
 ?>
-  <div id="password-popup" style="display:none;">
-    <h2>Options de complexité de mot de passe</h2>
-    <p>Saisir les options de complexité de mot de passe :</p>
-    <form id="password-popup-form">
-      <label for="password-length">Longueur du mot de passe (entre 7 et 34 caractères) :</label>
-      <input type="number" id="password-length" name="password-length" min="7" max="34" required>
-      <br>
-      <label for="password-uppercase">Présence de majuscules :</label>
-      <input type="checkbox" id="password-uppercase" name="password-uppercase">
-      <br>
-      <label for="password-lowercase">Présence de minuscules :</label>
-      <input type="checkbox" id="password-lowercase" name="password-lowercase">
-      <br>
-      <label for="password-digit">Présence de chiffres :</label>
-      <input type="checkbox" id="password-digit" name="password-digit">
-      <br>
-      <label for="password-symbol">Présence de symboles :</label>
-      <input type="checkbox" id="password-symbol" name="password-symbol">
-      <br>
-      <input type="submit" value="Enregistrer les options">
-    </form>
+  <div id="password-popup" class="popup">
+    <div class="popup-content">
+      <h2>Options de complexité de mot de passe</h2>
+      <p>Saisir les options de complexité de mot de passe :</p>
+      <form id="password-popup-form">
+        <label for="password-length">Longueur du mot de passe (entre 7 et 34 caractères) :</label>
+        <input type="number" id="password-length" name="password-length" min="7" max="34" required>
+        <br>
+        <label for="password-uppercase">Présence de majuscules :</label>
+        <input type="checkbox" id="password-uppercase" name="password-uppercase">
+        <br>
+        <label for="password-lowercase">Présence de minuscules :</label>
+        <input type="checkbox" id="password-lowercase" name="password-lowercase">
+        <br>
+        <label for="password-digit">Présence de chiffres :</label>
+        <input type="checkbox" id="password-digit" name="password-digit">
+        <br>
+        <label for="password-symbol">Présence de symboles :</label>
+        <input type="checkbox" id="password-symbol" name="password-symbol">
+        <br>
+        <input type="submit" value="Enregistrer les options">
+      </form>
+    </div>
   </div>
 <?php
 }
@@ -1882,34 +1696,9 @@ function add_password_complexity_popup_js() {
 <?php
 }
 
-
 function add_password_popup_ajax() {
     wp_enqueue_script( 'password-popup-ajax', plugin_dir_url( __FILE__ ) . 'js/password-popup-ajax.js', array( 'jquery' ) );
     wp_localize_script( 'password-popup-ajax', 'password_popup_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
-}
-
-function password_popup_ajax_callback() {
-    if ( ! isset( $_POST['length'] ) || ! isset( $_POST['uppercase'] ) || ! isset( $_POST['lowercase'] ) || ! isset( $_POST['digit'] ) || ! isset( $_POST['symbol'] ) ) {
-        wp_send_json_error( 'Invalid request.' );
-    }
-
-    $length = intval( $_POST['length'] );
-    $uppercase = boolval( $_POST['uppercase'] );
-    $lowercase = boolval( $_POST['lowercase'] );
-    $digit = boolval( $_POST['digit'] );
-    $symbol = boolval( $_POST['symbol'] );
-
-    $password_complexity_options = array(
-        'length' => $length,
-        'uppercase' => $uppercase,
-        'lowercase' => $lowercase,
-        'digit' => $digit,
-        'symbol' => $symbol
-    );
-
-    update_option( 'secure_login_customizer_password_complexity_options', $password_complexity_options );
-
-    wp_send_json_success( 'Options saved successfully.' );
 }
 
 function password_complexity_popup_css() {
@@ -1967,7 +1756,6 @@ function password_popup_ajax_callback() {
 	}
 	
 	$options = get_option( 'secure_login_customizer_security_options' );
-	
 	$options['password_complexity_length'] = isset( $_POST['length'] ) ? sanitize_text_field( $_POST['length'] ) : '';
 	$options['password_complexity_uppercase'] = isset( $_POST['uppercase'] ) ? true : false;
 	$options['password_complexity_lowercase'] = isset( $_POST['lowercase'] ) ? true : false;
@@ -2037,16 +1825,16 @@ function add_password_complexity_options_js() {
 }
 
 function add_password_complexity_popup_css() {
-  wp_enqueue_style(
-    'password-complexity-popup',
-    plugins_url('/css/password-complexity-popup.css', __FILE__)
-  );
+  echo '<style>';
+  echo '.popup {display: none; position: fixed; z-index: 1; left: 0; top: 0}';
+  echo '.popup-content {background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 50%; min-width: 400px;}';
+  echo '</style>';
 }
 
-function add_password_popup_ajax() {
+/* function add_password_popup_ajax() {
   add_action('wp_ajax_password_popup_save_options', 'password_popup_save_options');
 }
-
+ */
 // Enregistrement des options du popup de complexité de mot de passe
 add_action( 'wp_ajax_password_popup_save_options', 'password_popup_save_options' );
 
