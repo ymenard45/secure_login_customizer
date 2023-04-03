@@ -1288,18 +1288,27 @@ add_action( 'admin_post_save_proxy_state', 'save_proxy_state' );
 } */
 add_action( 'admin_post_save_password_security_state', 'save_password_security_state' );
 
- 
+
+// Ajouter le bouton pour afficher le pop-up
+// Include popup.php file
+include( plugin_dir_path( __FILE__ ) . 'popup.php' );
+function add_password_popup_button() {
+  ?>
+  <button id="password-popup-btn">Options de complexité de mot de passe</button>
+  <?php
+}
+add_action('admin_enqueue_scripts', 'add_password_popup_button');
+
+// Ajouter le fichier JavaScript pour le pop-up
+function add_password_popup_script() {
+  wp_enqueue_script('password-popup-script', plugin_dir_url(__FILE__) . 'password-popup.js', array('jquery', 'jquery-ui-dialog'));
+}
+add_action('admin_enqueue_scripts', 'add_password_popup_script'); 
 
 function secure_login_customizer_tab_security() {
 
-	// Include popup.php file
-    include( plugin_dir_path( __FILE__ ) . 'popup.php' );
+	
 	?>
-	<form method="post" action="options.php">
-		<?php settings_fields('secure_login_customizer_security_options'); ?>
-		<?php do_settings_sections('secure_login_customizer_security_options'); ?>
-		<input type="submit" class="button-primary" value="<?php esc_attr_e('Save Changes'); ?>" />
-	</form>
     <form method="post" action="options.php">
         <?php settings_fields( 'secure_login_customizer_security_options' ); ?>
         <?php do_settings_sections( 'secure_login_customizer_security' ); ?>
@@ -1338,11 +1347,11 @@ function secure_login_customizer_tab_security() {
 			<tr>
 				<th scope="row"><?php _e('Interdire les mots de passe à faible sécurité', 'slc'); ?></th>
 				<td>
-					<?php $password_security_state = get_option( 'secure_login_customizer_password_security' ); ?>
+				   	<?php $password_security_state = get_option( 'secure_login_customizer_password_security' ); ?>
 					<label for="secure_login_customizer_password_security">
-						
-						<input type="checkbox" id="secure_login_customizer_password_security" name="secure_login_customizer_password_security" <?php checked( $password_security_state, 1 ); ?>>
-						<?php _e('Interdire les mots de passe à faible sécurité', 'slc'); ?>
+					<input type="checkbox" id="secure_login_customizer_password_security" name="secure_login_customizer_password_security" <?php checked( $password_security_state, 1 ); ?>>
+						<?php _e('Cocher la case pour activer, cliquez sur le bouton à droite pour les options', 'slc'); ?>
+						<?php add_password_popup_button(); ?>	
 					</label>
 				</td>
 			</tr>
