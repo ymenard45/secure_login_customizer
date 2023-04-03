@@ -842,7 +842,8 @@ function secure_login_customizer_menu() {
         'manage_options',
         'secure-login-customizer',
         'secure_login_customizer_admin_page',
-		'dashicons-shield'
+		'',
+		30
     );
 }
 
@@ -1127,6 +1128,12 @@ function slc_security_page_callback() {
   <?php
 }
 
+function register_security_options() {
+  register_setting( 'secure_login_customizer_security_options_group', 'secure_login_customizer_security_options', 'security_options_sanitize' );
+  add_settings_section( 'security_options_section', 'Security Options', 'security_options_section_callback', 'secure_login_customizer_security_options' );
+  add_settings_field( 'password_complexity_options', 'Complexité de mot de passe', 'password_complexity_options_callback', 'secure_login_customizer_security_options', 'security_options_section' );
+}
+
 // Function to initialize the sections and fields of the "Security Plus" page.
 function slc_security_plus_initialize_options() {
   // Initialize the "Security Settings" section.
@@ -1282,12 +1289,6 @@ add_action( 'wp_loaded', 'check_and_apply_security_headers' );
 }
 add_action( 'admin_post_save_proxy_state', 'save_proxy_state' );
 
-/* function save_password_security_state() {
-    $value = isset( $_POST['secure_login_customizer_password_security'] ) ? 1 : 0;
-    update_option( 'secure_login_customizer_password_security', $value );
-} */
-add_action( 'admin_post_save_password_security_state', 'save_password_security_state' );
-
 
 // Ajouter le bouton pour afficher le pop-up
 // Include popup.php file
@@ -1304,6 +1305,29 @@ function add_password_popup_script() {
   wp_enqueue_script('password-popup-script', plugin_dir_url(__FILE__) . 'password-popup.js', array('jquery', 'jquery-ui-dialog'));
 }
 add_action('admin_enqueue_scripts', 'add_password_popup_script'); 
+
+// Enregistrer les options de complexité de mot de passe
+function password_popup_save_options() {
+  if ( ! current_user_can( 'manage_options' ) ) {
+    wp_die( 'Vous n\'êtes pas autorisé à accéder à cette page.' );
+  }
+
+  $options = array(
+    'length' => sanitize_text_field($_POST['length']),
+    'uppercase' => isset($_POST['uppercase']) ? true : false,
+    'lowercase' => isset($_POST['lowercase']) ? true : false,
+    'digit' => isset($_POST['digit']) ? true : false,
+    'symbol' => isset($_POST['symbol']) ? true : false
+  );
+
+  update_option('password_complexity_options', $options);
+
+  wp_die();
+}
+add_action('wp_ajax_password_popup_save_options', 'password_popup_save_options');
+add_action('wp_ajax_nopriv_password_popup_save_options', 'password_popup_save_options');
+
+
 
 function secure_login_customizer_tab_security() {
 
@@ -1517,9 +1541,12 @@ if ( get_option( 'secure_login_customizer_password_security' ) ) {
 
 // Action: Enregistrer la valeur de la case à cocher 'Interdire les Mots de passe à faible sécurité'
 function save_password_security_state() {
-$value = isset( $_POST['secure_login_customizer_password_security'] ) ? 1 : 0;
-update_option( 'secure_login_customizer_password_security', $value );
-}
+     if ( ! current_user_can( 'manage_options' ) ) {
+	wp_die( 'Vous n\'êtes pas autorisé à accéder à cette page.' );
+	}
+	$value = isset( $_POST['secure_login_customizer_password_security'] ) ? 1 : 0;
+	update_option( 'secure_login_customizer_password_security', $value );
+	}
 add_action( 'admin_post_save_password_security_state', 'save_password_security_state' );
 
  
