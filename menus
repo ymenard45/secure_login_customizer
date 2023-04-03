@@ -24,6 +24,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Initialisation :
 add_action( 'admin_menu', 'slc_add_admin_menu' );
 add_action( 'admin_init', 'slc_settings_init' );
+add_action('admin_init', 'slc_tab2_settings_init');
+add_action('admin_init', 'slc_tab3_settings_init');
+add_action('admin_init', 'slc_tab4_settings_init');
+add_action('admin_init', 'slc_tab5_settings_init');
 
 function slc_add_admin_menu() {
     add_options_page(
@@ -384,11 +388,9 @@ function slc_tab2_content() {
     </div>
     
 	<?php 
-	settings_fields('slc_tab2'); 
-    do_settings_sections('slc_tab2'); 
+	 
 }
  
-add_action('admin_init', 'slc_tab2_settings_init');
   // Case à cocher "Activer Security Headers" Saisie + Validation
   
   
@@ -725,7 +727,7 @@ function slc_tab4_settings_init() {
 	);
     // Ajoutez ici les champs pour l'onglet 4
 }
-add_action('admin_init', 'slc_tab4_settings_init');
+ 
 
 	
  	
@@ -1111,9 +1113,6 @@ function secure_login_customizer_init() {
 
 add_action('admin_init', 'secure_login_customizer_init');
 
-
-
-
 /*** ajout lien settings  ***/
 function secure_login_customizer_add_plugin_settings_link( $links ) {
     $settings_link = '<a href="admin.php?page=secure-login-customizer">' . __( 'Settings', 'slc' ) . '</a>';
@@ -1121,8 +1120,6 @@ function secure_login_customizer_add_plugin_settings_link( $links ) {
     return $links;
 }
 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'secure_login_customizer_add_plugin_settings_link' );
-
-
 
 /*** secure_login_customizer_admin_page ***/
 
@@ -1254,5 +1251,4 @@ function slc_activate_plugin() {
 // Activation du plugin
 register_activation_hook( __FILE__, 'slc_activate_plugin' );
 
-add_action('admin_init', 'slc_tab2_settings_init');
-add_action('admin_init', 'slc_tab4_settings_init');
+
