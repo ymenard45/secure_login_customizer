@@ -56,29 +56,34 @@ function slc_settings_init() {
     );
 
     // Ajouter les onglets
-	add_settings_section( 'slc_tab1_section', __( '2FA Settings', 'slc' ), 'slc_tab1_callback', 'slc_options_group' );
+	add_settings_section( 
+		'slc_tab1_section',
+		__( '2FA Settings', 'slc' ),
+		'slc_tab1_callback',
+		'slc_options_group' 
+	);
 
     add_settings_section(
         'slc_tab2_section',
-        __( 'Tab 2', 'slc' ),
+        __( 'Tab-2', 'slc' ),
         'slc_tab2_section_callback',
         'slc_options_group'
     );
     add_settings_section(
         'slc_tab3_section',
-        __( 'Tab 3', 'slc' ),
+        __( 'Tab-3', 'slc' ),
         'slc_tab3_section_callback',
         'slc_options_group'
     );
     add_settings_section(
         'slc_tab4_section',
-        __( 'Tab 4', 'slc' ),
+        __( 'Tab-4', 'slc' ),
         'slc_tab4_section_callback',
         'slc_options_group'
     );
     add_settings_section(
         'slc_tab5_section',
-        __( 'Tab 5', 'slc' ),
+        __( 'Tab-5', 'slc' ),
         'slc_tab5_section_callback',
         'slc_options_group'
     );
@@ -200,7 +205,6 @@ function slc_enable_backup_code_validate( $input ) {
     return $valid;
 }
 
-
 // Case à cocher "Interdire la désactivation de 2FA Authentication"  Saisie + validation
 
 function slc_disable_2fa_deactivation_callback() {
@@ -217,7 +221,6 @@ function slc_disable_2fa_deactivation_validate( $input ) {
     return $valid;
 }
 
-
 // Case à cocher de sélection des groupes de sécurité ou 2FA sera activée   Saisie + validation
 function slc_security_groups_callback() {
     $options = get_option( 'slc_options' );
@@ -231,7 +234,6 @@ function slc_security_groups_callback() {
     echo $html;
 }
 
-
 function slc_security_groups_validate( $input ) {
     $valid = array();
     if ( isset( $input['security_groups'] ) ) {
@@ -240,14 +242,9 @@ function slc_security_groups_validate( $input ) {
     }
     return $valid; 
 }	
-	
 
 /***  Onglet 2  CHAMP  ***/
- 
- 
- 
- 
- 
+  
 function slc_tab2_settings_init() {
 
     // Enregistrez la section de réglages pour l'onglet 2
@@ -330,19 +327,13 @@ function slc_tab2_settings_init() {
         'slc_tab2_settings_validate_and_sanitize' // Fonction de rappel pour valider et assainir les données de réglages
     );
 
-
-
-
-
     add_settings_section(
     'slc_tab2_section', // Identifiant unique de la section
     __('Sécurité', 'secure-login-customizer'), // Titre de la section
     'slc_tab2_content', // Fonction de rappel pour cette section
     'slc_tab2' // Identifiant de la page (onglet) sur laquelle la section doit être affichée
 );
-
 }
-
 
 /***  Onglet 2  SAISIE ET VALIDATION***/
  
@@ -388,16 +379,11 @@ function slc_tab2_content() {
     </div>
     
 	<?php 
-	 
 }
  
   // Case à cocher "Activer Security Headers" Saisie + Validation
-  
-  
-     // Insérez ici le code pour afficher le contenu de l'onglet SECURITY
- 
-  
-  
+  // Insérez ici le code pour afficher le contenu de l'onglet SECURITY
+   
 function slc_enable_security_headers_callback() {
     $options = get_option( 'slc_options' );
     $checked = isset( $options['enable_security_headers'] ) ? checked( $options['enable_security_headers'], true, false ) : '';
@@ -614,8 +600,6 @@ function slc_logo_url_validate( $input ) {
     return $valid;
 }
 
- 
-
 // Zone de saisie "Url pour desktop"
 function slc_desktop_url_callback() {
     $options = get_option( 'slc_options' );
@@ -700,8 +684,6 @@ $valid['transparency_level'] = isset( $input['transparency_level'] ) ? absint( $
 return $valid;
 }
 
-
-
 /***  Onglet 4 ***/
 
 function slc_tab4_settings_init() {
@@ -728,11 +710,6 @@ function slc_tab4_settings_init() {
     // Ajoutez ici les champs pour l'onglet 4
 }
  
-
-	
- 	
-
-
 function slc_render_url_field($args) {
     $options = get_option('slc_tab4_options');
     $value = isset($options[$args['label_for']]) ? $options[$args['label_for']] : '';
@@ -755,7 +732,6 @@ function slc_tab4_content() {
     <?php
 }
 
-	
 /*** Onglet 5 ***/	
 
 function slc_tab5_settings_init() {
@@ -855,8 +831,6 @@ function ddo_settings_sections( $page ) {
 	submit_button();
 	</div>';
 }
-
-
 
 
 /*** Fonction de validation des options ***/	
@@ -983,11 +957,8 @@ function secure_login_customizer_menu() {
     );
 }
 
-
-
 // Add the admin menu
 add_action('admin_menu', 'secure_login_customizer_menu');
-
 
 function secure_login_customizer_tab_messages() {
     // Insérez ici le code pour afficher le contenu de l'onglet "Customisation Messages"
