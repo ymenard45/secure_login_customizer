@@ -373,9 +373,13 @@ function slc_tab2_content() {
             <label for="require_special_characters"><input type="checkbox" id="require_special_characters" name="require_special_characters"> Exiger la présence de caractères spéciaux (#*/-+\$ !?;)</label>
         </div>
     </div>
-    <?php
+    
+	<?php 
+	settings_fields('slc_tab2'); 
+    do_settings_sections('slc_tab2'); 
 }
-
+ 
+  
  add_action('admin_init', 'slc_tab2_settings_init');
   // Case à cocher "Activer Security Headers" Saisie + Validation
   
@@ -690,15 +694,57 @@ return $valid;
 
 /***  Onglet 4 ***/
 
-	function slc_tab4_settings_init() {
+function slc_tab4_settings_init() {
+    register_setting('slc_tab4', 'slc_tab4_options');
+
+    add_settings_section(
+        'slc_tab4_section',
+        __('Customisation message', 'secure-login-customizer'),
+        'slc_tab4_content',
+        'slc_tab4'
+    );
+
 	add_settings_field(
-	'slc_qr_code_page_url',
-	__( 'QR Code Page URL', 'slc' ),
-	'slc_qr_code_page_url_callback',
-	'slc_options_group',
-	'slc_tab4_section'
+		'url_logo',
+		__('URL du logo', 'secure-login-customizer'),
+		'slc_render_url_field',
+		'slc_tab4',
+		'slc_tab4_section',
+		[
+			'label_for' => 'url_logo',
+			'maxlength' => 75,
+		]
 	);
-	}
+    // Ajoutez ici les champs pour l'onglet 4
+}
+add_action('admin_init', 'slc_tab4_settings_init');
+
+	
+ 	
+
+
+function slc_render_url_field($args) {
+    $options = get_option('slc_tab4_options');
+    $value = isset($options[$args['label_for']]) ? $options[$args['label_for']] : '';
+
+    printf(
+        '<input type="url" id="%1$s" name="slc_tab4_options[%1$s]" value="%2$s" maxlength="%3$s">',
+        esc_attr($args['label_for']),
+        esc_url($value),
+        esc_attr($args['maxlength'])
+    );
+}
+	
+function slc_tab4_content() {
+    ?>
+    <form action="options.php" method="post">
+        <?php settings_fields('slc_tab4'); ?>
+        <?php do_settings_sections('slc_tab4'); ?>
+        <?php submit_button(); ?>
+    </form>
+    <?php
+}
+
 	
 /*** Onglet 5 ***/	
 
