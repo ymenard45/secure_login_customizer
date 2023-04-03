@@ -344,6 +344,14 @@ function slc_tab2_settings_init() {
  
 function slc_tab2_content() {
     ?>
+    <form action="options.php" method="post">
+        <?php settings_fields('slc_tab2'); ?>
+        <?php do_settings_sections('slc_tab2'); ?>
+        <?php submit_button(); ?>
+    </form>
+    <?php
+	
+	?>
     <style>
         #security_options_container {
             display: flex;
@@ -358,6 +366,7 @@ function slc_tab2_content() {
             margin-left: 10px;
         }
     </style>
+	
     <div id="security_options_container">
         <div class="left_column">
             <!-- Insérez ici les champs existants de l'onglet 2 -->
@@ -379,8 +388,7 @@ function slc_tab2_content() {
     do_settings_sections('slc_tab2'); 
 }
  
-  
- add_action('admin_init', 'slc_tab2_settings_init');
+add_action('admin_init', 'slc_tab2_settings_init');
   // Case à cocher "Activer Security Headers" Saisie + Validation
   
   
@@ -697,12 +705,12 @@ return $valid;
 function slc_tab4_settings_init() {
     register_setting('slc_tab4', 'slc_tab4_options');
 
-    add_settings_section(
-        'slc_tab4_section',
-        __('Customisation message', 'secure-login-customizer'),
-        'slc_tab4_content',
-        'slc_tab4'
-    );
+	add_settings_section(
+		'slc_tab4_section', // Identifiant unique de la section
+		__('Customisation message', 'secure-login-customizer'), // Titre de la section
+		'slc_tab4_content', // Fonction de rappel pour cette section
+		'slc_tab4' // Identifiant de la page (onglet) sur laquelle la section doit être affichée
+	);
 
 	add_settings_field(
 		'url_logo',
@@ -1246,3 +1254,5 @@ function slc_activate_plugin() {
 // Activation du plugin
 register_activation_hook( __FILE__, 'slc_activate_plugin' );
 
+add_action('admin_init', 'slc_tab2_settings_init');
+add_action('admin_init', 'slc_tab4_settings_init');
