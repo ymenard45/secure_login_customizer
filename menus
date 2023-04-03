@@ -1288,8 +1288,18 @@ add_action( 'admin_post_save_proxy_state', 'save_proxy_state' );
 } */
 add_action( 'admin_post_save_password_security_state', 'save_password_security_state' );
 
+ 
+
 function secure_login_customizer_tab_security() {
-    ?>
+
+	// Include popup.php file
+    include( plugin_dir_path( __FILE__ ) . 'popup.php' );
+	?>
+	<form method="post" action="options.php">
+		<?php settings_fields('secure_login_customizer_security_options'); ?>
+		<?php do_settings_sections('secure_login_customizer_security_options'); ?>
+		<input type="submit" class="button-primary" value="<?php esc_attr_e('Save Changes'); ?>" />
+	</form>
     <form method="post" action="options.php">
         <?php settings_fields( 'secure_login_customizer_security_options' ); ?>
         <?php do_settings_sections( 'secure_login_customizer_security' ); ?>
@@ -1330,13 +1340,34 @@ function secure_login_customizer_tab_security() {
 				<td>
 					<?php $password_security_state = get_option( 'secure_login_customizer_password_security' ); ?>
 					<label for="secure_login_customizer_password_security">
+						
 						<input type="checkbox" id="secure_login_customizer_password_security" name="secure_login_customizer_password_security" <?php checked( $password_security_state, 1 ); ?>>
 						<?php _e('Interdire les mots de passe à faible sécurité', 'slc'); ?>
 					</label>
 				</td>
 			</tr>
 <?php if ( $password_security_state ) : ?>
-    <tr>
+    <button id="password-popup-btn">Options de complexité de mot de passe</button>
+	<script>
+		  jQuery(document).ready(function($) {
+			$('#password-popup-btn').click(function() {
+			  $('#password-popup').dialog({
+				width: 400,
+				modal: true,
+				title: 'Options de complexité de mot de passe',
+				buttons: {
+				  "Enregistrer les options": function() {
+					$('#password-popup-form').submit();
+				  },
+				  "Annuler": function() {
+					$(this).dialog('close');
+				  }
+				}
+			  });
+			});
+		  });
+</script>
+    <?php/* <tr>
         <th scope="row"><?php _e('Configuration des règles de sécurité des mots de passe', 'slc'); ?></th>
         <td>
             <label for="secure_login_customizer_password_length"><?php _e('Nombre de caractères minimum', 'slc'); ?></label>
@@ -1362,7 +1393,7 @@ function secure_login_customizer_tab_security() {
             <input type="checkbox" id="secure_login_customizer_password_special_chars" name="secure_login_customizer_password_special_chars" <?php checked( get_option( 'secure_login_customizer_password_special_chars', true ) ); ?>>
             <label for="secure_login_customizer_password_special_chars"><?php _e('Doit contenir des caractères spéciaux', 'slc'); ?></label>
         </td>
-    </tr>
+    </tr> */
 	<?php endif; ?>
     <tr>
         <th scope="row"><?php _e('Liste noire d\'IP', 'slc'); ?></th>
@@ -1403,6 +1434,37 @@ function secure_login_customizer_tab_security() {
 </form>
 <?php
 }
+ 
+ /*** fonctions pour sauvegarder les options des mots de passe  ***/
+ 
+ // Enregistrer les options de complexité de mot de passe
+function save_password_popup_options() {
+  // Vérifiez si l'utilisateur est autorisé à effectuer cette action
+  if (!current_user_can('manage_options')) {
+    wp_die('Vous n\'êtes pas autorisé à effectuer cette action.');
+  }
+
+  // Vérifiez si les données sont valides
+  $length = isset($_POST['length']) ? absint($_POST['length']) : 12;
+  $uppercase = isset($_POST['uppercase']) ? true : false;
+  $lowercase = isset($_POST['lowercase']) ? true : false;
+  $digit = isset($_POST['digit']) ? true : false;
+  $symbol = isset($_POST['symbol']) ? true : false;
+
+  // Enregistrer les options
+  update_option('password_length', $length);
+  update_option('password_uppercase', $uppercase);
+  update_option('password_lowercase', $lowercase);
+  update_option('password_digit', $digit);
+  update_option('password_symbol', $symbol);
+
+  die();
+}
+add_action('wp_ajax_password_popup_save_options', 'save_password_popup_options');
+add_action('wp_ajax_nopriv_password_popup_save_options', 'save_password_popup_options');
+
+ 
+ /***  Fin des  fonctions pour sauvegarder les options des mots de passe  ***/  
  
 // Si la case à cocher 'Interdire les Mots de passe à faible sécurité' est cochée, afficher les options de configuration
 function secure_login_customizer_password_security_options() {
